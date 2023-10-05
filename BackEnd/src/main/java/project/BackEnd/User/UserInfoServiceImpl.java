@@ -11,7 +11,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Autowired
     private UserInfoRepository userInfoRepository;
 
-
     @Override
     public UserInfo saveUserInfo(UserInfo userInfo) {
         return userInfoRepository.save(userInfo);
@@ -19,6 +18,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public List<UserInfo> getAllUserInfos() {
-        return null;
+        return userInfoRepository.findAll();
     }
 }

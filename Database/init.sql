@@ -1,6 +1,6 @@
+DROP TABLE IF EXISTS ownership_details;
 DROP TABLE IF EXISTS database_table;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS ownership_details;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,

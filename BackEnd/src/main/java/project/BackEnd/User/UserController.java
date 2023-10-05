@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/api")
 @CrossOrigin
 public class UserController {
 
@@ -17,7 +17,7 @@ public class UserController {
     @PostMapping("/add")
     public String add(@RequestBody UserInfo userInfo) {
         userInfoService.saveUserInfo(userInfo);
-        return "New student is added";
+        return "New user is added";
     }
 
     @GetMapping("/getAll")
