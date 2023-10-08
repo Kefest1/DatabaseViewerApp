@@ -9,20 +9,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin
-public class UserController {
+public class UserInfoController {
 
     @Autowired
-    private UserInfoService userInfoService;
+    private UserInfoService usersService;
 
     @PostMapping("/add")
     public String add(@RequestBody UserInfo userInfo) {
-        userInfoService.saveUserInfo(userInfo);
+        usersService.saveUsers(userInfo);
         return "New user is added";
     }
 
     @GetMapping("/getAll")
     public List<UserInfo> list() {
-        return userInfoService.getAllUserInfos();
+        return usersService.getAllUsers();
+    }
+
+    @GetMapping("/getByUsername")
+    public UserInfo getByUsername(@RequestParam("userName") String userInfoName) {
+        System.out.println(userInfoName);
+        return usersService.getUsersByUsername(userInfoName);
     }
 
 }

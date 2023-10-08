@@ -12,12 +12,18 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoRepository userInfoRepository;
 
     @Override
-    public UserInfo saveUserInfo(UserInfo userInfo) {
-        return userInfoRepository.save(userInfo);
+    public UserInfo saveUsers(UserInfo users) {
+        return userInfoRepository.save(users);
     }
 
     @Override
-    public List<UserInfo> getAllUserInfos() {
+    public List<UserInfo> getAllUsers() {
         return userInfoRepository.findAll();
     }
+
+    @Override
+    public UserInfo getUsersByUsername(String username) {
+        return userInfoRepository.findByUsername(username);
+    }
+
 }
