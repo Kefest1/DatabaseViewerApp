@@ -13,8 +13,7 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int masterID;
-    private String name;
-    private String lastname;
+    private String userName;
     private String password;
 
     public UserInfo() {
@@ -28,20 +27,12 @@ public class UserInfo {
         this.masterID = masterID;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getPassword() {
