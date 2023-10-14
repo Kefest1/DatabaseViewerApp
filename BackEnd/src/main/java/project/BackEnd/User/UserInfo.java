@@ -1,7 +1,8 @@
 package project.BackEnd.User;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 
 @Entity(name = "UserInfo")
 @Table(

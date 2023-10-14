@@ -26,4 +26,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         return userInfoRepository.findByUsername(username);
     }
 
+    @Override
+    public boolean checkExistenceByUsername(String username) {
+        return userInfoRepository.findByUsername(username) != null;
+    }
+
 }

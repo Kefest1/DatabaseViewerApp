@@ -28,7 +28,19 @@ services:
     networks:
       - my-network
     restart: unless-stopped
-  
+  #rabbitmq:
+   # container_name: rabbitmq
+    #image: rabbitmq:3-management-alpine
+    #environment:
+    #  RABBITMQ_DEFAULT_USER: rabbitmquser
+    #  RABBITMQ_DEFAULT_PASS: rabbitmqpassword
+    #ports:
+    #  - "5672:5672"
+    #  - "15672:15672"  # RabbitMQ management console
+    #networks:
+    #  - my-network
+    #restart: unless-stopped
+    
 networks:
   my-network:
 

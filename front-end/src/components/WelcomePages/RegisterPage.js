@@ -15,12 +15,6 @@ function RegisterPage() {
 
     const [users, setUsers] = useState('');
 
-    useEffect(() => {
-        fetch('http://localhost:8080/api/getAll')
-            .then((response) => response.json())
-            .then((data) => setUsers(data))
-            .catch((error) => console.error('Error fetching users:', error));
-    }, []);
 
     const ValidatePassword = () => {
         console.log(users)
@@ -47,19 +41,20 @@ function RegisterPage() {
 
     }
 
-    const Login = () => {
+    const Register = async () => {
         let errMessage = ValidatePassword()
         if (errMessage !== "OK") {
             setCaption(errMessage);
             return errMessage;
         }
 
-        const matchingObject  = users.find((obj) => obj.password_hash === password)
-        const foundUsername  = matchingObject.username;
-        console.log("-------------")
-        console.log(foundUsername === username)
-        console.log("-------------")
-        return foundUsername === username;
+        const response = await fetch('http://localhost:8080/api/checkExistenceByUsername/' + username);
+        const is = await response.json();
+        if (is === false)
+            return false;
+
+
+        return true;
     }
 
     return (
@@ -91,7 +86,7 @@ function RegisterPage() {
                             <input className='form-control rounded-0' type="password" placeholder="Registration Code"/>
                         </div>
 
-                        <button className='btn btn-success border w-100' onClick={Login}>Register</button>
+                        <button className='btn btn-success border w-100' onClick={Register}>Register</button>
                         <p></p>
                         <Link to="/login">
                             <button className='btn btn-light border-dark w-100'>Log in</button>

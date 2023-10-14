@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
@@ -6,8 +6,6 @@ import InvalidDataLabel from "./InvalidDataLabel";
 
 
 function LoginPage() {
-    const [users, setUsers] = useState('');
-
     const [IsVisible, setIsVisible] = useState(false)
     const [username, setUsername] = useState('');
 
@@ -15,17 +13,9 @@ function LoginPage() {
 
     const [errCode, setErrCode] = useState('');
 
-    function fetchData() {
-        console.log('http://localhost:8080/api/getByUsername?userName=' + username);
-        fetch('http://localhost:8080/api/getByUsername?userName=' + username)
-            .then((response) => response.json())
-            .then((data) => setUsers(data))
-            .catch((error) => console.error('Error fetching users:', error));
-
-    }
 
 
-    const Login = () => {
+    const Login = async () => {
         if (username.length === 0) {
             setErrCode("Enter username")
             setIsVisible(true);
@@ -36,21 +26,19 @@ function LoginPage() {
             setIsVisible(true);
             return;
         }
+        const response = await fetch('http://localhost:8080/api/getByUsername?userName=' + username);
+        const text = await response.json();
 
-        fetchData();
-
-        console.log(users);
-
-        let foundUsername = users.username;
-        let foundPassword = users.password_hash;
+        let foundPassword = text.password_hash;
 
         console.log(foundPassword);
         if (foundPassword === password) {
             setErrCode("Ok");
+            window.location.href = 'http://localhost:3000/register';
             setIsVisible(true);
             console.log("Ok");
-        }
-        else {
+
+        } else {
             console.log("Invalid password try again");
             setErrCode("Invalid user or password")
             setIsVisible(true);

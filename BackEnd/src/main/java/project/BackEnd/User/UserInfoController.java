@@ -31,4 +31,9 @@ public class UserInfoController {
         return usersService.getUsersByUsername(userInfoName);
     }
 
+    @GetMapping("/checkExistenceByUsername/{userInfoName}")
+    public boolean checkExistenceByUsername(@PathVariable("userInfoName") String userInfoName) {
+        return usersService.checkExistenceByUsername(userInfoName);
+    }
+
 }

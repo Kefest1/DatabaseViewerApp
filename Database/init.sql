@@ -5,10 +5,9 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     masterID INTEGER,
-    name VARCHAR(255),
-    lastname VARCHAR(255),
-    password VARCHAR(255),
-    created_at TIMESTAMP
+    username VARCHAR(255),
+    password_hash VARCHAR(255),
+    created_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE database_table (
