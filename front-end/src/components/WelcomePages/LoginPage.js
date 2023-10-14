@@ -33,14 +33,17 @@ function LoginPage() {
 
         console.log(foundPassword);
         if (foundPassword === password) {
+            localStorage.setItem("Data1", "Value123OK");
+            sessionStorage.setItem("Data2", "V02");
             setErrCode("Ok");
-            window.location.href = 'http://localhost:3000/register';
             setIsVisible(true);
-            console.log("Ok");
-
+            const expirationTime = new Date();
+            expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
+            document.cookie = 'userName=' + username + '; expires=' + expirationTime.toUTCString() + '; secure; samesite=strict ';
+            window.location.href = 'http://localhost:3000';
         } else {
             console.log("Invalid password try again");
-            setErrCode("Invalid user or password")
+            setErrCode("Invalid user or password");
             setIsVisible(true);
         }
 
