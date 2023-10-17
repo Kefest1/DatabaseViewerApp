@@ -10,7 +10,7 @@ const Folder = ({ name, subfolders }) => {
     return (
         <div>
             <div onClick={toggleFolder}>
-                {expanded ? '📂' : '📁'} {name}
+                {expanded ? 'v' : '>'} {name}
             </div>
             {expanded && (
                 <ul>
