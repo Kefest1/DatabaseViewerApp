@@ -12,7 +12,7 @@ import java.util.List;
 public class UserInfoController {
 
     @Autowired
-    private UserInfoService usersService;
+    UserInfoService usersService;
 
     @PostMapping("/add")
     public String add(@RequestBody UserInfo userInfo) {

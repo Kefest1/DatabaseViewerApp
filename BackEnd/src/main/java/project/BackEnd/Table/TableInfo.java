@@ -1,7 +1,10 @@
 package project.BackEnd.Table;
 
 import jakarta.persistence.*;
+import project.BackEnd.DatabaseInfo.DatabaseInfo;
+
 import java.sql.Timestamp;
+
 @Entity
 @Table(name = "table_info")
 public class TableInfo {
@@ -11,9 +14,9 @@ public class TableInfo {
     @Column(name = "id")
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "database_id")
-//    private DatabaseInfo databaseInfo;
+    @ManyToOne
+    @JoinColumn(name = "database_id")
+    private DatabaseInfo databaseInfo;
 
     @Column(name = "table_name", length = 255, nullable = false)
     private String tableName;
@@ -33,13 +36,13 @@ public class TableInfo {
         this.id = id;
     }
 
-//    public DatabaseInfo getDatabaseInfo() {
-//        return databaseInfo;
-//    }
-//
-//    public void setDatabaseInfo(DatabaseInfo databaseInfo) {
-//        this.databaseInfo = databaseInfo;
-//    }
+    public DatabaseInfo getDatabaseInfo() {
+        return databaseInfo;
+    }
+
+    public void setDatabaseInfo(DatabaseInfo databaseInfo) {
+        this.databaseInfo = databaseInfo;
+    }
 
     public String getTableName() {
         return tableName;

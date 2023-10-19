@@ -1,4 +1,5 @@
-package project.BackEnd.Table;
+package project.BackEnd.DatabaseInfo;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,16 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tableinfo")
+@RequestMapping("api/databaseinfo")
 @CrossOrigin
-public class TableInfoController {
+public class DatabaseInfoController {
 
     @Autowired
-    TableInfoService tableInfoService;
+    DatabaseInfoService databaseInfoService;
 
     @GetMapping("/getall")
-    public List<TableInfo> getAllTableInfos() {
-        return tableInfoService.getAllTableInfo();
+    public List<DatabaseInfo> getDatabase() {
+        return databaseInfoService.findAll();
     }
 
 }
