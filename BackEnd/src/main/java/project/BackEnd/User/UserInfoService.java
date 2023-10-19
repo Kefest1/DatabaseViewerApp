@@ -8,4 +8,5 @@ public interface UserInfoService {
     public List<UserInfo> getAllUsers();
     public UserInfo getUsersByUsername(String username);
     public boolean checkExistenceByUsername(String username);
+    public UserInfo findByMasterID(Long masterID);
 }

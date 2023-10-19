@@ -31,4 +31,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         return userInfoRepository.findByUsername(username) != null;
     }
 
+    @Override
+    public UserInfo findByMasterID(Long masterID) {
+        return userInfoRepository.findByMasterID(masterID);
+    }
+
 }

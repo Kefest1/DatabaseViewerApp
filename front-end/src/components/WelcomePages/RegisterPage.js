@@ -82,8 +82,8 @@ function RegisterPage() {
                             <input className='form-control rounded-0' type="password" placeholder="Enter Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                         </div>
                         <div className='mb-3'>
-                            <label htmlFor="registration_code"><strong>Registration Code</strong></label>
-                            <input className='form-control rounded-0' type="password" placeholder="Registration Code"/>
+                            <label htmlFor="username"><strong>Master username</strong></label>
+                            <input className='form-control rounded-0' type="text" placeholder="Master username"/>
                         </div>
 
                         <button className='btn btn-success border w-100' onClick={Register}>Register</button>

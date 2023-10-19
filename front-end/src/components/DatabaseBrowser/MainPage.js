@@ -1,7 +1,6 @@
 import {getCookie, isCookie} from "../getCookie";
 import React from "react";
 import Sidebar from "./Sidebar";
-import ConnectToDatabase from "./ConnectToDatabase";
 
 function MainPage() {
     const userName = getCookie('userName');
@@ -9,8 +8,7 @@ function MainPage() {
     if (userName) {
         return (
             <div>
-                <div align="center">User {userName} is logged in.</div>
-                <ConnectToDatabase />
+                <label align="center">User {userName} is logged in.</label>
             </div>
         );
     }
@@ -21,4 +19,3 @@ function MainPage() {
 }
 
 export default MainPage;
-    

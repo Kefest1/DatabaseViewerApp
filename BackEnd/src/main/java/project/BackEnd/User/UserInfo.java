@@ -30,11 +30,11 @@ public class UserInfo {
     private Long id;
 
     @Column(
-            name = "master_id",
+            name = "masterID",
             updatable = true,
-            nullable = true
+            nullable = false
     )
-    private int masterID;
+    private Long masterID;
 
     @Column(
             name = "username",
@@ -63,11 +63,11 @@ public class UserInfo {
     public UserInfo() {
     }
 
-    public int getMasterID() {
+    public Long getMasterID() {
         return masterID;
     }
 
-    public void setMasterID(int masterID) {
+    public void setMasterID(Long masterID) {
         this.masterID = masterID;
     }
 
