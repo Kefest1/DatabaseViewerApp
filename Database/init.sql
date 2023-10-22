@@ -26,7 +26,7 @@ CREATE TABLE database_info (
 
 CREATE TABLE table_info (
   id SERIAL PRIMARY KEY, 
-  database_id INTEGER REFERENCES database_info (id), 
+  database_id BIGINT REFERENCES database_info (id), 
   table_name VARCHAR(255), 
   created_at TIMESTAMP
 );
@@ -35,7 +35,7 @@ CREATE TABLE field_info (
   id SERIAL PRIMARY KEY, 
   table_id INTEGER REFERENCES table_info(id), 
   column_name TEXT,
-  value JSONB,
+  data_value JSONB,
   data_type TEXT,
   column_id INTEGER
 );

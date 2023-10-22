@@ -9,6 +9,7 @@ public class OwnershipDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ownership_details_id")
     private Long id;
 
     @Column(name = "level")
