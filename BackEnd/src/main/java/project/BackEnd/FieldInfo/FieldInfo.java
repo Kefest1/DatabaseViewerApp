@@ -21,7 +21,7 @@ public class FieldInfo {
     private Integer columnId;
 
     @Column(name = "data_type")
-    private String dataType;
+    private String dataType ;
 
     @Column(columnDefinition = "jsonb")
     private String dataValue;
