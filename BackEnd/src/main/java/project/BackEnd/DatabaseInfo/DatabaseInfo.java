@@ -1,7 +1,7 @@
 package project.BackEnd.DatabaseInfo;
 import jakarta.persistence.*;
-import lombok.Getter;
 
+import java.util.Date;
 import java.sql.Timestamp;
 
 @Entity(name = "database_info")
@@ -44,5 +44,10 @@ public class DatabaseInfo {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @PrePersist
+    public void setDefaultCreatedAt() {
+        this.createdAt = new Timestamp(new Date().getTime());
     }
 }

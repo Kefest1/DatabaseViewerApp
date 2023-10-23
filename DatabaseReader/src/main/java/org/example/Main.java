@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
+
     public static void main(String[] args) {
         //        String jdbcUrl = "jdbc:postgresql://localhost:5432/northwind";
 //        String username = "username";
@@ -31,6 +32,5 @@ public class Main {
         new DatabaseCreator(serverDB, clientDB);
 
     }
-
 
 }
