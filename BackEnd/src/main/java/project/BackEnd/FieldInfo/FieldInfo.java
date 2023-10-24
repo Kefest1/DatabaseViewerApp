@@ -17,16 +17,21 @@ public class FieldInfo {
     @Column(name = "column_name")
     private String columnName;
 
-    @Column(name = "column_id")
-    private Integer columnId;
-
     @Column(name = "data_type")
-    private String dataType ;
+    private String dataType;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "data_value", length = 1000)
     private String dataValue;
 
     public FieldInfo() {
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public TableInfo getTableInfo() {
@@ -43,14 +48,6 @@ public class FieldInfo {
 
     public void setColumnName(String columnName) {
         this.columnName = columnName;
-    }
-
-    public Integer getColumnId() {
-        return columnId;
-    }
-
-    public void setColumnId(Integer columnId) {
-        this.columnId = columnId;
     }
 
     public String getDataValue() {

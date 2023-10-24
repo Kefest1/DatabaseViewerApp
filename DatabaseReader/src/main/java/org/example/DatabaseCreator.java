@@ -12,30 +12,42 @@ public class DatabaseCreator {
     DatabaseInfo serverDb;
     DatabaseInfo clientDB;
 
+    Connection serverConnection;
+    Connection clientConnection;
+
     public DatabaseCreator(DatabaseInfo serverDb, DatabaseInfo clientDB) {
         this.serverDb = serverDb;
         this.clientDB = clientDB;
 
+        try {
+            serverConnection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
+            clientConnection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
+        } catch (SQLException e) {
+            return;
+        }
+
         String databaseName = getDatabaseName();
-//        setDatabaseName(databaseName);
+        setDatabaseName(databaseName);
         int databaseID = getDatabaseID(databaseName);
 
         Set<String> tableNames = getTableNames();
-        System.out.println(tableNames);
         setTableInfo(tableNames, databaseID);
+
         setFieldInfo(tableNames);
-//        for (String tbname : tableNames) {
-//            getTableInfo(tbname);
-//        }
+
+        try {
+            clientConnection.close();
+            serverConnection.close();
+        } catch (SQLException ignored) {
+
+        }
 
     }
 
     private String getDatabaseName() {
-        String databaseName = null;
         try {
-            Connection connection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
 
-            Statement statement = connection.createStatement();
+            Statement statement = clientConnection.createStatement();
             String sqlQuery = "SELECT current_database()";
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
@@ -44,21 +56,19 @@ public class DatabaseCreator {
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            return;
         }
 
         return databaseName;
     }
 
     private int getDatabaseID(String databaseName) {
-        int databaseID = -1;
+        int databaseID;
         try {
-            Connection connection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
 
-            Statement statement = connection.createStatement();
-            String sqlQuery = "SELECT database_id FROM database_info WHERE database_name = \'" + databaseName + "\';";
+            Statement statement = serverConnection.createStatement();
+            String sqlQuery = "SELECT database_id FROM database_info WHERE database_name = '" + databaseName + "';";
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
             resultSet.next();
@@ -66,41 +76,37 @@ public class DatabaseCreator {
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            return -1;
         }
 
         return databaseID;
     }
 
-    private int setDatabaseName(String databaseName) {
+    private void setDatabaseName(String databaseName) {
         try {
-            Connection connection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
 
-            Statement statement = connection.createStatement();
+            Statement statement = serverConnection.createStatement();
             String sqlQuery = "INSERT INTO database_info(database_name)" +
-                    " VALUES (\'" + databaseName + "\');";
+                    " VALUES ('" + databaseName + "');";
             statement.executeUpdate(sqlQuery);
 
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return 0;
     }
 
     private Set<String> getTableNames() {
         Set<String> tableNames = new HashSet<>();
         try {
-            Connection connection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
 
-            Statement statement = connection.createStatement();
-            String sqlQuery = "SELECT table_name\n" +
-                    "FROM information_schema.tables\n" +
-                    "WHERE table_schema = 'public';";
+            Statement statement = clientConnection.createStatement();
+            String sqlQuery = """
+                    SELECT table_name
+                    FROM information_schema.tables
+                    WHERE table_schema = 'public';""";
 
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
@@ -109,7 +115,6 @@ public class DatabaseCreator {
 
             resultSet.close();
             statement.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -117,13 +122,11 @@ public class DatabaseCreator {
         return tableNames;
     }
 
-    private boolean setTableInfo(Set<String> tableNames, int databaseID) {
-        Connection connection = null;
+    private void setTableInfo(Set<String> tableNames, int databaseID) {
         try {
-            connection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
             for (String tableName : tableNames) {
                 String insertSQL = "INSERT INTO table_info (table_name, database_id) VALUES (?, ?);";
-                try (PreparedStatement statement = connection.prepareStatement(insertSQL)) {
+                try (PreparedStatement statement = serverConnection.prepareStatement(insertSQL)) {
                     statement.setString(1, tableName);
                     statement.setInt(2, databaseID);
                     statement.executeUpdate();
@@ -132,72 +135,12 @@ public class DatabaseCreator {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        return true;
-
-        /*
-        try {
-            Connection connection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
-
-            Statement statement = connection.createStatement();
-            String sqlQuery;
-            for (String tablename : tableNames) {
-                HashSet<String> columnTypes = new HashSet<>();
-                sqlQuery = "SELECT column_name\n" +
-                        "FROM information_schema.columns\n" +
-                        "WHERE table_name = '" + tablename + "';";
-
-                ResultSet resultSet = statement.executeQuery(sqlQuery);
-                while (resultSet.next())
-                    columnTypes.add(resultSet.getString("column_name"));
-                System.out.println(columnTypes);
-
-                for (String colName : columnTypes) {
-                    fetchDataFromColumn(connection, tablename, colName);
-                }
-            }
-
-//            String sqlQuery = "INSERT INTO tableinfo VALUES(" + tableName;
-
-//            ResultSet resultSet = statement.executeQuery(sqlQuery);
-//
-//            while (resultSet.next())
-//                tableNames.add(resultSet.getString("table_name"));
-//
-//            resultSet.close();
-            statement.close();
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;*/
     }
 
-    private void fetchDataFromColumn(Connection connection, String tableName, String columnName) {
-        String sqlQuery = "SELECT " + columnName + " from " + tableName + ";";
-        String dataType = getDataTypeFromColumn(connection, tableName, columnName);
 
+    private String getDataTypeFromColumn(String tableName, String columnName) {
         try {
-            Statement statement = connection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery(sqlQuery);
-            while (resultSet.next()) {
-                System.out.println("-------");
-                var x = resultSet.getString(1);
-                var xd = resultSet.getMetaData().getColumnType(1);
-                System.out.println(x);
-                System.out.println(xd);
-                System.out.println("-------");
-            }
-
-        } catch (Exception e) {
-            return;
-        }
-    }
-
-    private String getDataTypeFromColumn(Connection connection, String tableName, String columnName) {
-        try {
-            DatabaseMetaData metaData = connection.getMetaData();
+            DatabaseMetaData metaData = clientConnection.getMetaData();
             ResultSet columns = metaData.getColumns(null, null, tableName, columnName);
 
             if (columns.next()) {
@@ -210,23 +153,19 @@ public class DatabaseCreator {
     }
 
     private void setFieldInfo(Set<String> tableNames) {
-        try {
-            Connection connection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
-            for (String table : tableNames) {
-                fetchTableInfo(connection, table);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+
+        for (String table : tableNames) {
+            fetchTableInfo(table);
         }
 
     }
-// TODO tableid
-    private void fetchTableInfo(Connection connection, String tableName) {
+
+    private void fetchTableInfo(String tableName) {
         Set<String> columnNames = new HashSet<>();
 
         try {
             String query = "SELECT * FROM " + tableName + " LIMIT 1";
-            Statement statement = connection.createStatement();
+            Statement statement = clientConnection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()) {
                 int columnCount = resultSet.getMetaData().getColumnCount();
@@ -247,8 +186,51 @@ public class DatabaseCreator {
     }
 
     private void setColumnInfo(String tableName, String columnName) {
+        int id = getTableId(tableName);
+        String datatype = getDataTypeFromColumn(tableName, columnName);
+        String query = "SELECT " + columnName + " AS C FROM " + tableName + ";";
+        try {
+            Statement statement = clientConnection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                var x = resultSet.getString(1);
+                insertColumnInfo(id, columnName, datatype, x);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertColumnInfo(int tableID, String columnName, String datatype, String dataValue) {
+        String safeDataValue = dataValue.replace("'", "''");
+        String query = "INSERT INTO field_info(table_id, column_name, data_type, data_value)" +
+                " VALUES(" + tableID + ", '" + columnName + "', '" + datatype + "', '" + safeDataValue + "');";
+
+        try {
+            Statement statement = serverConnection.createStatement();
+            statement.executeUpdate(query);
+            statement.close();
+        } catch (Exception e) {
+            System.out.println();
+        }
 
     }
 
+    private int getTableId(String tableName) {
+
+        try {
+            String query = "SELECT id FROM table_info WHERE table_name = '" + tableName + "'";
+            Statement statement = serverConnection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            resultSet.next();
+
+            return resultSet.getInt("id");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
 
 }

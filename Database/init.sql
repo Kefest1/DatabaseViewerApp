@@ -9,6 +9,12 @@ DROP
 DROP 
   TABLE IF EXISTS database_info;
 
+DELETE FROM field_info;
+DELETE FROM ownership_details;
+DELETE FROM user_info;
+DELETE FROM table_info;
+DELETE FROM database_info;
+
 CREATE TABLE user_info (
   id SERIAL PRIMARY KEY, 
   masterID INTEGER NOT NULL, 
