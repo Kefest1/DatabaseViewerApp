@@ -26,8 +26,7 @@ public class DatabaseCreator {
             return;
         }
 
-        String databaseName = getDatabaseName();
-        setDatabaseName(databaseName);
+        String databaseName = setDatabaseName();
         int databaseID = getDatabaseID(databaseName);
 
         Set<String> tableNames = getTableNames();
@@ -52,15 +51,15 @@ public class DatabaseCreator {
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
             resultSet.next();
-            databaseName = resultSet.getString("current_database");
+            String databaseName = resultSet.getString("current_database");
 
             resultSet.close();
             statement.close();
+            return databaseName;
         } catch (SQLException e) {
-            return;
+            return null;
         }
 
-        return databaseName;
     }
 
     private int getDatabaseID(String databaseName) {
@@ -83,7 +82,8 @@ public class DatabaseCreator {
         return databaseID;
     }
 
-    private void setDatabaseName(String databaseName) {
+    private String setDatabaseName() {
+        String databaseName = getDatabaseName();
         try {
 
             Statement statement = serverConnection.createStatement();
@@ -96,6 +96,7 @@ public class DatabaseCreator {
             e.printStackTrace();
         }
 
+        return databaseName;
     }
 
     private Set<String> getTableNames() {
