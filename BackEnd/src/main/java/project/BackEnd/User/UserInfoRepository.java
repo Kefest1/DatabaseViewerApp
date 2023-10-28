@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     UserInfo findByUsername(String username);
     UserInfo findByMasterID(Long MasterID);
+
 }

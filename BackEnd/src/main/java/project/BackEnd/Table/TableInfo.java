@@ -15,7 +15,7 @@ public class TableInfo {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "database_id")
+    @JoinColumn(name = "database_id", unique = false)
     private DatabaseInfo databaseInfo;
 
     @Column(name = "table_name", length = 255, nullable = false)

@@ -60,6 +60,7 @@ public class UserInfo {
     )
     private String password_hash;
 
+
     public UserInfo() {
     }
 

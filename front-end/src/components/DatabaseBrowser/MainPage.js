@@ -1,9 +1,9 @@
 import {getCookie, isCookie} from "../getCookie";
 import React from "react";
-import Sidebar from "./Sidebar";
 
-function MainPage() {
+async function MainPage() {
     const userName = getCookie('userName');
+    const availableTables = await fetch('');
 
     if (userName) {
         return (
@@ -11,8 +11,7 @@ function MainPage() {
                 <label align="center">User {userName} is logged in.</label>
             </div>
         );
-    }
-    else {
+    } else {
         window.location.href = 'http://localhost:3000/login';
     }
 

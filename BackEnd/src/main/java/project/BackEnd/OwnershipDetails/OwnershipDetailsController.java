@@ -1,12 +1,13 @@
 package project.BackEnd.OwnershipDetails;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import project.BackEnd.User.UserInfo;
+import project.BackEnd.User.UserInfoRepository;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ownershipdetails")
@@ -14,7 +15,13 @@ import java.util.List;
 public class OwnershipDetailsController {
 
     @Autowired
-    OwnershipDetailsRepository ownershipDetailsService;
+    OwnershipDetailsService ownershipDetailsService;
+
+    @Autowired
+    OwnershipDetailsRepository ownershipDetailsRepository;
+
+    @Autowired
+    UserInfoRepository userInfoRepository;
 
     @GetMapping("/getall")
     public List<OwnershipDetails> getAllOD() {
@@ -26,4 +33,20 @@ public class OwnershipDetailsController {
         return ownershipDetailsService.findAllWithUserAndTableInfo();
     }
 
+    @PostMapping("/add")
+    public String addUser(@RequestBody OwnershipDetailsPayload ownershipDetailsPayload) {
+        System.out.println(ownershipDetailsPayload);
+
+        ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
+        return "OK";
+    }
+
+    @GetMapping("/getallavailabletables/{username}")
+    public List<OwnershipDetails> getAllAvailableTables(@PathVariable("username") String username) {
+        System.out.println(username);
+        return ownershipDetailsRepository.testquery(username);
+//        return ownershipDetailsRepository.findAllUsersTable(username).stream()
+//                .map(ownershipDetails -> ownershipDetails.getTableInfo().getTableName())
+//                .collect(Collectors.toList());
+    }
 }
