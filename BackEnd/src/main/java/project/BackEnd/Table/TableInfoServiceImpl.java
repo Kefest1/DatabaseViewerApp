@@ -23,7 +23,12 @@ public class TableInfoServiceImpl implements TableInfoService {
         tableInfoRepository.save(tableInfo);
     }
 
-//    @Override
+    @Override
+    public String getTableNameByID(Long ID) {
+        return tableInfoRepository.getTableInfoById(ID).getTableName();
+    }
+
+    //    @Override
 //    public List<String> getByUserName() {
 //        return tableInfoRepository.getByUser();
 //    }

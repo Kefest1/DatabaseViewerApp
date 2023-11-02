@@ -15,23 +15,21 @@ public class OwnershipDetails {
     @Column(name = "access_level")
     private Integer access_level;
 
-    @OneToOne(
+    @ManyToOne(
             cascade = {
                     CascadeType.ALL,
                     CascadeType.MERGE
             },
-            fetch = FetchType.LAZY,
-            orphanRemoval = true
+            fetch = FetchType.LAZY
     )
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserInfo user;
 
-    @OneToOne(
+    @ManyToOne(
         cascade = {
             CascadeType.MERGE
         },
-        fetch = FetchType.LAZY,
-        orphanRemoval = true
+        fetch = FetchType.LAZY
     )
     @JoinColumn(name = "table_id", referencedColumnName = "id")
     private TableInfo tableInfo;

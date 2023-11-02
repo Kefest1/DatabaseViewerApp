@@ -14,4 +14,5 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 //    @Query("SELECT od.tableInfo.tableName FROM OwnershipDetails od JOIN FETCH od.user JOIN FETCH od.tableInfo ti")
 //    List<String> getTableInfoBy();
 
+    TableInfo getTableInfoById(Long id);
 }

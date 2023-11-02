@@ -42,11 +42,12 @@ public class OwnershipDetailsController {
     }
 
     @GetMapping("/getallavailabletables/{username}")
-    public List<OwnershipDetails> getAllAvailableTables(@PathVariable("username") String username) {
+    public List<String> getAllAvailableTables(@PathVariable("username") String username) {
         System.out.println(username);
-        return ownershipDetailsRepository.testquery(username);
-//        return ownershipDetailsRepository.findAllUsersTable(username).stream()
-//                .map(ownershipDetails -> ownershipDetails.getTableInfo().getTableName())
-//                .collect(Collectors.toList());
+        return ownershipDetailsRepository.findAllUsersTable(username)
+                .stream()
+                .map(ownershipDetails -> ownershipDetails.getTableInfo().getTableName())
+                .distinct()
+                .toList();
     }
 }

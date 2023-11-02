@@ -2,9 +2,7 @@
 export function getCookie(name) {
     const cookies = decodeURIComponent(document.cookie);
     let cookieArr = cookies.replaceAll(' ', '');
-    console.log(cookieArr);
     cookieArr = cookieArr.split(';');
-    console.log(cookieArr);
 
     let ret = null;
 
