@@ -2,6 +2,9 @@ package project.BackEnd.User;
 
 
 import jakarta.persistence.*;
+import project.BackEnd.OwnershipDetails.OwnershipDetails;
+
+import java.util.List;
 
 
 @Entity(name = "UserInfo")
@@ -60,9 +63,17 @@ public class UserInfo {
     )
     private String password_hash;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_ownership_details",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "ownership_details_id")
+    )
+    private List<OwnershipDetails> ownershipDetails;
 
     public UserInfo() {
     }
+
 
     public Long getMasterID() {
         return masterID;

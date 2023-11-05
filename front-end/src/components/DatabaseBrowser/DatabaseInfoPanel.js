@@ -1,12 +1,15 @@
 import React from 'react';
+import './DatabaseInfoPanel.css';
 
 const DatabaseInfoPanel = () => {
     return (
         <div>
-            <h1>Left Website</h1>
-            {/* Add your content here */}
+            <div className="header-container">
+                <label>Database Browser</label>
+            </div>
         </div>
-    );
+    )
+
 }
 
 export default DatabaseInfoPanel;

@@ -11,8 +11,11 @@ import java.util.List;
 
 @Repository
 public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, CrudRepository<TableInfo, Long> {
-//    @Query("SELECT od.tableInfo.tableName FROM OwnershipDetails od JOIN FETCH od.user JOIN FETCH od.tableInfo ti")
-//    List<String> getTableInfoBy();
+    @Query("SELECT od FROM OwnershipDetails od " +
+            "INNER JOIN od.tables " +
+            "INNER JOIN od.users us " +
+            "WHERE us.username = :username")
+    List<TableInfo> findTablesByUserUsername(@Param("username") String username);
 
     TableInfo getTableInfoById(Long id);
 }

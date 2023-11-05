@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import project.BackEnd.User.UserInfo;
 import project.BackEnd.User.UserInfoRepository;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class OwnershipDetailsController {
 
     @GetMapping("/getall")
     public List<OwnershipDetails> getAllOD() {
-        return ownershipDetailsService.findAll();
+        return ownershipDetailsRepository.findWithTables();
     }
 
     @GetMapping("/getalljoined")
@@ -35,7 +36,9 @@ public class OwnershipDetailsController {
 
     @PostMapping("/add")
     public String addUser(@RequestBody OwnershipDetailsPayload ownershipDetailsPayload) {
+        System.out.println("------------");
         System.out.println(ownershipDetailsPayload);
+        System.out.println("------------");
 
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         return "OK";
@@ -44,10 +47,11 @@ public class OwnershipDetailsController {
     @GetMapping("/getallavailabletables/{username}")
     public List<String> getAllAvailableTables(@PathVariable("username") String username) {
         System.out.println(username);
-        return ownershipDetailsRepository.findAllUsersTable(username)
-                .stream()
-                .map(ownershipDetails -> ownershipDetails.getTableInfo().getTableName())
-                .distinct()
-                .toList();
+//        return ownershipDetailsRepository.findAllUsersTable(username)
+//                .stream()
+//                .map(ownershipDetails -> ownershipDetails.getTableInfo().getTableName())
+//                .distinct()
+//                .toList();
+        return new LinkedList<String>(Collections.singleton("TODO"));
     }
 }

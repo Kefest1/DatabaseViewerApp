@@ -14,6 +14,9 @@ public class TableInfoController {
     @Autowired
     TableInfoService tableInfoService;
 
+    @Autowired
+    TableInfoRepository tableInfoRepository;
+
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
         return tableInfoService.getAllTableInfo();
@@ -25,9 +28,10 @@ public class TableInfoController {
         return "OK";
     }
 
-//    @GetMapping("/getbyusername")
-//    public List<String> getAvailableTablesByUserName(@RequestParam("username") String userName) {
-//        return tableInfoService.getByUserName();
-//    }
+    @GetMapping("/getbyusername/{username}")
+    public List<TableInfo> getAvailableTablesByUserName(@PathVariable("username") String userName) {
+        return tableInfoRepository.findTablesByUserUsername(userName);
+//        return null;
+    }
 
 }

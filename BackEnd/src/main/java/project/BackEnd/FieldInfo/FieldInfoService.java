@@ -8,7 +8,7 @@ import java.util.List;
 public interface FieldInfoService {
 
     List<FieldInfo> getAllFieldInfos();
-    List<FieldInfo> getAllFieldInfosByColumnName(String columnName);
+//    List<FieldInfo> getAllFieldInfosByColumnName(String columnName);
     List<String> getDataTypes();
 
 }

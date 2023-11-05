@@ -1,8 +1,10 @@
 package project.BackEnd.DatabaseInfo;
 import jakarta.persistence.*;
+import project.BackEnd.Table.TableInfo;
 
 import java.util.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity(name = "database_info")
 @Table
@@ -19,7 +21,18 @@ public class DatabaseInfo {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
+    @OneToMany(mappedBy = "databaseInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TableInfo> tables;
+
     public DatabaseInfo() {
+    }
+
+    public List<TableInfo> getTables() {
+        return tables;
+    }
+
+    public void setTables(List<TableInfo> tables) {
+        this.tables = tables;
     }
 
     public Long getId() {

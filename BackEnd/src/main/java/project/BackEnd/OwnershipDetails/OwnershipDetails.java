@@ -1,7 +1,12 @@
 package project.BackEnd.OwnershipDetails;
 import jakarta.persistence.*;
+import lombok.Getter;
 import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfo;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "ownership_details")
@@ -9,30 +14,22 @@ public class OwnershipDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ownership_details_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "access_level")
     private Integer access_level;
 
-    @ManyToOne(
-            cascade = {
-                    CascadeType.ALL,
-                    CascadeType.MERGE
-            },
-            fetch = FetchType.LAZY
+    @ManyToMany
+    @JoinTable(
+            name = "user_table_access",
+            joinColumns = @JoinColumn(name = "ownership_details_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private UserInfo user;
+    private List<UserInfo> users = new ArrayList<>();
 
-    @ManyToOne(
-        cascade = {
-            CascadeType.MERGE
-        },
-        fetch = FetchType.LAZY
-    )
-    @JoinColumn(name = "table_id", referencedColumnName = "id")
-    private TableInfo tableInfo;
+    @ManyToMany(mappedBy = "ownershipDetails")
+    private List<TableInfo> tables = new ArrayList<>();
 
     public OwnershipDetails() {
     }
@@ -40,13 +37,6 @@ public class OwnershipDetails {
     public OwnershipDetails(OwnershipDetails ownershipDetails) {
         ownershipDetails.setId(ownershipDetails.getId());
         ownershipDetails.setAccess_level(ownershipDetails.getAccess_level());
-    }
-
-    public OwnershipDetails(Long id, Integer access_level, UserInfo user, TableInfo tableInfo) {
-        this.id = id;
-        this.access_level = access_level;
-        this.user = user;
-        this.tableInfo = tableInfo;
     }
 
     public Long getId() {
@@ -65,31 +55,19 @@ public class OwnershipDetails {
         this.access_level = access_level;
     }
 
-    public UserInfo getUser() {
-        return user;
+    public List<UserInfo> getUsers() {
+        return users;
     }
 
-    public void setUser(UserInfo user) {
-        this.user = user;
+    public void setUsers(List<UserInfo> users) {
+        this.users = users;
     }
 
-    public TableInfo getTableInfo() {
-        return tableInfo;
+    public List<TableInfo> getTables() {
+        return tables;
     }
 
-    public void setTableInfo(TableInfo tableInfo) {
-        this.tableInfo = tableInfo;
+    public void setTables(List<TableInfo> tables) {
+        this.tables = tables;
     }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("OwnershipDetails{");
-        sb.append("id=").append(id);
-        sb.append(", access_level=").append(access_level);
-        sb.append(", user=").append(user);
-        sb.append(", tableInfo=").append(tableInfo);
-        sb.append('}');
-        return sb.toString();
-    }
-
 }

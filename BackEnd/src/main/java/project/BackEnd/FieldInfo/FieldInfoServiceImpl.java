@@ -16,10 +16,10 @@ public class FieldInfoServiceImpl implements FieldInfoService {
         return fieldInfoRepository.findAll();
     }
 
-    @Override
-    public List<FieldInfo> getAllFieldInfosByColumnName(String columnName) {
-        return fieldInfoRepository.getFieldInfosByColumnName(columnName);
-    }
+//    @Override
+//    public List<FieldInfo> getAllFieldInfosByColumnName(String columnName) {
+//        return fieldInfoRepository.getFieldInfosByColumnName(columnName);
+//    }
 
     @Override
     public List<String> getDataTypes() {

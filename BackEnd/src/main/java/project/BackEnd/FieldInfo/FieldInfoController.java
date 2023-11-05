@@ -19,10 +19,10 @@ public class FieldInfoController {
     }
 
 
-    @GetMapping("/{fieldName}")
-    public List<FieldInfo> getAllByFieldName(@PathVariable String fieldName) {
-        return fieldInfoService.getAllFieldInfosByColumnName(fieldName);
-    }
+//    @GetMapping("/{fieldName}")
+//    public List<FieldInfo> getAllByFieldName(@PathVariable String fieldName) {
+//        return fieldInfoService.getAllFieldInfosByColumnName(fieldName);
+//    }
 
 }
 

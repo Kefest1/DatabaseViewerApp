@@ -207,13 +207,14 @@ public class DatabaseCreator {
         String safeDataValue = dataValue.replace("'", "''");
         String query = "INSERT INTO field_info(table_id, column_name, data_type, data_value)" +
                 " VALUES(" + tableID + ", '" + columnName + "', '" + datatype + "', '" + safeDataValue + "');";
+//        System.out.println(query);
 
         try {
             Statement statement = serverConnection.createStatement();
             statement.executeUpdate(query);
             statement.close();
         } catch (Exception e) {
-            System.out.println();
+            e.printStackTrace();
         }
 
     }
