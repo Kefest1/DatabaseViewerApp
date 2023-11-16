@@ -15,8 +15,9 @@ public class UserInfoController {
     UserInfoService usersService;
 
     @PostMapping("/add")
-    public String add(@RequestBody UserInfo userInfo) {
-        usersService.saveUsers(userInfo);
+    public String add(@RequestBody UserPayload userPayload) {
+        usersService.saveUsers(userPayload);
+//        System.out.println(userPayload);
         return "New user is added";
     }
 
@@ -29,6 +30,12 @@ public class UserInfoController {
     public UserInfo getByUsername(@RequestParam("userName") String userInfoName) {
         System.out.println(userInfoName);
         return usersService.getUsersByUsername(userInfoName);
+    }
+
+    @GetMapping("/getIdByUsername/{username}")
+    public Long getIDByUsername(@PathVariable("username") String userInfoName) {
+        System.out.println(userInfoName);
+        return usersService.getUsersByUsername(userInfoName).getId();
     }
 
     @GetMapping("/checkExistenceByUsername/{userInfoName}")

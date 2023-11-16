@@ -1,11 +1,16 @@
 package project.BackEnd.FieldInfo;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import project.BackEnd.Table.TableInfo;
 
 import java.util.List;
 
 @Entity
 @Table(name = "field_info")
+@Getter
+@Setter
 public class FieldInfo {
 
     @Id
@@ -22,25 +27,11 @@ public class FieldInfo {
     private String dataValue;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "table_id")
     private TableInfo tableInfo;
 
     public FieldInfo() {
     }
 
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public String getDataValue() {
-        return dataValue;
-    }
-
-    public void setDataValue(String dataValue) {
-        this.dataValue = dataValue;
-    }
 }

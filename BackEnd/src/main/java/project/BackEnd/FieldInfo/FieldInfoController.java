@@ -13,16 +13,19 @@ public class FieldInfoController {
     @Autowired
     FieldInfoService fieldInfoService;
 
+    @Autowired
+    FieldInfoRepository fieldInfoRepository;
+
     @GetMapping
     public List<FieldInfo> getAll() {
         return fieldInfoService.getAllFieldInfos();
     }
 
 
-//    @GetMapping("/{fieldName}")
-//    public List<FieldInfo> getAllByFieldName(@PathVariable String fieldName) {
-//        return fieldInfoService.getAllFieldInfosByColumnName(fieldName);
-//    }
+    @GetMapping("/getcolumns/{username}")
+    public List<String> getAllByFieldName(@PathVariable String username) {
+        return fieldInfoRepository.findWithUsersAndTables(username);
+    }
 
 }
 

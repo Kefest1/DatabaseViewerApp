@@ -2,12 +2,12 @@ package project.BackEnd.OwnershipDetails;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfo;
 import project.BackEnd.User.UserInfoRepository;
+import project.BackEnd.User.UserInfoService;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,14 +24,28 @@ public class OwnershipDetailsController {
     @Autowired
     UserInfoRepository userInfoRepository;
 
-    @GetMapping("/getall")
-    public List<OwnershipDetails> getAllOD() {
-        return ownershipDetailsRepository.findWithTables();
-    }
+    @Autowired
+    UserInfoService userInfoService;
 
-    @GetMapping("/getalljoined")
-    public List<OwnershipDetails> getAllODJoined() {
-        return ownershipDetailsService.findAllWithUserAndTableInfo();
+//    @GetMapping("/getallus")
+//    public List<OwnershipDetails> getAllODT() {
+//        return ownershipDetailsRepository.findWithUsers();
+//    }
+//
+//    @GetMapping("/getallta")
+//    public List<OwnershipDetails> getAllODU() {
+//        return ownershipDetailsRepository.findWithTables();
+//    }
+
+    @GetMapping("/gettablenames/{user}")
+    public Set<String> getAllODJoined(@PathVariable("user") String username) {
+        Long id = userInfoService.getIdByUsername(username);
+        List<OwnershipDetails> ownershipDetails = ownershipDetailsRepository.findWithUsersAndTables(id);
+        HashSet<String> availableTables = new HashSet<>();
+        return ownershipDetails
+                .stream()
+                .map(e -> e.getTableInfo().getTableName())
+                .collect(Collectors.toSet());
     }
 
     @PostMapping("/add")

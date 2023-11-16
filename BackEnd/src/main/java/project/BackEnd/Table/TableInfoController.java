@@ -30,8 +30,18 @@ public class TableInfoController {
 
     @GetMapping("/getbyusername/{username}")
     public List<TableInfo> getAvailableTablesByUserName(@PathVariable("username") String userName) {
-        return tableInfoRepository.findTablesByUserUsername(userName);
-//        return null;
+//        return tableInfoRepository.findTablesByUserUsername(userName);
+        return null;
+    }
+
+    @GetMapping("/getalljoined")
+    public List<TableInfo> getAllODJoined() {
+        return tableInfoRepository.findWithUsersAndTables();
+    }
+
+    @GetMapping("/getalltablenames")
+    public List<String> getAllTableNames() {
+        return tableInfoRepository.findDistinctTableNames();
     }
 
 }

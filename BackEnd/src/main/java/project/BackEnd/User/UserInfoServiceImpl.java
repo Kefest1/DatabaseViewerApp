@@ -12,8 +12,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoRepository userInfoRepository;
 
     @Override
-    public UserInfo saveUsers(UserInfo users) {
-        return userInfoRepository.save(users);
+    public UserInfo saveUsers(UserPayload userPayload) {
+        var x = new UserInfo(userPayload.getMasterID(), userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash());
+        return userInfoRepository.save(x);
     }
 
     @Override
@@ -36,4 +37,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         return userInfoRepository.findByMasterID(masterID);
     }
 
+    @Override
+    public Long getIdByUsername(String username) {
+        return userInfoRepository.findByUsername(username).getId();
+    }
 }

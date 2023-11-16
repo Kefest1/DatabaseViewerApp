@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfo;
 
 import java.util.List;
@@ -12,8 +13,19 @@ import java.util.List;
 @Repository
 public interface OwnershipDetailsRepository extends JpaRepository<OwnershipDetails, Long> {
 
-    @Query("SELECT od FROM OwnershipDetails od LEFT JOIN FETCH od.tables t")
-    List<OwnershipDetails> findWithTables();
+//    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.tableInfo t JOIN FETCH od.user u")
+    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.tableInfo JOIN FETCH od.user WHERE od.user.id = :id")
+    List<OwnershipDetails> findWithUsersAndTables(Long id);
+
+
+
+//
+//    @Query("SELECT od FROM OwnershipDetails od LEFT JOIN FETCH od.tables t")
+//    List<OwnershipDetails> findWithTables();
+//
+//    @Query("SELECT od FROM OwnershipDetails od")
+//    List<OwnershipDetails> findWithUsers();
+
 //    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.user JOIN FETCH od.tableInfo")
 //    List<OwnershipDetails> findAllWithUserAndTableInfo();
 //

@@ -2,10 +2,13 @@ package project.BackEnd.User;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity(name = "UserInfo")
 @Table(
@@ -14,6 +17,8 @@ import java.util.List;
                 @UniqueConstraint(name = "user_unique", columnNames = "username")
         }
 )
+@Getter
+@Setter
 public class UserInfo {
 
     @Id
@@ -55,6 +60,7 @@ public class UserInfo {
     )
     private String email;
 
+
     @Column(
             name = "password_hash",
             updatable = true,
@@ -63,47 +69,39 @@ public class UserInfo {
     )
     private String password_hash;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_ownership_details",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "ownership_details_id")
-    )
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
     private List<OwnershipDetails> ownershipDetails;
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("UserInfo{");
+        sb.append("id=").append(id);
+        sb.append(", masterID=").append(masterID);
+        sb.append(", username='").append(username).append('\'');
+        sb.append(", email='").append(email).append('\'');
+        sb.append(", password_hash='").append(password_hash).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
     public UserInfo() {
+
     }
 
-
-    public Long getMasterID() {
-        return masterID;
-    }
-
-    public void setMasterID(Long masterID) {
+    public UserInfo(Long id, Long masterID, String username, String email, String password_hash, List<OwnershipDetails> ownershipDetails) {
+        this.id = id;
         this.masterID = masterID;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword_hash() {
-        return password_hash;
-    }
-
-    public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
+        this.password_hash = password_hash;
+        this.ownershipDetails = ownershipDetails;
+    }
+
+    public UserInfo(Long masterID, String username, String email, String password_hash) {
+        this.masterID = masterID;
+        this.username = username;
+        this.email = email;
+        this.password_hash = password_hash;
     }
 }

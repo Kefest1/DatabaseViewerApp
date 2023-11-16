@@ -24,13 +24,13 @@ public class OwnershipDetailsServiceImpl implements OwnershipDetailsService {
 
     @Override
     public void addOwnershipDetails(OwnershipDetailsPayload ownershipDetailsPayload) {
-        OwnershipDetails ownershipDetails = new OwnershipDetails(ownershipDetailsPayload.ownershipDetails);
+        OwnershipDetails ownershipDetails = new OwnershipDetails();
 
         UserInfo userInfo = userInfoRepository.getReferenceById(ownershipDetailsPayload.userID);
         TableInfo tableInfo = tableInfoRepository.getReferenceById(ownershipDetailsPayload.tableID);
-        System.out.println("----" + tableInfo + "----");
-        ownershipDetails.getUsers().add(userInfo);
-        ownershipDetails.getTables().add(tableInfo);
+
+        ownershipDetails.setUser(userInfo);
+        ownershipDetails.setTableInfo(tableInfo);
 
         ownershipDetailsRepository.save(ownershipDetails);
     }
@@ -42,8 +42,13 @@ public class OwnershipDetailsServiceImpl implements OwnershipDetailsService {
 
     @Override
     public List<OwnershipDetails> findAllWithUserAndTableInfo() {
-        return null;
+        return ownershipDetailsRepository.findAll();
     }
+
+//    @Override
+//    public List<OwnershipDetails> findAllWithUserAndTableInfo() {
+//        return ownershipDetailsRepository.findWithUsersAndTables();
+//    }
 
 //    @Override
 //    public List<OwnershipDetails> findAllWithUserAndTableInfo() {

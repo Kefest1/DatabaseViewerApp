@@ -8,7 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class OwnershipDetailsPayload {
-    OwnershipDetails ownershipDetails;
     Long userID;
     Long tableID;
 }

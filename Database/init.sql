@@ -1,13 +1,13 @@
 DROP 
-  TABLE IF EXISTS field_info;
+  TABLE IF EXISTS field_info CASCADE;
 DROP 
-  TABLE IF EXISTS ownership_details;
+  TABLE IF EXISTS ownership_details CASCADE;
 DROP 
-  TABLE IF EXISTS user_info;
+  TABLE IF EXISTS user_info CASCADE;
 DROP 
-  TABLE IF EXISTS table_info;
+  TABLE IF EXISTS table_info CASCADE;
 DROP 
-  TABLE IF EXISTS database_info;
+  TABLE IF EXISTS database_info CASCADE;
 
 DELETE FROM field_info;
 DELETE FROM ownership_details;
