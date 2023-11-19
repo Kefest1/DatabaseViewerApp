@@ -14,8 +14,8 @@ import java.util.List;
 public interface OwnershipDetailsRepository extends JpaRepository<OwnershipDetails, Long> {
 
 //    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.tableInfo t JOIN FETCH od.user u")
-    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.tableInfo JOIN FETCH od.user WHERE od.user.id = :id")
-    List<OwnershipDetails> findWithUsersAndTables(Long id);
+//    @Query("SELECT od FROM OwnershipDetails od JOIN FETCH od.tableInfo JOIN FETCH od.user WHERE od.user.id = :id")
+//    List<OwnershipDetails> findWithUsersAndTables(Long id);
 
 
 

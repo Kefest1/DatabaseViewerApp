@@ -23,11 +23,9 @@ public class DatabaseInfoController {
         return databaseInfoService.findAll();
     }
 
-    @GetMapping("/getdatabasesbyuser/{username}")
-    public List<String> getDatabasesByUser(@PathVariable("username") String username) {
-        System.out.println(username);
-        return null;
-//        return databaseInfoRepository.test(username);
+    @GetMapping("/getfoldermap/{username}")
+    public List<String> getFolderMap(@PathVariable String username) {
+        return databaseInfoRepository.findAllUsersTable(username);
     }
 
 }

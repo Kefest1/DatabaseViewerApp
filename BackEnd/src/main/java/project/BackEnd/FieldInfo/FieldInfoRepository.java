@@ -16,4 +16,5 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long> {
 
     @Query("SELECT DISTINCT fi.column_name, ti.tableName FROM FieldInfo fi JOIN fi.tableInfo ti JOIN fi.tableInfo.ownershipDetails od JOIN od.user WHERE od.user.username = :username")
     List<String> findWithUsersAndTables(@Param("username") String username);
+
 }

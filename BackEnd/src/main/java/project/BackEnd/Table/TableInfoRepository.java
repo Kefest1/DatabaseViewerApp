@@ -24,4 +24,7 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     @Query("SELECT ti.tableName FROM TableInfo ti")
     List<String> findDistinctTableNames();
+
+    @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.user WHERE od.user.username = :username")
+    List<String> findDatabasesByUserName(@Param("username") String username);
 }

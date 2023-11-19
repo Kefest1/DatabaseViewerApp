@@ -28,10 +28,9 @@ public class TableInfoController {
         return "OK";
     }
 
-    @GetMapping("/getbyusername/{username}")
-    public List<TableInfo> getAvailableTablesByUserName(@PathVariable("username") String userName) {
-//        return tableInfoRepository.findTablesByUserUsername(userName);
-        return null;
+    @GetMapping("/getAvailableDatabases/{username}")
+    public List<String> getAvailableTablesByUserName(@PathVariable("username") String userName) {
+        return tableInfoRepository.findDatabasesByUserName(userName);
     }
 
     @GetMapping("/getalljoined")
