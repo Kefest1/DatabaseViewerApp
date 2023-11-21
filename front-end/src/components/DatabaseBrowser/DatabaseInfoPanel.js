@@ -94,12 +94,15 @@ const DatabaseInfoPanel = () => {
                 console.error("Error fetching data:", error);
             });
     }, [userName]);
-
+    console.log(tablesData);
     const jsonData = transformToNestedStructure(tablesData);
+    console.log(jsonData);
 
     return (
-        <div>
-            {renderTree(jsonData)}
+        <div style={{ maxHeight: '95%', overflow: 'auto' }}>
+            <div style={{ maxHeight: '100%', overflow: 'auto' }}>
+                {renderTree(jsonData)}
+            </div>
         </div>
     );
 
