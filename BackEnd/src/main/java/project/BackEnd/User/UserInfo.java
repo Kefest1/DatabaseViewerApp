@@ -2,13 +2,10 @@ package project.BackEnd.User;
 
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.Getter;
+import lombok.Setter;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
-import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,62 +17,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
                 @UniqueConstraint(name = "user_unique", columnNames = "username")
         }
 )
+@Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserInfo implements UserDetails {
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword_hash() {
-        return password_hash;
-    }
-
-    public List<OwnershipDetails> getOwnershipDetails() {
-        return ownershipDetails;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(getUsername()));
-    }
-
-    @Override
-    public String getPassword() {
-        return password_hash;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
+public class UserInfo {
 
     @Id
     @SequenceGenerator(
@@ -83,7 +27,10 @@ public class UserInfo implements UserDetails {
             sequenceName = "userinfo_sequence",
             allocationSize = 1
     )
-    @GeneratedValue
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "userinfo_sequence"
+    )
     @Column(
             name = "id",
             updatable = false
@@ -130,7 +77,11 @@ public class UserInfo implements UserDetails {
         return sb.toString();
     }
 
-    public UserInfo(Long id, Long masterID, String username, String email, String password_hash, List<OwnershipDetails> ownershipDetails) {
+    public UserInfo() {
+
+    }
+
+    public UserInfo(Long id, String username, String email, String password_hash, List<OwnershipDetails> ownershipDetails) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -138,7 +89,7 @@ public class UserInfo implements UserDetails {
         this.ownershipDetails = ownershipDetails;
     }
 
-    public UserInfo(Long masterID, String username, String email, String password_hash) {
+    public UserInfo(String username, String email, String password_hash) {
         this.username = username;
         this.email = email;
         this.password_hash = password_hash;

@@ -4,8 +4,6 @@ package project.BackEnd.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.BackEnd.auth.AuthenticationRequest;
-import project.BackEnd.auth.AuthenticationResponse;
 
 import java.util.List;
 

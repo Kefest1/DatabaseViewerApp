@@ -11,5 +11,4 @@ public interface UserInfoService {
     public UserInfo getUsersByUsername(String username);
     public boolean checkExistenceByUsername(String username);
     public Long getIdByUsername(String username);
-    UserDetails loadUserByUsername(String username);
 }

@@ -14,7 +14,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserInfo saveUsers(UserPayload userPayload) {
-        var x = new UserInfo(userPayload.getMasterID(), userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash());
+        var x = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash());
         return userInfoRepository.save(x);
     }
 
@@ -38,8 +38,4 @@ public class UserInfoServiceImpl implements UserInfoService {
         return userInfoRepository.findByUsername(username).getId();
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String userName) {
-        return userInfoRepository.findByUsername(userName);
-    }
 }
