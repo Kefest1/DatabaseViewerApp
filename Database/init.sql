@@ -8,12 +8,18 @@ DROP
   TABLE IF EXISTS table_info CASCADE;
 DROP 
   TABLE IF EXISTS database_info CASCADE;
-
+DROP 
+  TABLE IF EXISTS ownership_join_table CASCADE;
+DROP 
+  TABLE IF EXISTS user_table_access CASCADE;
+  
 DELETE FROM field_info;
 DELETE FROM ownership_details;
 DELETE FROM user_info;
 DELETE FROM table_info;
 DELETE FROM database_info;
+DELETE FROM ownership_join_table;
+DELETE FROM user_table_access;
 
 CREATE TABLE user_info (
   id SERIAL PRIMARY KEY, 

@@ -2,7 +2,10 @@ package project.BackEnd.User;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.BackEnd.auth.AuthenticationRequest;
+import project.BackEnd.auth.AuthenticationResponse;
 
 import java.util.List;
 
@@ -14,12 +17,20 @@ public class UserInfoController {
     @Autowired
     UserInfoService usersService;
 
-    @PostMapping("/add")
-    public String add(@RequestBody UserPayload userPayload) {
-        usersService.saveUsers(userPayload);
-//        System.out.println(userPayload);
-        return "New user is added";
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthenticationResponse> register(
+//            @RequestBody RegisterRequest request
+//    ) {
+//        usersService.saveUsers(userPayload);
+//        return "New user is added";
+//    }
+//
+//    @PostMapping("/authenticate")
+//    public ResponseEntity<AuthenticationResponse> authenticate(
+//            @RequestBody AuthenticationRequest request
+//    ) {
+//
+//    }
 
     @GetMapping("/getAll")
     public List<UserInfo> list() {

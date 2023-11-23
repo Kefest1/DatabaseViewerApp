@@ -1,5 +1,7 @@
 package project.BackEnd.User;
 
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.List;
 
 
@@ -8,6 +10,6 @@ public interface UserInfoService {
     public List<UserInfo> getAllUsers();
     public UserInfo getUsersByUsername(String username);
     public boolean checkExistenceByUsername(String username);
-    public UserInfo findByMasterID(Long masterID);
     public Long getIdByUsername(String username);
+    UserDetails loadUserByUsername(String username);
 }

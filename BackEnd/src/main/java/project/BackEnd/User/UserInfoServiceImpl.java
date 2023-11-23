@@ -1,6 +1,7 @@
 package project.BackEnd.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,12 +34,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfo findByMasterID(Long masterID) {
-        return userInfoRepository.findByMasterID(masterID);
+    public Long getIdByUsername(String username) {
+        return userInfoRepository.findByUsername(username).getId();
     }
 
     @Override
-    public Long getIdByUsername(String username) {
-        return userInfoRepository.findByUsername(username).getId();
+    public UserDetails loadUserByUsername(String userName) {
+        return userInfoRepository.findByUsername(userName);
     }
 }
