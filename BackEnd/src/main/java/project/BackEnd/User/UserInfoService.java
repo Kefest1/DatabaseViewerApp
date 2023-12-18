@@ -1,7 +1,5 @@
 package project.BackEnd.User;
 
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.List;
 
 

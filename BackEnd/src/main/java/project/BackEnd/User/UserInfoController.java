@@ -8,27 +8,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/userinfo")
 @CrossOrigin
 public class UserInfoController {
 
     @Autowired
     UserInfoService usersService;
 
-//    @PostMapping("/register")
-//    public ResponseEntity<AuthenticationResponse> register(
-//            @RequestBody RegisterRequest request
-//    ) {
-//        usersService.saveUsers(userPayload);
-//        return "New user is added";
-//    }
-//
-//    @PostMapping("/authenticate")
-//    public ResponseEntity<AuthenticationResponse> authenticate(
-//            @RequestBody AuthenticationRequest request
-//    ) {
-//
-//    }
+    @PostMapping("/add")
+    public String add(@RequestBody UserPayload userPayload) {
+        usersService.saveUsers(userPayload);
+        return "New user is added";
+    }
 
     @GetMapping("/getAll")
     public List<UserInfo> list() {

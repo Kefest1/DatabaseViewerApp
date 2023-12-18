@@ -1,0 +1,29 @@
+/* Header.css */
+
+header {
+    background-color: #3498db;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+
+h3, h4, p {
+    margin: 0;
+}
+
+h3 {
+    font-size: 1.5em;
+}
+
+h4 {
+    font-size: 1.2em;
+}
+
+p {
+    font-size: 1em;
+}
+
+[align="center"] {
+    text-align: center;
+}

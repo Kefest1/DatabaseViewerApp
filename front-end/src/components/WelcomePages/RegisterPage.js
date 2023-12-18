@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import {Link} from "react-router-dom";
-import InvalidDataLabel from "./InvalidDataLabel";
 
 
 function RegisterPage() {
@@ -92,7 +91,7 @@ function RegisterPage() {
                             <button className='btn btn-light border-dark w-100'>Log in</button>
                         </Link>
                         {isVisible && <label>{caption}</label>}
-                    {/*</form>*/}
+                    {}
                 </div>
             </div>
         </div>

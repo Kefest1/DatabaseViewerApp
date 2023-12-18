@@ -1,76 +1,52 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './DatabaseInfoPanel.css';
-import {getCookie} from "../getCookie";
+import { getCookie } from "../getCookie";
 
 async function fetchAvailableDatabases(userName) {
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
     return await tables.json();
 }
 
-const transformToNestedStructure = (data) => {
-    const result = [];
+function organizeData(dataArray) {
+    const organizedData = {};
 
-    data.forEach((path) => {
-        const pathParts = path.split(',');
-        let currentLevel = result;
+    dataArray.forEach(entry => {
+        const [database, table, field] = entry.split(',');
 
-        pathParts.forEach((part, index) => {
-            const existingFolder = currentLevel.find((item) => item.name === part);
+        if (!organizedData[database]) {
+            organizedData[database] = {};
+        }
 
-            if (existingFolder) {
-                currentLevel = existingFolder.content;
-            } else {
-                const newFolder = {
-                    name: part,
-                    content: [],
-                };
+        if (!organizedData[database][table]) {
+            organizedData[database][table] = [];
+        }
 
-                currentLevel.push(newFolder);
-                currentLevel = newFolder.content;
-
-                if (index === pathParts.length - 1) {
-                    newFolder.content.push({ name: part });
-                }
-            }
-        });
+        organizedData[database][table].push(field);
     });
 
-    return result;
-};
+    return organizedData;
+}
 
-const File = ({ name }) => {
+const ColumnName = ({ name }) => {
     return <div style={{ marginLeft: '20px' }}>{name}</div>;
 };
 
-const TreeItem = ({ item }) => {
-    if (Array.isArray(item.content)) {
-        return <Folder name={item.name} content={item.content} isFolder={item.isFolder} />;
-    } else {
-        return <File name={item.name} />;
-    }
-};
-
-const Folder = ({ name, content }) => {
+const Tables = ({ columns, name }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleFolder = () => {
         setIsOpen(!isOpen);
     };
 
-    const isFolder = Array.isArray(content);
-    const isThirdLevel = content.every((item) => !Array.isArray(item.content));
-
     return (
         <div>
-            {isFolder && content.length > 0 && (
-                <div onClick={isThirdLevel ? null : toggleFolder}>
-                    {isThirdLevel ? '\u00A0\u00A0\u00A0' : isOpen ? '[-]' : '[+]'} {name}
-                </div>
-            )}
-            {isOpen && isFolder && content.length > 0 && (
+            <div onClick={toggleFolder}>
+                {isOpen ? '[-]' : '[+]'} {name}
+            </div>
+            {isOpen && (
                 <div style={{ marginLeft: '20px' }}>
-                    {content.map((item, index) => (
-                        <TreeItem key={index} item={item} />
+                    {columns.map((item, index) => (
+                        <ColumnName key={index} name={item} />
                     ))}
                 </div>
             )}
@@ -78,13 +54,52 @@ const Folder = ({ name, content }) => {
     );
 };
 
-const renderTree = (data) => {
-    return data.map((item, index) => <TreeItem key={index} item={item} />);
+const Databases = ({ tables, name }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleFolder = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const tableKeys = Object.keys(tables);
+
+    return (
+        <div>
+            <div onClick={toggleFolder}>
+                {isOpen ? '[-]' : '[+]'} {name}
+            </div>
+            {isOpen && (
+                <div style={{ marginLeft: '20px' }}>
+                    {tableKeys.map((key, index) => (
+                        <Tables key={index} columns={tables[key]} name={key} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 };
+
+const Tree = ({ databases }) => {
+    const dbKeys = Object.keys(databases);
+
+    return (
+        <div>
+            {'Available databases'}
+            <div style={{marginLeft: '20px'}}>
+                {dbKeys.map((key, index) => (
+                    <Databases key={index} tables={databases[key]} name={key}/>
+                ))}
+            </div>
+
+        </div>
+    );
+}
 
 const DatabaseInfoPanel = () => {
     const [tablesData, setTablesData] = useState([]);
+    const [jsonData, setJsonData] = useState(null);
     const userName = getCookie("userName");
+
     useEffect(() => {
         fetchAvailableDatabases(userName)
             .then((data) => {
@@ -94,18 +109,25 @@ const DatabaseInfoPanel = () => {
                 console.error("Error fetching data:", error);
             });
     }, [userName]);
-    console.log(tablesData);
-    const jsonData = transformToNestedStructure(tablesData);
-    console.log(jsonData);
+
+    useEffect(() => {
+        if (tablesData.length > 0) {
+            const organizedData = organizeData(tablesData);
+            setJsonData(organizedData);
+        }
+    }, [tablesData]);
 
     return (
         <div style={{ maxHeight: '95%', overflow: 'auto' }}>
             <div style={{ maxHeight: '100%', overflow: 'auto' }}>
-                {renderTree(jsonData)}
+                {jsonData ? (
+                    <Tree databases={jsonData} />
+                ) : (
+                    <p>Loading...</p>
+                )}
             </div>
         </div>
     );
-
 }
 
 export default DatabaseInfoPanel;

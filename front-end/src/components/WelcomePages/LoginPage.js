@@ -26,7 +26,7 @@ function LoginPage() {
             setIsVisible(true);
             return;
         }
-        const response = await fetch('http://localhost:8080/api/getByUsername?userName=' + username);
+        const response = await fetch('http://localhost:8080/api/userinfo/getByUsername?userName=' + username);
         const text = await response.json();
 
         let foundPassword = text.password_hash;
@@ -47,7 +47,6 @@ function LoginPage() {
             setIsVisible(true);
         }
 
-        // const err = ValidatePassword(password);
     }
 
     return (
@@ -71,7 +70,7 @@ function LoginPage() {
                         <button className='btn btn-light border-dark w-100'>Register</button>
                         </Link>
                         {IsVisible && <InvalidDataLabel errCode={errCode}/>}
-                    {/*</form>*/}
+                    {}
                 </div>
             </div>
         </div>
