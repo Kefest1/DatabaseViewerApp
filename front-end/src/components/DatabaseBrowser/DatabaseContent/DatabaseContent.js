@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './DatabaseContent.css';
-import './QueryTool';
-import QueryTool from "./QueryTool";
-
+import './BrowseDatabase/QueryTool';
+import QueryTool from "./BrowseDatabase/QueryTool";
 
 
 const Component = ( {name} ) => {
@@ -22,11 +21,11 @@ const DatabaseContent = () => {
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
-                return <Component name={"TODO"}/>;
+                return <QueryTool />;
             case 2:
                 return <Component name={"TODO"}/>;
             case 3:
-                return <QueryTool />;
+                return <Component name={"TODO"}/>;
             default:
                 return null;
         }
@@ -41,7 +40,8 @@ const DatabaseContent = () => {
                         className={`wcPanelTab ${activeButton === 1 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        Button 1
+                        Browse content
+
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 2 ? 'active' : ''}`}
@@ -53,7 +53,7 @@ const DatabaseContent = () => {
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        Browse content
+                        Button 3
                     </div>
 
                 </div>

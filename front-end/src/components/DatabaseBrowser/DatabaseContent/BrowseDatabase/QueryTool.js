@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getCookie } from "../../getCookie";
+import { getCookie } from "../../../getCookie";
 
 
 async function fetchAvailableDatabases(userName) {
@@ -45,8 +45,9 @@ async function fetchColumnsForTable(userName, database, table) {
 }
 
 async function runQuery(database, table, column) {
+    console.log("database, table, column");
     console.log(database, table, column);
-    // Perform your query logic here
+
     return undefined;
 }
 
@@ -97,6 +98,8 @@ const QueryTool = () => {
 
     useEffect(() => {
         if (selectedDatabase && selectedTable) {
+            console.log("dd")
+            setSelectedColumns([]);
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
                 .then((columns) => setAvailableColumns(columns))
                 .catch((error) =>
