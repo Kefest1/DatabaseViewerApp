@@ -21,35 +21,35 @@ public class OwnershipDetails {
     public String toString() {
         return "OwnershipDetails{" +
                 "id=" + id +
-                ", user=" + (user != null ? user.getId() : null) +
-                ", tableInfo=" + (tableInfo != null ? tableInfo.getId() : null) +
+                ", user=" + (userInfo != null ? userInfo : null) +
+                ", tableInfo=" + (tableInfo != null ? tableInfo : null) +
                 '}';
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "ownership_details_id")
     private Long id;
 
-    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_table_access",
             joinColumns = @JoinColumn(name = "ownership_details_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private UserInfo user;
+    private UserInfo userInfo;
 
-    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "ownership_join_table")
     private TableInfo tableInfo;
 
     public OwnershipDetails() {
+        userInfo = new UserInfo();
+        tableInfo = new TableInfo();
     }
 
-    public OwnershipDetails(OwnershipDetails ownershipDetails) {
-        ownershipDetails.setId(ownershipDetails.getId());
-    }
+//    public OwnershipDetails(OwnershipDetails ownershipDetails) {
+//        ownershipDetails.setId(ownershipDetails.getId());
+//    }
 
 }

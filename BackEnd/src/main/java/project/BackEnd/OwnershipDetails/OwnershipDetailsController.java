@@ -30,8 +30,15 @@ public class OwnershipDetailsController {
 
     @PostMapping("/add")
     public String addUser(@RequestBody OwnershipDetailsPayload ownershipDetailsPayload) {
+        System.out.println(ownershipDetailsPayload);
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         return "OK";
+    }
+
+
+    @GetMapping("/getall")
+    public List<OwnershipDetails> getall() {
+        return ownershipDetailsService.findAll();
     }
 
 }

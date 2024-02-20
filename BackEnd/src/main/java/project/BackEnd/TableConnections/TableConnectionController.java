@@ -19,7 +19,7 @@ public class TableConnectionController {
     }
 
     @PostMapping("/addconnection")
-    public String addConnection(@RequestBody  TableConnection tableConnection) {
+    public String addConnection(@RequestBody TableConnection tableConnection) {
         System.out.println("HERE: ");
         tableConnectionRepository.save(tableConnection);
         return "OK";

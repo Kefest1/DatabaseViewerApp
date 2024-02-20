@@ -12,6 +12,8 @@ DROP
   TABLE IF EXISTS ownership_join_table CASCADE;
 DROP 
   TABLE IF EXISTS user_table_access CASCADE;
+DROP 
+  TABLE IF EXISTS table_connection CASCADE;
   
 DELETE FROM field_info;
 DELETE FROM ownership_details;

@@ -1,5 +1,6 @@
 package project.BackEnd.TableConnections;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +23,12 @@ public class TableConnection {
 
     @ManyToOne
     @JoinColumn(name = "one")
+    @JsonIgnore
     TableInfo one;
 
     @ManyToOne
     @JoinColumn(name = "many")
+    @JsonIgnore
     TableInfo many;
 
 }

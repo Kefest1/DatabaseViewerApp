@@ -10,13 +10,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity(name = "UserInfo")
-@Table(
-        name = "UserInfo",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "user_unique", columnNames = "username")
-        }
-)
+@Entity
+@Table(name = "UserInfo")
 @Getter
 @Setter
 public class UserInfo {
@@ -32,16 +27,17 @@ public class UserInfo {
             generator = "userinfo_sequence"
     )
     @Column(
-            name = "id",
+            name = "user_info_id",
             updatable = false
     )
-    private Long id;
+    Long id;
 
     @Column(
             name = "username",
             updatable = false,
             nullable = false,
-            columnDefinition = "TEXT"
+            columnDefinition = "TEXT",
+            unique = true
     )
     private String username;
 
@@ -49,7 +45,8 @@ public class UserInfo {
             name = "email",
             updatable = false,
             nullable = false,
-            columnDefinition = "TEXT"
+            columnDefinition = "TEXT",
+            unique = true
     )
     private String email;
 
@@ -63,7 +60,7 @@ public class UserInfo {
     private String password_hash;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OwnershipDetails> ownershipDetails;
 
     @Override
@@ -81,12 +78,12 @@ public class UserInfo {
 
     }
 
-    public UserInfo(Long id, String username, String email, String password_hash, List<OwnershipDetails> ownershipDetails) {
+    public UserInfo(Long id, String username, String email, String password_hash, OwnershipDetails ownershipDetails) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password_hash = password_hash;
-        this.ownershipDetails = ownershipDetails;
+        this.ownershipDetails.add(ownershipDetails);
     }
 
     public UserInfo(String username, String email, String password_hash) {

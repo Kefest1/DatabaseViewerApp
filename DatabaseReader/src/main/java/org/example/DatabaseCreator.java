@@ -205,7 +205,7 @@ public class DatabaseCreator {
 
     private void insertColumnInfo(int tableID, String columnName, String datatype, String dataValue) {
         String safeDataValue = dataValue.replace("'", "''");
-        String query = "INSERT INTO field_info(table_id, column_name, data_type, data_value)" +
+        String query = "INSERT INTO field_info(id, column_name, data_type, data_value)" +
                 " VALUES(" + tableID + ", '" + columnName + "', '" + datatype + "', '" + safeDataValue + "');";
 //        System.out.println(query);
 
@@ -222,12 +222,12 @@ public class DatabaseCreator {
     private int getTableId(String tableName) {
 
         try {
-            String query = "SELECT id FROM table_info WHERE table_name = '" + tableName + "'";
+            String query = "SELECT table_info_id FROM table_info WHERE table_name = '" + tableName + "'";
             Statement statement = serverConnection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
 
-            return resultSet.getInt("id");
+            return resultSet.getInt("table_info_id");
         } catch (Exception e) {
             e.printStackTrace();
         }

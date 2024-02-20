@@ -17,6 +17,7 @@ public class FieldInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "field_id")
     private Long id;
 
     @Column(name = "data_type")
@@ -30,7 +31,7 @@ public class FieldInfo {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "table_id")
+    @JoinColumn(name = "id")
     private TableInfo tableInfo;
 
     public FieldInfo() {

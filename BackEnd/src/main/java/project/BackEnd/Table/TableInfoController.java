@@ -29,10 +29,10 @@ public class TableInfoController {
         return "OK";
     }
 
-    @GetMapping("/getAvailableDatabases/{username}")
-    public List<String> getAvailableTablesByUserName(@PathVariable("username") String userName) {
-        return tableInfoRepository.findDatabasesByUserName(userName);
-    }
+//    @GetMapping("/getAvailableDatabases/{username}")
+//    public List<String> getAvailableTablesByUserName(@PathVariable("username") String userName) {
+//        return tableInfoRepository.findDatabasesByUserName(userName);
+//    }
 
     @GetMapping("/getalljoined")
     public List<TableInfo> getAllODJoined() {
@@ -44,15 +44,15 @@ public class TableInfoController {
         return tableInfoRepository.findDistinctTableNames();
     }
 
-    @GetMapping("/getTables/{user}/{databasename}")
-    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName) {
-        return tableInfoRepository.findDatabasesByUserNameAndUsername(databaseName, userName);
-    }
-
-    @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
-    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
-        return tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablename(databaseName, userName, tablename);
-    }
+//    @GetMapping("/getTables/{user}/{databasename}")
+//    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName) {
+//        return tableInfoRepository.findDatabasesByUserNameAndUsername(databaseName, userName);
+//    }
+//
+//    @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
+//    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
+//        return tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablename(databaseName, userName, tablename);
+//    }
 
     @GetMapping("/getFields/{user}/{databasename}/{tablename}")
     public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {

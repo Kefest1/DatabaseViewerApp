@@ -21,18 +21,20 @@ public class TableInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "table_info_id")
     private Long id;
 
     @JsonIgnore
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OwnershipDetails> ownershipDetails;
 
-    @ManyToOne
     @JoinColumn(name = "database_id")
+    @JsonIgnore
+    @ManyToOne
     private DatabaseInfo databaseInfo;
 
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<FieldInfo> fields;
 
     @Column(name = "table_name", length = 255, nullable = false)
@@ -43,6 +45,7 @@ public class TableInfo {
 
     @Override
     public String toString() {
+        System.out.println("--------------------------");
         return "TableInfo{" +
                 "id=" + id +
                 ", databaseInfo=" + (databaseInfo != null ? databaseInfo.getId() : null) +

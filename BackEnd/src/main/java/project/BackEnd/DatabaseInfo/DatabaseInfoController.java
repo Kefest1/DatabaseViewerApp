@@ -4,6 +4,7 @@ package project.BackEnd.DatabaseInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
+import project.BackEnd.User.UserInfo;
 
 import java.util.List;
 
@@ -27,5 +28,4 @@ public class DatabaseInfoController {
     public List<String> getFolderMap(@PathVariable String username) {
         return databaseInfoRepository.findAllUsersTable(username);
     }
-
 }

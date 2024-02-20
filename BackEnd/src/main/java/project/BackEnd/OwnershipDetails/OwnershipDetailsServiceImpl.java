@@ -29,11 +29,12 @@ public class OwnershipDetailsServiceImpl implements OwnershipDetailsService {
         UserInfo userInfo = userInfoRepository.getReferenceById(ownershipDetailsPayload.userID);
         TableInfo tableInfo = tableInfoRepository.getReferenceById(ownershipDetailsPayload.tableID);
 
-        ownershipDetails.setUser(userInfo);
+        ownershipDetails.setUserInfo(userInfo);
         ownershipDetails.setTableInfo(tableInfo);
 
         ownershipDetailsRepository.save(ownershipDetails);
     }
+
 
     @Override
     public List<OwnershipDetails> findAll() {

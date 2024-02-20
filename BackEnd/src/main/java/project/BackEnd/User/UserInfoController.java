@@ -4,8 +4,8 @@ package project.BackEnd.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @RestController
 @RequestMapping("/api/userinfo")
@@ -17,11 +17,17 @@ public class UserInfoController {
 
     @PostMapping("/add")
     public String add(@RequestBody UserPayload userPayload) {
-        usersService.saveUsers(userPayload);
+        try {
+            usersService.saveUsers(userPayload);
+        } catch (DataIntegrityViolationException  e) {
+            return e.getMessage();
+        } catch (Exception e) {
+            return "An error has occured";
+        }
         return "New user is added";
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/getall")
     public List<UserInfo> list() {
         return usersService.getAllUsers();
     }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfo;
 import project.BackEnd.Table.TableInfoRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -29,11 +30,15 @@ public class FieldInfoController {
         return fieldInfoService.getAllFieldInfos();
     }
 
-
-    @GetMapping("/getcolumns/{username}")
-    public List<String> getAllByFieldName(@PathVariable String username) {
-        return fieldInfoRepository.findWithUsersAndTables(username);
+    @GetMapping("/bycolumnnames")
+    public List<FieldInfo> getFieldInfosByColumnNames(@RequestParam Collection<String> columnNames, @RequestParam String tablename) {
+        return fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(columnNames, tablename);
     }
+
+//    @GetMapping("/getcolumns/{username}")
+//    public List<String> getAllByFieldName(@PathVariable String username) {
+//        return fieldInfoRepository.findWithUsersAndTables(username);
+//    }
 
     @PostMapping("/insertvalue")
     public String insertValue(@RequestBody InsertPayload fieldInfo) {
