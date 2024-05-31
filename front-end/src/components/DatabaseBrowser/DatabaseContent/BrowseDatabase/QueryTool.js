@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { getCookie } from "../../../getCookie";
+import React, {useEffect, useState} from "react";
+import {getCookie} from "../../../getCookie";
 
 
 async function fetchAvailableDatabases(userName) {
@@ -44,11 +44,33 @@ async function fetchColumnsForTable(userName, database, table) {
     return data;
 }
 
-async function runQuery(database, table, column) {
-    console.log("database, table, column");
-    console.log(database, table, column);
+async function runQuery(database, table, columns) {
+    // Use template literals for better readability
+    console.log(`Database: ${database}`);
+    console.log(`Table: ${table}`);
+    console.log(`Columns: ${columns}`);
 
-    return undefined;
+    try {
+        const requestBody = { database, table, columns: [...columns] };
+
+        console.log(JSON.stringify(requestBody));
+
+        const url = 'http://localhost:8080/api/tableinfo/getAllFields';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+        return null;
+    }
 }
 
 const QueryTool = () => {
@@ -117,7 +139,7 @@ const QueryTool = () => {
                     justifyContent: "left",
                 }}
             >
-                <h5 style={{ margin: "0 10px" }}>
+                <h5 style={{margin: "0 10px"}}>
                     Create your own customizable query for{" "}
                 </h5>
                 <select
@@ -132,28 +154,29 @@ const QueryTool = () => {
                     ))}
                 </select>
 
-            {selectedDatabase && (
-                <div>
-                    <label>{'\u00A0\u00A0\u00A0'}Select a table:{'\u00A0'}</label>
+                {selectedDatabase && (
+                    <div>
+                        <label>{'\u00A0\u00A0\u00A0'}Select a table:{'\u00A0'}</label>
 
-                    <select
-                        value={selectedTable}
-                        onChange={(e) => setSelectedTable(e.target.value)}
-                    >
-                        <option value="">Select a table</option>
-                        {tablesForSelectedDatabase.map((table, index) => (
-                            <option key={index} value={table}>
-                                {table}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            )}
+                        <select
+                            value={selectedTable}
+                            onChange={(e) => setSelectedTable(e.target.value)}
+                        >
+                            <option value="">Select a table</option>
+
+                            {tablesForSelectedDatabase.map((table, index) => (
+                                <option key={index} value={table}>
+                                    {table}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
             </div>
 
 
             {selectedDatabase && selectedTable && (
-                <div style={{ marginTop: "10px" }}>
+                <div style={{marginTop: "10px"}}>
                     <label>Select columns:</label>
                     {availableColumns.map((column, index) => (
                         <div key={index}>
@@ -169,9 +192,17 @@ const QueryTool = () => {
                 </div>
             )}
 
-            <div style={{ marginTop: "10px" }}>
+            <div style={{marginTop: "10px"}}>
                 <button
-                    onClick={() => runQuery(selectedDatabase, selectedTable, selectedColumns)}
+                    onClick={() => {
+                        runQuery(selectedDatabase, selectedTable, selectedColumns) // Assuming runQuery returns a Promise
+                            .then(result => {
+                                console.log(result);
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }}
                 >
                     Run
                 </button>

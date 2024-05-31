@@ -13,8 +13,6 @@ function RegisterPage() {
     const [caption, setCaption] = useState('');
 
     const [users, setUsers] = useState('');
-
-
     const ValidatePassword = () => {
         console.log(users)
         setIsVisible(true);
@@ -47,13 +45,9 @@ function RegisterPage() {
             return errMessage;
         }
 
-        const response = await fetch('http://localhost:8080/api/checkExistenceByUsername/' + username);
+        const response = await fetch('http://localhost:8080/api/userinfo/checkExistenceByUsername/' + username);
         const is = await response.json();
-        if (is === false)
-            return false;
-
-
-        return true;
+        return is !== false;
     }
 
     return (
