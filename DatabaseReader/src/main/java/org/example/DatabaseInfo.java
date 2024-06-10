@@ -13,5 +13,4 @@ public class DatabaseInfo {
     private String jdbcUrl;
     private String username;
     private String password;
-
 }

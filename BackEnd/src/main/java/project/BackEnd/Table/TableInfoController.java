@@ -69,9 +69,9 @@ public class TableInfoController {
         System.out.println(request.getDatabase());
         System.out.println(request.getTable());
         request.getColumns().forEach(System.out::println);
-        var fields = tableInfoRepository.getFields(request.getDatabase(), request.getTable());
+        var fields = tableInfoRepository.getFields(request.getDatabase(), request.getTable(), request.getColumns());
         fields.forEach(System.out::println);
-        return tableInfoRepository.getFields(request.getDatabase(), request.getTable());
+        return tableInfoRepository.getFields(request.getDatabase(), request.getTable(), request.getColumns());
     }
 
 

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
+import Button1DbContent from "./Button1DbContent";
 
 
 async function fetchAvailableDatabases(userName) {
@@ -40,8 +41,7 @@ async function fetchColumnsForTable(userName, database, table) {
     const response = await fetch(
         `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
     );
-    const data = await response.json();
-    return data;
+    return await response.json();
 }
 
 async function runQuery(database, table, columns) {
@@ -81,6 +81,8 @@ const QueryTool = () => {
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [availableColumns, setAvailableColumns] = useState([]);
+    const [isQueryRunning, setIsQueryRunning] = useState(false);
+    const [queryResult, setQueryResult] = useState([]);
 
     function handleColumnCheckboxChange(column) {
         setSelectedColumns((prevSelectedColumns) => {
@@ -195,9 +197,10 @@ const QueryTool = () => {
             <div style={{marginTop: "10px"}}>
                 <button
                     onClick={() => {
-                        runQuery(selectedDatabase, selectedTable, selectedColumns) // Assuming runQuery returns a Promise
+                        runQuery(selectedDatabase, selectedTable, selectedColumns)
                             .then(result => {
-                                console.log(result);
+                                setQueryResult(result);
+                                setIsQueryRunning(true);
                             })
                             .catch(error => {
                                 console.error(error);
@@ -207,6 +210,7 @@ const QueryTool = () => {
                     Run
                 </button>
             </div>
+            {isQueryRunning && <Button1DbContent data={queryResult} />}
         </div>
     );
 };
