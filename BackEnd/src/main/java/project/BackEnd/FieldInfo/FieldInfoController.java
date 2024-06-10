@@ -30,10 +30,10 @@ public class FieldInfoController {
         return fieldInfoService.getAllFieldInfos();
     }
 
-    @GetMapping("/bycolumnnames")
-    public List<FieldInfo> getFieldInfosByColumnNames(@RequestParam Collection<String> columnNames, @RequestParam String tablename) {
-        return fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(columnNames, tablename);
-    }
+//    @GetMapping("/bycolumnnames")
+//    public List<FieldInfo> getFieldInfosByColumnNames(@RequestParam Collection<String> columnNames, @RequestParam String tablename) {
+//        return fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(columnNames, tablename);
+//    }
 
 //    @GetMapping("/getcolumns/{username}")
 //    public List<String> getAllByFieldName(@PathVariable String username) {

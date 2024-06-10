@@ -45,7 +45,6 @@ async function fetchColumnsForTable(userName, database, table) {
 }
 
 async function runQuery(database, table, columns) {
-    // Use template literals for better readability
     console.log(`Database: ${database}`);
     console.log(`Table: ${table}`);
     console.log(`Columns: ${columns}`);

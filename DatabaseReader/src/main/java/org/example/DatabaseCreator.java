@@ -15,9 +15,12 @@ public class DatabaseCreator {
     Connection serverConnection;
     Connection clientConnection;
 
+    Long columnIDGlobal;
+
     public DatabaseCreator(DatabaseInfo serverDb, DatabaseInfo clientDB) {
         this.serverDb = serverDb;
         this.clientDB = clientDB;
+        this.columnIDGlobal = 0L;
 
         try {
             serverConnection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
@@ -150,7 +153,7 @@ public class DatabaseCreator {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // Return null if the column or table is not found
+        return null;
     }
 
     private void setFieldInfo(Set<String> tableNames) {
@@ -189,13 +192,21 @@ public class DatabaseCreator {
     private void setColumnInfo(String tableName, String columnName) {
         int id = getTableId(tableName);
         String datatype = getDataTypeFromColumn(tableName, columnName);
-        String query = "SELECT " + columnName + " AS C FROM " + tableName + ";";
+        String query = "SELECT * FROM " + tableName + ";";
         try {
             Statement statement = clientConnection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
             while (resultSet.next()) {
-                var x = resultSet.getString(1);
-                insertColumnInfo(id, columnName, datatype, x);
+                this.columnIDGlobal++;
+                for (int i = 1; i <= columnCount; i++) {
+                    String fieldName = metaData.getColumnName(i);
+                    String fieldType = metaData.getColumnTypeName(i);
+                    String fieldValue = resultSet.getString(i);
+                    insertColumnInfo(id, fieldName, datatype, fieldValue, this.columnIDGlobal);
+                }
             }
 
         } catch (Exception e) {
@@ -203,11 +214,10 @@ public class DatabaseCreator {
         }
     }
 
-    private void insertColumnInfo(int tableID, String columnName, String datatype, String dataValue) {
+    private void insertColumnInfo(int tableID, String columnName, String datatype, String dataValue, Long column_id) {
         String safeDataValue = dataValue.replace("'", "''");
-        String query = "INSERT INTO field_info(id, column_name, data_type, data_value)" +
-                " VALUES(" + tableID + ", '" + columnName + "', '" + datatype + "', '" + safeDataValue + "');";
-//        System.out.println(query);
+        String query = "INSERT INTO field_info(id, column_name, data_type, data_value, column_id)" +
+                " VALUES(" + tableID + ", '" + columnName + "', '" + datatype + "', '" + safeDataValue + "', '" + column_id + "');";
 
         try {
             Statement statement = serverConnection.createStatement();

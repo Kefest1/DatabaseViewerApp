@@ -7,9 +7,13 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.FieldInfo.FieldInfo;
+import project.BackEnd.FieldInfo.FieldInfoRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tableinfo")
@@ -21,6 +25,9 @@ public class TableInfoController {
 
     @Autowired
     TableInfoRepository tableInfoRepository;
+
+    @Autowired
+    FieldInfoRepository fieldInfoRepository;
 
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
@@ -64,14 +71,13 @@ public class TableInfoController {
     }
 
     @PostMapping("/getAllFields")
-    public List<FieldInfo> getFields(@RequestBody TableInfoRequest request) {
+    public List<List<FieldInfo>> getFields(@RequestBody TableInfoRequest request) {
+        List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(request.getColumns(), request.getTable());
 
-        System.out.println(request.getDatabase());
-        System.out.println(request.getTable());
-        request.getColumns().forEach(System.out::println);
-        var fields = tableInfoRepository.getFields(request.getDatabase(), request.getTable(), request.getColumns());
-        fields.forEach(System.out::println);
-        return tableInfoRepository.getFields(request.getDatabase(), request.getTable(), request.getColumns());
+        Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()
+                .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
+
+        return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
     }
 
 
@@ -84,7 +90,5 @@ public class TableInfoController {
         private String table;
         private List<String> columns;
     }
-
-
 
 }

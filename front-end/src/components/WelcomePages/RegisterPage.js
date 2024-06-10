@@ -56,7 +56,6 @@ function RegisterPage() {
             <div style={BackGroundStyle}
                  className="d-flex justify-content-center align-items-center vh-100">
                 <div className='bg-white p-3 rounded w-25'>
-                    {/*<form action="http://localhost:8080">*/}
                         <h1>Sign-Up</h1>
                         <div className='mb-3'>
                             <label htmlFor="username"><strong>Username</strong></label>
