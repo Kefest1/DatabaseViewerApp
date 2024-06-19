@@ -1,4 +1,5 @@
 import React from 'react';
+import './DbTable.css';
 
 const DbTable = ({ data }) => {
     const columns = data[0].map((column) => ({
@@ -15,11 +16,11 @@ const DbTable = ({ data }) => {
     });
 
     return (
-        <table>
+        <table className="db-table">
             <thead>
             <tr>
                 {columns.map((column) => (
-                    <th key={column.accessor}>
+                    <th key={column.accessor} className="db-table-header">
                         {column.Header}
                         <br />
                         <small>({column.Footer})</small>
@@ -29,9 +30,11 @@ const DbTable = ({ data }) => {
             </thead>
             <tbody>
             {rows.map((row, index) => (
-                <tr key={index}>
+                <tr key={index} className="db-table-row">
                     {columns.map((column) => (
-                        <td key={column.accessor}>{row[column.accessor]}</td>
+                        <td key={column.accessor} className="db-table-cell">
+                            {row[column.accessor]}
+                        </td>
                     ))}
                 </tr>
             ))}

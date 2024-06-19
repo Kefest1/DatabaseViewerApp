@@ -1,0 +1,29 @@
+.db-table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+}
+
+.db-table-header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.db-table-row {
+    border-bottom: 1px solid #ddd;
+}
+
+.db-table-cell {
+    padding: 10px;
+    text-align: left;
+}
+
+.db-table-cell, .db-table-header {
+    border-right: 1px solid #ddd;
+}
+
+.db-table-cell:last-child, .db-table-header:last-child {
+    border-right: none;
+}

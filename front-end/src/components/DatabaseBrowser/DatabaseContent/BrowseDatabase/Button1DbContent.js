@@ -1,16 +1,16 @@
 import React from 'react';
 import DbTable from './DbTable';
-import Resizable from './Resizeable';
+import ResizableWrapper from './Resizeable';
 
 function Button1DbContent({ data }) {
     return (
-        <Resizable initialHeight={300}>
-            <div>
+        <ResizableWrapper>
+            <div style={{ maxHeight: '48vh', overflow: 'auto' }}>
                 <h2>DbContent</h2>
                 <button onClick={() => console.log(data)}>Click me</button>
                 <DbTable data={data} />
             </div>
-        </Resizable>
+        </ResizableWrapper>
     );
 }
 
