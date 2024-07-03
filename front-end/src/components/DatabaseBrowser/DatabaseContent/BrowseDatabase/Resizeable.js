@@ -10,6 +10,7 @@ const ResizableWrapper = ({ children }) => {
                 overflow: 'auto',
                 bottom: `40px`,
                 border: '1px solid black',
+                backgroundColor: '#ffffff',
             }}
         >
             {children}

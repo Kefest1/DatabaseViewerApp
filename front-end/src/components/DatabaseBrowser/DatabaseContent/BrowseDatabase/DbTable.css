@@ -13,11 +13,13 @@
 
 .db-table-row {
     border-bottom: 1px solid #ddd;
+    height: 5px;
 }
 
 .db-table-cell {
-    padding: 10px;
+    padding: 5px;
     text-align: left;
+    font-size: 0.8em;
 }
 
 .db-table-cell, .db-table-header {
@@ -26,4 +28,15 @@
 
 .db-table-cell:last-child, .db-table-header:last-child {
     border-right: none;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
 }
