@@ -9,7 +9,6 @@ import lombok.*;
 @ToString
 public class UpdatePayload {
     String columnName;
-    String tableName;
-    String oldDataValue;
+    Long rowIndex;
     String newDataValue;
 }

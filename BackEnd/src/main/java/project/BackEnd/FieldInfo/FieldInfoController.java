@@ -1,14 +1,9 @@
 package project.BackEnd.FieldInfo;
 
-import org.hibernate.sql.Insert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.BackEnd.Table.TableInfo;
 import project.BackEnd.Table.TableInfoRepository;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -56,10 +51,11 @@ public class FieldInfoController {
     @PutMapping("/update")
     public String updateFieldInfo(@RequestBody UpdatePayload updatePayload) {
         try {
-            fieldInfoRepository.updateFieldInfo(updatePayload.columnName, updatePayload.tableName, updatePayload.oldDataValue, updatePayload.newDataValue);
+            System.out.println(updatePayload);
+            fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.newDataValue);
             return "OK";
         } catch (Exception e) {
-            // Handle any exceptions that might occur during the update process
+            System.out.println(e.getCause().toString());
             return "Error";
         }
     }

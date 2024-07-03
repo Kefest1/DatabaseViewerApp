@@ -25,21 +25,26 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
 
     FieldInfo findByColumnNameAndTableInfo_TableNameAndDataValue(String columnName, String tableName, String dataValue);
 
+    @Modifying
+    @Query("UPDATE FieldInfo fi SET fi.dataValue = :dataValue WHERE fi.columnId = :columnId AND fi.columnName = :columnName")
+    @Transactional
+    Integer updateFieldInfoByColumnIdAndColumnName(@Param("dataValue") String dataValue, @Param("columnId") Long columnId, @Param("columnName") String columnName);
+
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName IN :columnNames")
     List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("columnNames") Collection<String> columnNames, @Param("tableName") String tableName);
 
 
-    @Transactional
-    default void updateFieldInfo(String columnName, String tableName, String oldDataValue, String newDataValue) {
-        FieldInfo existingFieldInfo = findByColumnNameAndTableInfo_TableNameAndDataValue(columnName, tableName, oldDataValue);
-
-        if (existingFieldInfo != null) {
-            existingFieldInfo.setDataValue(newDataValue);
-            save(existingFieldInfo);
-        } else {
-
-        }
-    }
+//    @Transactional
+//    default void updateFieldInfo(String columnName, String tableName,String newDataValue) {
+//        FieldInfo existingFieldInfo = findByColumnNameAndTableInfo_TableNameAndDataValue(columnName, tableName, oldDataValue);
+//
+//        if (existingFieldInfo != null) {
+//            existingFieldInfo.setDataValue(newDataValue);
+//            save(existingFieldInfo);
+//        } else {
+//
+//        }
+//    }
 
     FieldInfo findByIdAndColumnNameAndTableInfo_TableName(Long id, String columnName, String tableName);
 

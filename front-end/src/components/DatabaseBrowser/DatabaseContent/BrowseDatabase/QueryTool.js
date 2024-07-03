@@ -53,19 +53,22 @@ async function runQuery(database, table, columns) {
         const requestBody = { database, table, columns: [...columns] };
 
         console.log(JSON.stringify(requestBody));
-
         const url = 'http://localhost:8080/api/tableinfo/getAllFields';
+        const startTime = performance.now();
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
+        const endTime = performance.now();
+        const fetchTime = endTime - startTime;
 
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        return { result, fetchTime };
     } catch (error) {
         console.error(`Error: ${error.message}`);
         return null;
@@ -121,7 +124,7 @@ const QueryTool = () => {
 
     useEffect(() => {
         if (selectedDatabase && selectedTable) {
-            console.log("dd")
+            localStorage.setItem("selectedDatabase", selectedDatabase);
             setSelectedColumns([]);
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
                 .then((columns) => setAvailableColumns(columns))
@@ -209,7 +212,7 @@ const QueryTool = () => {
                     Run
                 </button>
             </div>
-            {isQueryRunning && <Button1DbContent data={queryResult} />}
+            {isQueryRunning && <Button1DbContent data={queryResult.result} fetchTime={queryResult.fetchTime} />}
         </div>
     );
 };
