@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/fieldinfo")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class FieldInfoController {
 
     @Autowired
@@ -52,8 +52,8 @@ public class FieldInfoController {
     public String updateFieldInfo(@RequestBody UpdatePayload updatePayload) {
         try {
             System.out.println(updatePayload);
-            fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.newDataValue);
-            return "OK";
+            Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
+            return i.toString();
         } catch (Exception e) {
             System.out.println(e.getCause().toString());
             return "Error";
@@ -61,13 +61,12 @@ public class FieldInfoController {
     }
 
     @DeleteMapping("/delete")
-    public String deleteFieldInfo(@RequestBody InsertPayload insertPayload) {
+    public String deleteFieldInfo(@RequestBody Integer columnID) {
         try {
-            fieldInfoRepository.deleteFieldInfo(insertPayload.dataValue, insertPayload.columnName, insertPayload.tableName);
+            fieldInfoRepository.deleteByColumnId(columnID.longValue());
             return "OK";
         } catch (Exception e) {
-            // Handle any exceptions that might occur during the update process
-            return "Error";
+            return e.toString();
         }
     }
 }

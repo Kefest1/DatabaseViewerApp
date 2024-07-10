@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
 import Button1DbContent from "./Button1DbContent";
-
+import QueryLogger from './QueryLogger';
 
 async function fetchAvailableDatabases(userName) {
     const response = await fetch(
@@ -86,6 +86,8 @@ const QueryTool = () => {
     const [isQueryRunning, setIsQueryRunning] = useState(false);
     const [queryResult, setQueryResult] = useState([]);
 
+    const logger = new QueryLogger();
+
     function handleColumnCheckboxChange(column) {
         setSelectedColumns((prevSelectedColumns) => {
             if (prevSelectedColumns.includes(column)) {
@@ -148,7 +150,13 @@ const QueryTool = () => {
                 </h5>
                 <select
                     value={selectedDatabase}
-                    onChange={(e) => setSelectedDatabase(e.target.value)}
+                    onChange={(e) =>
+                        {
+                            setSelectedDatabase(e.target.value);
+                            logger.addLog("PUSHED");
+                            console.log("PUSHED");
+                        }
+                    }
                 >
                     <option value="">Select a database</option>
                     {databases.map((database, index) => (

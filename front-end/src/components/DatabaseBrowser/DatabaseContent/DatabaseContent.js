@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './DatabaseContent.css';
 import './BrowseDatabase/QueryTool';
 import QueryTool from "./BrowseDatabase/QueryTool";
+import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 
 
 const Component = ( {name} ) => {
@@ -12,10 +13,8 @@ const Component = ( {name} ) => {
 const DatabaseContent = () => {
     const [activeButton, setActiveButton] = useState(null);
 
-
     const handleButtonClick = (buttonIndex) => {
         setActiveButton(buttonIndex);
-        return <Component name={'test no. ' + buttonIndex}/>;
     };
 
     const renderButtonContent = () => {
@@ -26,11 +25,12 @@ const DatabaseContent = () => {
                 return <Component name={"TODO"}/>;
             case 3:
                 return <Component name={"TODO"}/>;
+            case 4:
+                return <QueryLoggerComponent/>;
             default:
                 return null;
         }
     }
-
 
     return (
         <div>
@@ -54,6 +54,12 @@ const DatabaseContent = () => {
                         onClick={() => handleButtonClick(3)}
                     >
                         Button 3
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 4 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(4)}
+                    >
+                        Logger
                     </div>
 
                 </div>
