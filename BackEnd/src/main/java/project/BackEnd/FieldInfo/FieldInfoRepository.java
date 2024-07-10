@@ -14,6 +14,10 @@ import java.util.List;
 @Repository
 public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, CrudRepository<FieldInfo, Long> {
 
+    Long countDistinctColumnIDByColumnId(Long id);
+
+    Long countDistinctColumnNameByColumnId(Long id);
+
     @Query("SELECT DISTINCT fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti WHERE fi.columnName = :columnName AND ti.tableName = :tableName")
     String findTopDataTypeByColumnNameOrdered(@Param("columnName") String columnName, @Param("tableName") String tableName);
 
@@ -33,6 +37,10 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName IN :columnNames")
     List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("columnNames") Collection<String> columnNames, @Param("tableName") String tableName);
 
+    @Modifying
+    @Query("DELETE FROM FieldInfo f WHERE f.columnId = :columnId")
+    @Transactional
+    void deleteByColumnId(@Param("columnId") Long columnId);
 
 //    @Transactional
 //    default void updateFieldInfo(String columnName, String tableName,String newDataValue) {
