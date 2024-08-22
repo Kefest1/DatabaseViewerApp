@@ -20,8 +20,10 @@ DELETE FROM ownership_details;
 DELETE FROM user_info;
 DELETE FROM table_info;
 DELETE FROM database_info;
-DELETE FROM ownership_join_table;
-DELETE FROM user_table_access;
+
+INSERT INTO database_info (
+  database_id, database_name, created_at
+) VALUES (1, 'northwind', null);
 
 CREATE TABLE user_info (
   id SERIAL PRIMARY KEY, 

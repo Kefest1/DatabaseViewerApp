@@ -29,8 +29,8 @@ public class DatabaseCreator {
             return;
         }
 
-        String databaseName = setDatabaseName();
-        int databaseID = getDatabaseID(databaseName);
+//        String databaseName = setDatabaseName();
+        int databaseID = 1;  // getDatabaseID(databaseName);
 
         Set<String> tableNames = getTableNames();
         setTableInfo(tableNames, databaseID);
@@ -74,7 +74,7 @@ public class DatabaseCreator {
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
             resultSet.next();
-            databaseID = resultSet.getInt("database_id");
+            databaseID = resultSet.getInt("id");
 
             resultSet.close();
             statement.close();
@@ -165,8 +165,14 @@ public class DatabaseCreator {
     }
 
     private void fetchTableInfo(String tableName) {
-        Set<String> columnNames = new HashSet<>();
+        Set<String> columnNames = getColumnNames(tableName);
 
+            setColumnInfo(tableName);
+
+    }
+
+    private Set<String> getColumnNames(String tableName) {
+        Set <String> columnNames = new HashSet<>();
         try {
             String query = "SELECT * FROM " + tableName + " LIMIT 1";
             Statement statement = clientConnection.createStatement();
@@ -178,20 +184,18 @@ public class DatabaseCreator {
                     columnNames.add(columnName);
                 }
             }
-
-            for (String column : columnNames) {
-                setColumnInfo(tableName, column);
-            }
-
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        return columnNames;
     }
 
-    private void setColumnInfo(String tableName, String columnName) {
+    private void setColumnInfo(String tableName) {
         int id = getTableId(tableName);
-        String datatype = getDataTypeFromColumn(tableName, columnName);
+
         String query = "SELECT * FROM " + tableName + ";";
         try {
             Statement statement = clientConnection.createStatement();
@@ -203,7 +207,7 @@ public class DatabaseCreator {
                 this.columnIDGlobal++;
                 for (int i = 1; i <= columnCount; i++) {
                     String fieldName = metaData.getColumnName(i);
-                    String fieldType = metaData.getColumnTypeName(i);
+                    String datatype = getDataTypeFromColumn(tableName, fieldName);
                     String fieldValue = resultSet.getString(i);
                     insertColumnInfo(id, fieldName, datatype, fieldValue, this.columnIDGlobal);
                 }

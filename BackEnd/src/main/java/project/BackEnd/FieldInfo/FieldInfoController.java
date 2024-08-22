@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -48,12 +49,14 @@ public class FieldInfoController {
         return "OK";
     }
 
-    @PutMapping("/update")
-    public String updateFieldInfo(@RequestBody UpdatePayload updatePayload) {
+    @PostMapping("/update")
+    public String updateFieldInfo(@RequestBody List<UpdatePayload> updatePayloads) {
         try {
-            System.out.println(updatePayload);
-            Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
-            return i.toString();
+            for (UpdatePayload updatePayload : updatePayloads) {
+                System.out.println(updatePayload);
+                // Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
+            }
+            return "Success";
         } catch (Exception e) {
             System.out.println(e.getCause().toString());
             return "Error";
@@ -64,6 +67,17 @@ public class FieldInfoController {
     public String deleteFieldInfo(@RequestBody Integer columnID) {
         try {
             fieldInfoRepository.deleteByColumnId(columnID.longValue());
+            return "OK";
+        } catch (Exception e) {
+            return e.toString();
+        }
+    }
+
+    @DeleteMapping("/deleteArray")
+    public String deleteFieldInfo(@RequestBody Long[] columnIds) {
+        try {
+            System.out.println(Arrays.toString(columnIds));
+            // fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
             return "OK";
         } catch (Exception e) {
             return e.toString();

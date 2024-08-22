@@ -42,6 +42,11 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Transactional
     void deleteByColumnId(@Param("columnId") Long columnId);
 
+    @Modifying
+    @Query("DELETE FROM FieldInfo f WHERE f.columnId IN (:columnIds)")
+    @Transactional
+    void deleteByColumnIds(@Param("columnIds") List<Long> columnIds);
+
 //    @Transactional
 //    default void updateFieldInfo(String columnName, String tableName,String newDataValue) {
 //        FieldInfo existingFieldInfo = findByColumnNameAndTableInfo_TableNameAndDataValue(columnName, tableName, oldDataValue);

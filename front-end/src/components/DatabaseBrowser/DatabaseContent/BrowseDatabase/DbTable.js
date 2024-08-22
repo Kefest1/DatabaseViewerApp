@@ -4,6 +4,10 @@ import {exportCsv, exportJson, exportXml} from './DataImportExport';
 
 const DbTable = ({ data }) => {
     const [newRow, setNewRow] = React.useState(data);
+    const [crossedOutRows, setCrossedOutRows] = useState([]);
+    const [toDeleteRows, setToDeleteRows] = useState([]);
+
+    const [updatedRows, setUpdatedRows] = useState([]);
 
     const handleAddRow = () => {
         const row = { /* initialize new row with default values */ };
@@ -11,21 +15,69 @@ const DbTable = ({ data }) => {
 
     };
 
-    const handleDelete = (rowIndex) => {
-        const columnId = data[rowIndex][0].columnId;
-        console.log(columnId);
-        fetch('http://localhost:8080/api/fieldinfo/delete', {
+    const Debug = () => {
+        console.log("----------------");
+        console.log(data);
+        sortDataByColumnName("categoryname");
+        console.log(data);
+        console.log("----------------");
+    }
+
+    const commitChanges = () => {
+        commitUpdate();
+        commitDelete();
+    }
+
+    const commitDelete = () => {
+
+        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
-                mode: 'no-cors'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(columnId)
+            body: JSON.stringify(toDeleteRows)
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+    };
+
+    const commitUpdate = () => { // TODO remove duplicates before sending
+        fetch('http://localhost:8080/api/fieldinfo/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedRows),
         })
             .then(response => response.text())
             .then(data => console.log(data))
             .catch(error => console.error(error));
+    };
+
+    const sortDataByColumnName = (columnName) => {
+        rows.sort((a, b) => {
+            const aValue = a.find(item => item.columnName === columnName).dataValue;
+            const bValue = b.find(item => item.columnName === columnName).dataValue;
+            return aValue.localeCompare(bValue);
+        });
     }
+
+    const handleDelete = (rowIndex) => {
+        console.log(data[rowIndex][0].columnId);
+        const tableIndex = data[rowIndex][0].columnId;
+
+        if (crossedOutRows.includes(rowIndex)) {
+            setCrossedOutRows(crossedOutRows.filter((index) => index !== rowIndex));
+        } else {
+            setCrossedOutRows([...crossedOutRows, rowIndex]);
+        }
+
+        if (toDeleteRows.includes(tableIndex)) {
+            setToDeleteRows(toDeleteRows.filter((index) => index !== tableIndex));
+        } else {
+            setToDeleteRows([...toDeleteRows, tableIndex]);
+        }
+        console.log(crossedOutRows);
+    };
 
     const [editedFields, setEditedFields] = useState({});
     console.log(data)
@@ -59,7 +111,11 @@ const DbTable = ({ data }) => {
             newDataValue: value,
         };
 
-        fetch('http://localhost:8080/api/fieldinfo/update', {
+        setUpdatedRows([...updatedRows, updatePayload]);
+        console.log(updatePayload);
+
+
+        /*fetch('http://localhost:8080/api/fieldinfo/update', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatePayload),
@@ -67,6 +123,7 @@ const DbTable = ({ data }) => {
             .then(response => response.text())
             .then(data => console.log(data))
             .catch(error => console.error(error));
+            */
     };
 
     return (
@@ -107,6 +164,20 @@ const DbTable = ({ data }) => {
                     Export to JSON
                 </button>
 
+                <button
+                    onClick={() => commitChanges(data)}
+                    className="btn btn-info"
+                >
+                    Commit
+                </button>
+
+                <button
+                    onClick={() => Debug()}
+                    className="btn btn-info"
+                >
+                    Debug
+                </button>
+
             </div>
             <table className="db-table">
                 <thead>
@@ -123,7 +194,7 @@ const DbTable = ({ data }) => {
                 </thead>
                 <tbody>
                 {rows.map((row, index) => (
-                    <tr key={index} className="db-table-row">
+                    <tr key={index} className={`db-table-row ${crossedOutRows.includes(index) ? 'crossed-out' : ''}`}>
                         {columns.map((column) => (
                             <td
                                 key={column.accessor}

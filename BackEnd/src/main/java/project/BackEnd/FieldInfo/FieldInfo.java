@@ -31,7 +31,7 @@ public class FieldInfo {
     @Column(name = "column_name")
     private String columnName;
 
-    @Column(name = "data_value", length = 512)
+    @Column(name = "data_value", length = 512)  // ALTER TABLE field_info ALTER COLUMN data_value TYPE varchar(512);
     private String dataValue;
 
     @ManyToOne
