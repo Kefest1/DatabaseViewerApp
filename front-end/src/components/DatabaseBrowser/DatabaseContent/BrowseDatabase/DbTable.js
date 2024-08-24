@@ -7,6 +7,15 @@ const DbTable = ({ data }) => {
     const [crossedOutRows, setCrossedOutRows] = useState([]);
     const [toDeleteRows, setToDeleteRows] = useState([]);
 
+    const rowsBuf = data.map((row) => {
+        return row.reduce((acc, current) => {
+            acc[current.columnName] = current.dataValue;
+            return acc;
+        }, {});
+    });
+
+    const [rows, setRows] = useState(rowsBuf);
+
     const [updatedRows, setUpdatedRows] = useState([]);
 
     const handleAddRow = () => {
@@ -17,9 +26,9 @@ const DbTable = ({ data }) => {
 
     const Debug = () => {
         console.log("----------------");
-        console.log(data);
-        sortDataByColumnName("categoryname");
-        console.log(data);
+        console.log(rows);
+        sortByKey("description");
+        console.log(rows);
         console.log("----------------");
     }
 
@@ -53,11 +62,11 @@ const DbTable = ({ data }) => {
             .catch(error => console.error(error));
     };
 
-    const sortDataByColumnName = (columnName) => {
-        rows.sort((a, b) => {
-            const aValue = a.find(item => item.columnName === columnName).dataValue;
-            const bValue = b.find(item => item.columnName === columnName).dataValue;
-            return aValue.localeCompare(bValue);
+    function sortByKey(key) {
+        return rows.sort((a, b) => {
+            if (a[key] < b[key]) return -1;
+            if (a[key] > b[key]) return 1;
+            return 0;
         });
     }
 
@@ -79,20 +88,25 @@ const DbTable = ({ data }) => {
         console.log(crossedOutRows);
     };
 
+    const handleSort = (rowIndex) => {
+        console.log(rows);
+        const sortedRows = [...rows].sort((a, b) => {
+            if (a[rowIndex] < b[rowIndex]) return -1;
+            if (a[rowIndex] > b[rowIndex]) return 1;
+            return 0;
+        });
+        setRows(sortedRows);
+    };
+
     const [editedFields, setEditedFields] = useState({});
-    console.log(data)
+
     const columns = data[0].map((column) => ({
         Header: column.columnName,
         accessor: column.columnName,
         Footer: column.dataType,
     }));
 
-    const rows = data.map((row) => {
-        return row.reduce((acc, current) => {
-            acc[current.columnName] = current.dataValue;
-            return acc;
-        }, {});
-    });
+
 
     const handleInputChange = (columnName, rowIndex, value) => {
         setEditedFields((prevEditedFields) => ({
@@ -188,6 +202,7 @@ const DbTable = ({ data }) => {
                             {column.Header}
                             <br/>
                             <small>({column.Footer})</small>
+                            <button onClick={(e) => handleSort(column.Header)}>Sort by row</button>
                         </th>
                     ))}
                 </tr>
