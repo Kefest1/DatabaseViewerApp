@@ -14,9 +14,14 @@ import java.util.List;
 @Repository
 public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, CrudRepository<FieldInfo, Long> {
 
-    Long countDistinctColumnIDByColumnId(Long id);
+    @Query("SELECT COUNT(DISTINCT fi.columnId) FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
+    Long countDistinctColumnIDByColumnId(@Param("tableName") String tableName);
 
-    Long countDistinctColumnNameByColumnId(Long id);
+    @Query("SELECT COUNT(DISTINCT fi.columnName) FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
+    Long countDistinctColumnNamesByTableName(@Param("tableName") String tableName);
+
+    @Query("SELECT DISTINCT fi.columnName FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
+    List<String> findDistinctColumnNamesByTableName(@Param("tableName") String tableName);
 
     @Query("SELECT DISTINCT fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti WHERE fi.columnName = :columnName AND ti.tableName = :tableName")
     String findTopDataTypeByColumnNameOrdered(@Param("columnName") String columnName, @Param("tableName") String tableName);

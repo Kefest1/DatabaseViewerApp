@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './DbTable.css';
 import {exportCsv, exportJson, exportXml} from './DataImportExport';
 
@@ -15,21 +15,61 @@ const DbTable = ({ data }) => {
     });
 
     const [rows, setRows] = useState(rowsBuf);
+    const [rowCopy, setRowCopy] = useState(rowsBuf);
+
 
     const [updatedRows, setUpdatedRows] = useState([]);
-
     const handleAddRow = () => {
         const row = { /* initialize new row with default values */ };
         setNewRow([...rows, newRow]);
+    };
+    const [searchQueries, setSearchQueries] = useState({});
+    const [searchRows, setSearchRows] = useState([]);
 
+
+    const handleSearch = (columnName, newValue) => {
+        setRows(rowCopy);
+        setSearchRows((prevSearchRows) => {
+            const existingIndex = prevSearchRows.findIndex((row) => row.columnName === columnName);
+            if (existingIndex !== -1) {
+                if (newValue !== '') {
+                    prevSearchRows[existingIndex] = { columnName, newValue };
+                } else {
+                    prevSearchRows.splice(existingIndex, 1);
+                }
+            } else if (newValue !== '') {
+                prevSearchRows.push({ columnName, newValue });
+            }
+            return [...prevSearchRows];
+        });
     };
 
+    const filterData = () => {
+        const filteredRows = rows.filter((row) => {
+            return searchRows.every((searchRow) => {
+                const columnName = searchRow.columnName;
+                const newValue = searchRow.newValue;
+                const rowValue = row[columnName];
+                if (newValue === '')
+                    return true;
+                return rowValue.toString().toLowerCase().includes(newValue.toLowerCase());
+            });
+        });
+        setRows(filteredRows);
+    };
+
+    useEffect(() => {
+        console.log(searchRows);
+        filterData();
+    }, [searchRows]);
+
     const Debug = () => {
-        console.log("----------------");
-        console.log(rows);
-        sortByKey("description");
-        console.log(rows);
-        console.log("----------------");
+        console.log(searchRows);
+        // console.log("----------------");
+        // console.log(rows);
+        // sortByKey("description");
+        // console.log(rows);
+        // console.log("----------------");
     }
 
     const commitChanges = () => {
@@ -199,10 +239,29 @@ const DbTable = ({ data }) => {
                 <tr>
                     {columns.map((column) => (
                         <th key={column.accessor} className="db-table-header">
+                        <span>
                             {column.Header}
-                            <br/>
-                            <small>({column.Footer})</small>
+                        <br/>
+                        <small>({column.Footer})</small>
+                        </span>
                             <button onClick={(e) => handleSort(column.Header)}>Sort by row</button>
+                            <input
+                                type="search"
+                                value={searchQueries[column.accessor] || ''}
+                                onChange={(e) => {
+                                    setSearchQueries((prevSearchQueries) => ({
+                                        ...prevSearchQueries,
+                                        [column.accessor]: e.target.value,
+                                    }));
+                                    handleSearch(column.Header, e.target.value);
+                                }}
+                                placeholder="Search..."
+                                style={{
+                                    padding: '10px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '5px',
+                                }}
+                            />
                         </th>
                     ))}
                 </tr>

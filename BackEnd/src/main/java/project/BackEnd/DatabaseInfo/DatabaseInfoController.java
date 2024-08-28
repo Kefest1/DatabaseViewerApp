@@ -1,6 +1,7 @@
 package project.BackEnd.DatabaseInfo;
 
 
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
@@ -16,7 +17,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("api/databaseinfo")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class DatabaseInfoController {
 
     @Autowired
@@ -41,8 +42,9 @@ public class DatabaseInfoController {
         return databaseInfoRepository.findAllUsersTable(username);
     }
 
-    @GetMapping("/getStatistics/{database}")
+    @GetMapping("/getStatistics/{database}")  // TODO check database's name
     public DatabaseStatistics getDatabaseStatistics(@PathVariable String database) {
+//        return new DatabaseStatistics();
         return getStats();
     }
 
@@ -58,31 +60,39 @@ public class DatabaseInfoController {
         databaseStatistics.tableStatistics = new LinkedList<>();
 
         var tableNames = tableInfoRepository.findDistinctTableNames();
-        for (String tableName : tableNames)
+        for (String tableName : tableNames) {
             databaseStatistics.tableStatistics.add(getTableStatistic(tableName));
+        }
 
         return databaseStatistics;
     }
 
     private TableStatistics getTableStatistic(String tableName) {
         TableStatistics tableStatistics = new TableStatistics();
+
         tableStatistics.tableName = tableName;
-        Long id = tableInfoRepository.findIdByTableName(tableName);
-
-        tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnIDByColumnId(id);
-
-        tableStatistics.columnCounts = fieldInfoRepository.countDistinctColumnNameByColumnId(id);
+        tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnNamesByTableName(tableName);
+        tableStatistics.columnCounts = fieldInfoRepository.countDistinctColumnIDByColumnId(tableName);
+        tableStatistics.rowNames = fieldInfoRepository.findDistinctColumnNamesByTableName(tableName);
 
         return tableStatistics;
     }
 
 }
 
+@ToString
+@Getter
+@Setter
+@NoArgsConstructor
 class DatabaseStatistics {
     Integer tableCount;
     List<TableStatistics> tableStatistics;
 }
 
+@ToString
+@Getter
+@Setter
+@NoArgsConstructor
 class TableStatistics {
     String tableName;
     List<String> rowNames;
