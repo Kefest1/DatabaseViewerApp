@@ -7,6 +7,7 @@ import lombok.*;
 import project.BackEnd.DatabaseInfo.DatabaseInfo;
 import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
+import project.BackEnd.TableVisitHistory.TableVisitHistory;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -36,6 +37,9 @@ public class TableInfo {
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<FieldInfo> fields;
+
+    @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TableVisitHistory> visitHistory;
 
     @Column(name = "table_name", length = 255, nullable = false)
     private String tableName;
