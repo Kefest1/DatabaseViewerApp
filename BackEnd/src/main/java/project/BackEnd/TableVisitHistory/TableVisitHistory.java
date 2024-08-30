@@ -8,6 +8,7 @@ import project.BackEnd.OwnershipDetails.OwnershipDetails;
 import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfo;
 
+import java.util.Date;
 import java.sql.Timestamp;
 
 @Entity
@@ -32,11 +33,12 @@ public class TableVisitHistory {
     private UserInfo userInfo;
 
     @Column(name = "visited_at")
-    private Timestamp visitedAt;
+    private Date visitedAt;
 
-    public TableVisitHistory(TableInfo tableInfo) {
+
+    public TableVisitHistory(TableInfo tableInfo, UserInfo userInfo, Date visitedAt) {
         this.tableInfo = tableInfo;
-        this.visitedAt = new Timestamp(System.currentTimeMillis());
+        this.userInfo = userInfo;
+        this.visitedAt = visitedAt;
     }
-
 }
