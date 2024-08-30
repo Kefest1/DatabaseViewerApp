@@ -26,6 +26,16 @@ public class FieldInfoController {
         return fieldInfoService.getAllFieldInfos();
     }
 
+    @GetMapping("/getColumns/{databasename}/{tablename}/{columnname}")
+    public List<String> getSingleColumnData(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
+
+        List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
+        System.out.println("--------");
+        System.out.println(rows);
+
+        return rows;
+    }
+
 //    @GetMapping("/bycolumnnames")
 //    public List<FieldInfo> getFieldInfosByColumnNames(@RequestParam Collection<String> columnNames, @RequestParam String tablename) {
 //        return fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(columnNames, tablename);

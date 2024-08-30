@@ -3,6 +3,7 @@ import './DatabaseContent.css';
 import './BrowseDatabase/QueryTool';
 import QueryTool from "./BrowseDatabase/QueryTool";
 import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
+import Statistics from "./DatabaseStatistics/Statistics";
 
 
 const Component = ( {name} ) => {
@@ -22,7 +23,7 @@ const DatabaseContent = () => {
             case 1:
                 return <QueryTool />;
             case 2:
-                return <Component name={"TODO"}/>;
+                return <Statistics/>;
             case 3:
                 return <Component name={"TODO"}/>;
             case 4:
@@ -47,7 +48,7 @@ const DatabaseContent = () => {
                         className={`wcPanelTab ${activeButton === 2 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        Button 2
+                        Statistics
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}

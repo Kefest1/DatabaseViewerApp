@@ -23,19 +23,21 @@ public class DatabaseCreator {
         this.columnIDGlobal = 0L;
 
         try {
-            serverConnection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());
-            clientConnection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());
+            serverConnection = DriverManager.getConnection(serverDb.getJdbcUrl(), serverDb.getUsername(), serverDb.getPassword());  // database
+            clientConnection = DriverManager.getConnection(clientDB.getJdbcUrl(), clientDB.getUsername(), clientDB.getPassword());  // northwind
         } catch (SQLException e) {
             return;
         }
 
 //        String databaseName = setDatabaseName();
-        int databaseID = 1;  // getDatabaseID(databaseName);
+//        int databaseID = getDatabaseID(databaseName);
+//
+//        Set<String> tableNames = getTableNames();
+//        setTableInfo(tableNames, databaseID);
+//
+//        setFieldInfo(tableNames);
 
-        Set<String> tableNames = getTableNames();
-        setTableInfo(tableNames, databaseID);
-
-        setFieldInfo(tableNames);
+        setTableConnections();
 
         try {
             clientConnection.close();
@@ -43,6 +45,50 @@ public class DatabaseCreator {
         } catch (SQLException ignored) {
 
         }
+
+    }
+
+    private void setTableConnections() {
+        try {
+            Statement statement = clientConnection.createStatement();
+            String sqlQuery = "SELECT \n" +
+                    "    tc.table_name, \n" +
+                    "    kcu.column_name, \n" +
+                    "    ccu.table_name AS foreign_table_name, \n" +
+                    "    ccu.column_name AS foreign_column_name \n" +
+                    "FROM \n" +
+                    "    information_schema.table_constraints tc \n" +
+                    "JOIN \n" +
+                    "    information_schema.key_column_usage kcu \n" +
+                    "ON \n" +
+                    "    tc.constraint_name = kcu.constraint_name \n" +
+                    "JOIN \n" +
+                    "    information_schema.constraint_column_usage ccu \n" +
+                    "ON \n" +
+                    "    ccu.constraint_name = tc.constraint_name \n" +
+                    "WHERE \n" +
+                    "    tc.constraint_type = 'FOREIGN KEY';";
+
+            ResultSet resultSet = statement.executeQuery(sqlQuery);
+
+            while(resultSet.next()) {
+                String tableName = resultSet.getString("table_name");
+                String column_name = resultSet.getString("column_name");
+                String foreign_table_name = resultSet.getString("foreign_table_name");
+                String foreign_column_name = resultSet.getString("foreign_column_name");
+
+                System.out.println(tableName);
+                System.out.println(column_name);
+                System.out.println(foreign_table_name);
+                System.out.println(foreign_column_name);
+                System.out.println();
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
@@ -74,7 +120,7 @@ public class DatabaseCreator {
             ResultSet resultSet = statement.executeQuery(sqlQuery);
 
             resultSet.next();
-            databaseID = resultSet.getInt("id");
+            databaseID = resultSet.getInt("database_id");
 
             resultSet.close();
             statement.close();
@@ -141,7 +187,6 @@ public class DatabaseCreator {
         }
     }
 
-
     private String getDataTypeFromColumn(String tableName, String columnName) {
         try {
             DatabaseMetaData metaData = clientConnection.getMetaData();
@@ -166,8 +211,7 @@ public class DatabaseCreator {
 
     private void fetchTableInfo(String tableName) {
         Set<String> columnNames = getColumnNames(tableName);
-
-            setColumnInfo(tableName);
+        setColumnInfo(tableName);
 
     }
 

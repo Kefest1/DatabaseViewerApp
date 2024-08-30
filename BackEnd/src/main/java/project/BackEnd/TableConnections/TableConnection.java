@@ -31,4 +31,10 @@ public class TableConnection {
     @JsonIgnore
     TableInfo many;
 
+//    @Column(name = "one_column_name", length = 255, nullable = false)
+//    String oneColumnName;
+//
+//    @Column(name = "many_column_name", length = 255, nullable = false)
+//    String manyColumnName;
+
 }

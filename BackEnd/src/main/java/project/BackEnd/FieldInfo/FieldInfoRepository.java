@@ -14,6 +14,12 @@ import java.util.List;
 @Repository
 public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, CrudRepository<FieldInfo, Long> {
 
+    @Query("SELECT fi.dataValue FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE ti.tableName = :tableName AND fi.columnName = :columnName AND db.databaseName = :databaseName")
+    List<String> getSingleRow(@Param("tableName") String tableName, @Param("columnName") String columnName, @Param("databaseName") String databaseName);
+
+    @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
+    List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+
     @Query("SELECT COUNT(DISTINCT fi.columnId) FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
     Long countDistinctColumnIDByColumnId(@Param("tableName") String tableName);
 
