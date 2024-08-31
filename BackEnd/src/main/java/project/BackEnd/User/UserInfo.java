@@ -2,8 +2,8 @@ package project.BackEnd.User;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.apache.catalina.User;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
 import java.util.List;
@@ -15,7 +15,23 @@ import project.BackEnd.TableVisitHistory.TableVisitHistory;
 @Table(name = "UserInfo")
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
 public class UserInfo {
+
+    public UserInfo(String username, String email, String password_hash, boolean isAdmin) {
+        this.username = username;
+        this.email = email;
+        this.password_hash = password_hash;
+        this.isAdmin = isAdmin;
+    }
+
+    public UserInfo(String username, String email, String password_hash, UserInfo admin) {
+        this.username = username;
+        this.email = email;
+        this.password_hash = password_hash;
+        this.admin = admin;
+    }
 
     @Id
     @SequenceGenerator(
@@ -64,36 +80,21 @@ public class UserInfo {
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OwnershipDetails> ownershipDetails;
 
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private UserInfo admin;
 
+    @OneToMany(mappedBy = "admin")
+    private List<UserInfo> subordinates;
+
+    @Column(
+            name = "is_admin",
+            updatable = true,
+            nullable = false
+    )
+    private boolean isAdmin;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TableVisitHistory> visitHistory;
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("UserInfo{");
-        sb.append("id=").append(id);
-        sb.append(", username='").append(username).append('\'');
-        sb.append(", email='").append(email).append('\'');
-        sb.append(", password_hash='").append(password_hash).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
-
-    public UserInfo() {
-
-    }
-
-    public UserInfo(Long id, String username, String email, String password_hash, OwnershipDetails ownershipDetails) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password_hash = password_hash;
-        this.ownershipDetails.add(ownershipDetails);
-    }
-
-    public UserInfo(String username, String email, String password_hash) {
-        this.username = username;
-        this.email = email;
-        this.password_hash = password_hash;
-    }
 }

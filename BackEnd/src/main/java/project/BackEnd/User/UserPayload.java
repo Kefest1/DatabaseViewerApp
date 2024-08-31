@@ -12,6 +12,6 @@ public class UserPayload {
     private String username;
     private String email;
     private String password_hash;
-
-
+    private String registerCode;
+    private String adminName;
 }
