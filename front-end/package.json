@@ -16,6 +16,9 @@
     "react-split-pane": "^0.1.92",
     "web-vitals": "^2.1.4"
   },
+    "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

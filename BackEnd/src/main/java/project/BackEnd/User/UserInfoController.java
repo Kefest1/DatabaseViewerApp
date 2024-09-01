@@ -23,7 +23,7 @@ public class UserInfoController {
     @PostMapping("/add")
     public String add(@RequestBody UserPayload userPayload) {
         try {
-            UserInfo userInfo = null;
+            UserInfo userInfo;
             boolean isAdmin = Arrays.stream(availableHashes).toList().contains(userPayload.getRegisterCode());
 
             if (isAdmin) {

@@ -67,7 +67,10 @@ function LoginPage() {
                         <button onClick={Login} className='btn btn-success w-100'>Log in</button>
                         <p></p>
                         <Link to="/register">
-                        <button className='btn btn-light border-dark w-100'>Register</button>
+                            <button
+                                className='btn btn-light border-dark w-100'
+                                style={{ marginTop: '10px' }}
+                            >Register</button>
                         </Link>
                         {IsVisible && <InvalidDataLabel errCode={errCode}/>}
                     {}

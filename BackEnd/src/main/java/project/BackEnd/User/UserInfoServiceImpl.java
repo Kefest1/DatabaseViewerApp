@@ -12,9 +12,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoRepository userInfoRepository;
 
     @Override
-    public UserInfo saveUsers(UserPayload userPayload) {
-        var x = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash());
-        return userInfoRepository.save(x);
+    public UserInfo saveUsers(UserInfo userInfo) {
+        return userInfoRepository.save(userInfo);
     }
 
     @Override

@@ -74,14 +74,23 @@ function RegisterPage() {
                             <input className='form-control rounded-0' type="password" placeholder="Enter Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                         </div>
                         <div className='mb-3'>
-                            <label htmlFor="username"><strong>Master username</strong></label>
+                            <label htmlFor="username"><strong>Admin username (not required when registering as an admin)</strong></label>
+                            <input className='form-control rounded-0' type="text" placeholder="Master username"/>
+                        </div>
+                        <div className='mb-3'>
+                            <label htmlFor="username"><strong>Hash (use only when registering as an admin)</strong></label>
                             <input className='form-control rounded-0' type="text" placeholder="Master username"/>
                         </div>
 
                         <button className='btn btn-success border w-100' onClick={Register}>Register</button>
                         <p></p>
                         <Link to="/login">
-                            <button className='btn btn-light border-dark w-100'>Log in</button>
+                            <button
+                                className='btn btn-light border-dark w-100'
+                                style={{ marginTop: '10px' }}
+                            >
+                                Log in</button>
+
                         </Link>
                         {isVisible && <label>{caption}</label>}
                     {}

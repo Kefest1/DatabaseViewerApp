@@ -3,7 +3,6 @@ package project.BackEnd.User;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.catalina.User;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
 import java.util.List;
@@ -17,6 +16,7 @@ import project.BackEnd.TableVisitHistory.TableVisitHistory;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserInfo {
 
     public UserInfo(String username, String email, String password_hash, boolean isAdmin) {
@@ -90,7 +90,7 @@ public class UserInfo {
     @Column(
             name = "is_admin",
             updatable = true,
-            nullable = false
+            nullable = true
     )
     private boolean isAdmin;
 
