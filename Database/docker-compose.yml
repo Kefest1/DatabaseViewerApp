@@ -34,7 +34,7 @@ services:
   app:
     container_name: spring_app
     build:
-      context: ./BackEnd
+      context: ../BackEnd
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/database
       SPRING_DATASOURCE_USERNAME: username
@@ -50,7 +50,7 @@ services:
   frontend:
     container_name: react_frontend
     build:
-      context: ./front-end
+      context: ../front-end
     ports:
       - "3000:3000"
     networks:
