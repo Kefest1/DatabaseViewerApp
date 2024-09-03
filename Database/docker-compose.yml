@@ -7,9 +7,9 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
+      POSTGRES_DB: database
     volumes:
       - postgres:/data/postgres
-      - ../Database:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
