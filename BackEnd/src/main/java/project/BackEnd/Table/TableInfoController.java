@@ -36,6 +36,7 @@ public class TableInfoController {
 
     @PostMapping("/add")
     public String saveInfo(@RequestParam("userInfo") TableInfo tableInfo) {
+        System.out.println(tableInfo);
         tableInfoService.saveTableInfo(tableInfo);
         return "OK";
     }

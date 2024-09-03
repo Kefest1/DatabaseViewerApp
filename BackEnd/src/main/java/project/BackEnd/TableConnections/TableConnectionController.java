@@ -1,8 +1,10 @@
 package project.BackEnd.TableConnections;
 
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
+import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfoRepository;
 
 import java.util.ArrayList;
@@ -28,8 +30,11 @@ public class TableConnectionController {
     }
 
     @PostMapping("/addconnection")
-    public String addConnection(@RequestBody TableConnection tableConnection) {
-        System.out.println("HERE: ");
+    public String addConnection(@RequestBody TableInfoPayload tableInfoPayload) {
+        TableInfo tableInfoOne = tableInfoRepository.getTableInfoByTableName(tableInfoPayload.oneTableName);
+        TableInfo tableInfoMany = tableInfoRepository.getTableInfoByTableName(tableInfoPayload.manyTableName);
+        System.out.println(tableInfoPayload);
+        TableConnection tableConnection = new TableConnection(tableInfoOne, tableInfoMany, tableInfoPayload.oneColumnName, tableInfoPayload.manyColumnName);
         tableConnectionRepository.save(tableConnection);
         return "OK";
     }
@@ -40,7 +45,6 @@ public class TableConnectionController {
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
 
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
-        List<TableConnection> listMany = tableConnectionRepository.getConnectedTablesMany(id);
         List<TableConnection> retlist = new LinkedList<>();
 
         for (Long availableId : availableTables) {
@@ -50,15 +54,21 @@ public class TableConnectionController {
                     break;
                 }
             }
-            for (TableConnection tableConnectionMany : listMany) {
-                if (Objects.equals(tableConnectionMany.one.getId(), availableId)) {
-                    retlist.add(tableConnectionMany);
-                    break;
-                }
-            }
         }
 
-
         return retlist;
+    }
+
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    static class TableInfoPayload {
+        String oneColumnName;
+        String manyColumnName;
+
+        String oneTableName;
+        String manyTableName;
     }
 }

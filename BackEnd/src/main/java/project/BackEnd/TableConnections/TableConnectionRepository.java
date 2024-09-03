@@ -14,7 +14,4 @@ public interface TableConnectionRepository extends JpaRepository<TableConnection
 
     @Query("SELECT tc FROM TableConnection tc WHERE tc.one.id = :id")
     List<TableConnection> getConnectedTablesOne(@Param("id") Long id);
-
-    @Query("SELECT tc FROM TableConnection tc WHERE tc.many.id = :id")
-    List<TableConnection> getConnectedTablesMany(@Param("id") Long id);
 }

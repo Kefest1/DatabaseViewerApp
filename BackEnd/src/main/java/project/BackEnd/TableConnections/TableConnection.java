@@ -2,18 +2,15 @@ package project.BackEnd.TableConnections;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project.BackEnd.Table.TableInfo;
 
 @Entity
 @Table(name = "table_connection")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class TableConnection {
 
     @Id
@@ -23,12 +20,10 @@ public class TableConnection {
 
     @ManyToOne
     @JoinColumn(name = "one")
-    @JsonIgnore
     TableInfo one;
 
     @ManyToOne
     @JoinColumn(name = "many")
-    @JsonIgnore
     TableInfo many;
 
     @Column(name = "one_column_name", length = 255, nullable = false)
@@ -37,4 +32,10 @@ public class TableConnection {
     @Column(name = "many_column_name", length = 255, nullable = false)
     String manyColumnName;
 
+    public TableConnection(TableInfo one, TableInfo many, String oneColumnName, String manyColumnName) {
+        this.one = one;
+        this.many = many;
+        this.oneColumnName = oneColumnName;
+        this.manyColumnName = manyColumnName;
+    }
 }

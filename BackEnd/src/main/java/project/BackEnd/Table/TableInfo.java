@@ -18,6 +18,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class TableInfo {
 
     @Id
@@ -39,6 +40,7 @@ public class TableInfo {
     private List<FieldInfo> fields;
 
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<TableVisitHistory> visitHistory;
 
     @Column(name = "table_name", length = 255, nullable = false)
@@ -47,14 +49,4 @@ public class TableInfo {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
-    @Override
-    public String toString() {
-        System.out.println("--------------------------");
-        return "TableInfo{" +
-                "id=" + id +
-                ", databaseInfo=" + (databaseInfo != null ? databaseInfo.getId() : null) +
-                ", tableName='" + tableName + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 }

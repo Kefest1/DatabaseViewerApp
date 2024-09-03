@@ -14,6 +14,8 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     TableInfo getTableInfoById(Long id);
 
+    TableInfo getTableInfoByTableName(String tableName);
+
     @Query("SELECT ti.id FROM TableInfo ti WHERE ti.tableName = :tableName")
     Long getTableIdByTableName(@Param("tableName") String tableName);
 
