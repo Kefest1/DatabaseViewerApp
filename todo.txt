@@ -1,0 +1,1 @@
+Skrypt dostaje admina i info czyja jest baza i które tabele do jakiego użytkownika
