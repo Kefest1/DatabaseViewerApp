@@ -1,5 +1,5 @@
 Skrypt dostaje admina i info czyja jest baza i które tabele do jakiego użytkownika
-
+Sort/max/min/count, group BY
 SELECT 
   tc.table_name AS source_table,
   kcu.column_name AS source_column,
