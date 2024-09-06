@@ -58,7 +58,7 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     const [rowCopy, setRowCopy] = useState(rowsBuf);
 
 
-    const joinColumn = async (id, tableToJoin, matchingManyColumnName, matchingOneColumnName) => {
+    const joinColumn = async (id, tableToJoin, matchingManyColumnName, matchingOneColumnName, dataTypes) => {
         const response = await fetch(`http://localhost:8080/api/tableinfo/getFields/${userName}/${databaseName}/${tableToJoin}`);
         const result = await response.json();
         const groupedData = {};
@@ -98,15 +98,26 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
             });
         });
 
-        let dataTypes = [];
+        console.log(result[0]);
+        const dataTypesMany = [];
+        let i = 0;
 
-        result.forEach(obj => {
-            if (!dataTypes[obj.columnName]) {
-                dataTypes[obj.columnName] = obj.dataType;
+        while (result[i].columnId === result[0].columnId) {
+            console.log(result[i].columnName);
+            console.log(matchingOneColumnName[0]);
+            if (result[i].columnName !== matchingOneColumnName[0]) {
+                dataTypesMany.push(result[i].dataType);
             }
-        });
+            i++;
+        }
+
+
+
 
         console.log(dataTypes);
+        console.log(dataTypesMany);
+        console.log(dataTypes.concat(dataTypesMany));
+
         console.log(joinedData);
         console.log(keyNames);
 
@@ -232,10 +243,13 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     };
 
     const [editedFields, setEditedFields] = useState({});
-
     const columns = data[0].map((column) => {
 
         const isMatchingColumnName = tableConnections[3] && tableConnections[3].includes(column.columnName);
+
+        const columnId = column.columnId;
+        const dataTypes = data.flatMap(sublist => sublist.filter(node => node.columnId === columnId).map(node => node.dataType));
+        // setDataTypesBuf(dataTypes);
 
         return {
             Header: (
@@ -252,7 +266,7 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
                                 borderRadius: '5px',
                                 cursor: 'pointer',
                             }}
-                            onClick={() => joinColumn(tableConnections[0], tableConnections[1], tableConnections[2], tableConnections[3])}
+                            onClick={() => joinColumn(tableConnections[0], tableConnections[1], tableConnections[2], tableConnections[3], dataTypes)}
                         >
                             {tableConnections[0]} {tableConnections[1]} {tableConnections[2]} {tableConnections[3]}
                         </button>
