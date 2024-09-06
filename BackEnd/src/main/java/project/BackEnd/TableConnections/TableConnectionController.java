@@ -39,12 +39,39 @@ public class TableConnectionController {
         return "OK";
     }
 
-    @GetMapping("/getconnectedtables/{tablename}/{databasename}/{username}")
+    @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")
     public List<TableConnection> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
+        System.out.println("Here123");
         Long id = tableInfoRepository.getTableIdByTableName(tablename);
+
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
 
+        System.out.println(id + " " + tablename);
+
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
+
+        List<TableConnection> retlist = new LinkedList<>();
+
+        for (Long availableId : availableTables) {
+            for (TableConnection tableConnectionOne : listOne) {
+                if (Objects.equals(tableConnectionOne.many.getId(), availableId)) {
+                    retlist.add(tableConnectionOne);
+                }
+            }
+        }
+
+        return retlist;
+    }
+    @GetMapping("/checkifhasconnectedtables/{databasename}/{tablename}/{username}")
+    public boolean checkIfHasConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
+        Long id = tableInfoRepository.getTableIdByTableName(tablename);
+
+        List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
+
+        System.out.println(id + " " + tablename);
+
+        List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
+
         List<TableConnection> retlist = new LinkedList<>();
 
         for (Long availableId : availableTables) {
@@ -56,7 +83,7 @@ public class TableConnectionController {
             }
         }
 
-        return retlist;
+        return retlist.isEmpty();
     }
 
     @ToString

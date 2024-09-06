@@ -1,7 +1,6 @@
 package project.BackEnd.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import project.BackEnd.DatabaseInfo.DatabaseInfo;
@@ -26,13 +25,13 @@ public class TableInfo {
     @Column(name = "table_info_id")
     private Long id;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<OwnershipDetails> ownershipDetails;
 
     @JoinColumn(name = "database_id")
-    @JsonIgnore
     @ManyToOne
+    @JsonIgnore
     private DatabaseInfo databaseInfo;
 
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)

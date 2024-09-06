@@ -12,6 +12,6 @@ import java.util.Set;
 public interface TableConnectionRepository extends JpaRepository<TableConnection, Long> {
     List<TableConnection> findAll();
 
-    @Query("SELECT tc FROM TableConnection tc WHERE tc.one.id = :id")
+    @Query("SELECT tc FROM TableConnection tc WHERE tc.many.id = :id")
     List<TableConnection> getConnectedTablesOne(@Param("id") Long id);
 }

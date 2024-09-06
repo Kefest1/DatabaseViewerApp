@@ -220,7 +220,7 @@ const QueryTool = () => {
                     Run
                 </button>
             </div>
-            {isQueryRunning && <Button1DbContent data={queryResult.result} fetchTime={queryResult.fetchTime} />}
+            {isQueryRunning && <Button1DbContent data={queryResult.result} fetchTime={queryResult.fetchTime} tableName={selectedTable} databaseName={selectedDatabase} selectedColumns={selectedColumns} />}
         </div>
     );
 };

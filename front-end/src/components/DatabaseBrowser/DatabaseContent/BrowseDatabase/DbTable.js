@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import './DbTable.css';
 import {exportCsv, exportJson, exportXml} from './DataImportExport';
+import {getCookie} from "../../../getCookie";
 
-const DbTable = ({ data }) => {
+
+const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
+
+    const userName = getCookie("userName");
     const [newRow, setNewRow] = React.useState(data);
     const [crossedOutRows, setCrossedOutRows] = useState([]);
     const [toDeleteRows, setToDeleteRows] = useState([]);
+    const [dataTypesBuf, setDataTypesBuf] = useState([]);
 
     const rowsBuf = data.map((row) => {
         return row.reduce((acc, current) => {
@@ -14,13 +19,104 @@ const DbTable = ({ data }) => {
         }, {});
     });
 
+    const checkTableConnectionInfo = async () => {
+        const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`);
+        return await response.json();
+    }
+
+
+    const findTableName = async (searchTableName) => {
+        const connectedTables = await checkTableConnectionInfo();
+
+        const matchingIds = connectedTables.filter((item) => item.many.tableName === searchTableName).map((item) => item.one.id);
+        const matchingTableNames = connectedTables.filter((item) => item.many.tableName === searchTableName).map((item) => item.one.tableName);
+        const matchingManyColumnNames = connectedTables.filter((item) => item.many.tableName === searchTableName).map((item) => item.manyColumnName);
+        const matchingOneColumnNames = connectedTables.filter((item) => item.many.tableName === searchTableName).map((item) => item.oneColumnName);
+        return [matchingIds, matchingTableNames, matchingManyColumnNames, matchingOneColumnNames];
+    }
+
+    const [tableConnections, setTableConnections] = useState({});
+
+    useEffect(() => {
+        findTableName(tableName).then((res) => {
+            setTableConnections(res);
+        });
+    }, [tableName]);
+
+    useEffect(() => {
+        const rowsBuf = data.map((row) => {
+            return row.reduce((acc, current) => {
+                acc[current.columnName] = current.dataValue;
+                return acc;
+            }, {});
+        });
+        setRows(rowsBuf);
+        setRowCopy(rowsBuf);
+    }, [data]);
+
     const [rows, setRows] = useState(rowsBuf);
     const [rowCopy, setRowCopy] = useState(rowsBuf);
 
 
+    const joinColumn = async (id, tableToJoin, matchingManyColumnName, matchingOneColumnName) => {
+        const response = await fetch(`http://localhost:8080/api/tableinfo/getFields/${userName}/${databaseName}/${tableToJoin}`);
+        const result = await response.json();
+        const groupedData = {};
+
+        result.forEach((item) => {
+            const columnId = item.columnId;
+            if (!groupedData[columnId]) {
+                groupedData[columnId] = {};
+            }
+            groupedData[columnId][item.columnName] = item.dataValue;
+        });
+
+        const transformedResult = Object.values(groupedData).map((row) => {
+            const obj = {};
+            Object.keys(row).forEach((key) => {
+                obj[key] = row[key];
+            });
+            return obj;
+        });
+
+        const joinedData = rows.map((row) => {
+            const matchingValue = row[matchingManyColumnName];
+            const matchingRow = transformedResult.find((transformedRow) => transformedRow[matchingOneColumnName] === matchingValue);
+            if (matchingRow) {
+                return { ...row, ...matchingRow };
+            } else {
+                return row;
+            }
+        });
+
+        let keyNames = [];
+        joinedData.forEach(obj => {
+            Object.keys(obj).forEach(key => {
+                if (!keyNames.includes(key)) {
+                    keyNames.push(key);
+                }
+            });
+        });
+
+        let dataTypes = [];
+
+        result.forEach(obj => {
+            if (!dataTypes[obj.columnName]) {
+                dataTypes[obj.columnName] = obj.dataType;
+            }
+        });
+
+        console.log(dataTypes);
+        console.log(joinedData);
+        console.log(keyNames);
+
+    };
+
+
     const [updatedRows, setUpdatedRows] = useState([]);
+
     const handleAddRow = () => {
-        const row = { /* initialize new row with default values */ };
+        const row = {};
         setNewRow([...rows, newRow]);
     };
     const [searchQueries, setSearchQueries] = useState({});
@@ -29,6 +125,10 @@ const DbTable = ({ data }) => {
 
     const handleSearch = (columnName, newValue) => {
         setRows(rowCopy);
+        setSearchQueries((prevSearchQueries) => ({
+            ...prevSearchQueries,
+            [columnName]: newValue,
+        }));
         setSearchRows((prevSearchRows) => {
             const existingIndex = prevSearchRows.findIndex((row) => row.columnName === columnName);
             if (existingIndex !== -1) {
@@ -46,30 +146,23 @@ const DbTable = ({ data }) => {
 
     const filterData = () => {
         const filteredRows = rows.filter((row) => {
-            return searchRows.every((searchRow) => {
-                const columnName = searchRow.columnName;
-                const newValue = searchRow.newValue;
+            return columns.every((column) => {
+                const columnName = column.accessor;
+                const searchValue = searchQueries[columnName];
+                if (searchValue === undefined) return true;
                 const rowValue = row[columnName];
-                if (newValue === '')
-                    return true;
-                return rowValue.toString().toLowerCase().includes(newValue.toLowerCase());
+                return rowValue.toString().toLowerCase().includes(searchValue.toLowerCase());
             });
         });
         setRows(filteredRows);
     };
 
     useEffect(() => {
-        console.log(searchRows);
         filterData();
     }, [searchRows]);
 
     const Debug = () => {
         console.log(searchRows);
-        // console.log("----------------");
-        // console.log(rows);
-        // sortByKey("description");
-        // console.log(rows);
-        // console.log("----------------");
     }
 
     const commitChanges = () => {
@@ -128,23 +221,49 @@ const DbTable = ({ data }) => {
         console.log(crossedOutRows);
     };
 
-    const handleSort = (rowIndex) => {
-        console.log(rows);
+    const handleSort = (accessor) => {
         const sortedRows = [...rows].sort((a, b) => {
-            if (a[rowIndex] < b[rowIndex]) return -1;
-            if (a[rowIndex] > b[rowIndex]) return 1;
+            if (a[accessor] < b[accessor]) return -1;
+            if (a[accessor] > b[accessor]) return 1;
             return 0;
         });
         setRows(sortedRows);
+        setRowCopy(sortedRows);
     };
 
     const [editedFields, setEditedFields] = useState({});
 
-    const columns = data[0].map((column) => ({
-        Header: column.columnName,
-        accessor: column.columnName,
-        Footer: column.dataType,
-    }));
+    const columns = data[0].map((column) => {
+
+        const isMatchingColumnName = tableConnections[3] && tableConnections[3].includes(column.columnName);
+
+        return {
+            Header: (
+                <span>
+                {column.columnName}
+                    {isMatchingColumnName && (
+                        <button
+                            style={{
+                                marginLeft: 10,
+                                backgroundColor: '#4CAF50',
+                                color: '#ffffff',
+                                padding: '5px 10px',
+                                border: 'none',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                            }}
+                            onClick={() => joinColumn(tableConnections[0], tableConnections[1], tableConnections[2], tableConnections[3])}
+                        >
+                            {tableConnections[0]} {tableConnections[1]} {tableConnections[2]} {tableConnections[3]}
+                        </button>
+                    )}
+        </span>
+            ),
+            accessor: column.columnName,
+            Footer: column.dataType,
+        };
+    });
+
 
 
 
@@ -244,7 +363,8 @@ const DbTable = ({ data }) => {
                         <br/>
                         <small>({column.Footer})</small>
                         </span>
-                            <button onClick={(e) => handleSort(column.Header)}>Sort by row</button>
+                            <button onClick={(e) => handleSort(column.accessor)}>Sort by row</button>
+
                             <input
                                 type="search"
                                 value={searchQueries[column.accessor] || ''}

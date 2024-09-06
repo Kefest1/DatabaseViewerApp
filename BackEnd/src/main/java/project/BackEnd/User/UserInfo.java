@@ -76,15 +76,17 @@ public class UserInfo {
     )
     private String password_hash;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<OwnershipDetails> ownershipDetails;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")
+    @JsonIgnore
     private UserInfo admin;
 
     @OneToMany(mappedBy = "admin")
+    @JsonIgnore
     private List<UserInfo> subordinates;
 
     @Column(
@@ -94,7 +96,7 @@ public class UserInfo {
     )
     private boolean isAdmin;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<TableVisitHistory> visitHistory;
 }
