@@ -4,6 +4,8 @@ import './BrowseDatabase/QueryTool';
 import QueryTool from "./BrowseDatabase/QueryTool";
 import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 import Statistics from "./DatabaseStatistics/Statistics";
+import {getCookie} from "../../getCookie";
+import AdminPanel from "../admin/AdminPanel";
 
 
 const Component = ( {name} ) => {
@@ -12,6 +14,10 @@ const Component = ( {name} ) => {
 
 
 const DatabaseContent = () => {
+    console.log("getCookie(\"isAdmin\")");
+    console.log(getCookie("isAdmin"));
+    const isAdmin = getCookie("isAdmin");
+
     const [activeButton, setActiveButton] = useState(null);
 
     const handleButtonClick = (buttonIndex) => {
@@ -25,7 +31,10 @@ const DatabaseContent = () => {
             case 2:
                 return <Statistics/>;
             case 3:
-                return <Component name={"TODO"}/>;
+                if (isAdmin)
+                    return <AdminPanel name={"Admin panel"}/>;
+                else
+                    return <Component name={"TODO"}/>;
             case 4:
                 return <QueryLoggerComponent/>;
             default:
@@ -54,7 +63,7 @@ const DatabaseContent = () => {
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        Button 3
+                        Admin Panel
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 4 ? 'active' : ''}`}

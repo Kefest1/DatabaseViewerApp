@@ -10,7 +10,6 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     const [newRow, setNewRow] = React.useState(data);
     const [crossedOutRows, setCrossedOutRows] = useState([]);
     const [toDeleteRows, setToDeleteRows] = useState([]);
-    const [dataTypesBuf, setDataTypesBuf] = useState([]);
 
     const rowsBuf = data.map((row) => {
         return row.reduce((acc, current) => {
@@ -56,7 +55,9 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
 
     const [rows, setRows] = useState(rowsBuf);
     const [rowCopy, setRowCopy] = useState(rowsBuf);
-
+    useEffect(() => {
+        console.log('rows have changed:', rows);
+    }, [rows]);
 
     const joinColumn = async (id, tableToJoin, matchingManyColumnName, matchingOneColumnName, dataTypes) => {
         const response = await fetch(`http://localhost:8080/api/tableinfo/getFields/${userName}/${databaseName}/${tableToJoin}`);
@@ -79,7 +80,8 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
             return obj;
         });
 
-        const joinedData = rows.map((row) => {
+        console.log(rows);
+        const joinedData = await rows.map((row) => {
             const matchingValue = row[matchingManyColumnName];
             const matchingRow = transformedResult.find((transformedRow) => transformedRow[matchingOneColumnName] === matchingValue);
             if (matchingRow) {
@@ -88,6 +90,7 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
                 return row;
             }
         });
+        console.log(rows);
 
         let keyNames = [];
         joinedData.forEach(obj => {
@@ -98,13 +101,10 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
             });
         });
 
-        console.log(result[0]);
         const dataTypesMany = [];
         let i = 0;
 
         while (result[i].columnId === result[0].columnId) {
-            console.log(result[i].columnName);
-            console.log(matchingOneColumnName[0]);
             if (result[i].columnName !== matchingOneColumnName[0]) {
                 dataTypesMany.push(result[i].dataType);
             }
@@ -112,13 +112,10 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
         }
 
 
-
-
-        console.log(dataTypes);
-        console.log(dataTypesMany);
+        console.log("--------------------");
         console.log(dataTypes.concat(dataTypesMany));
-
-        console.log(joinedData);
+        setRows(joinedData);
+        console.log(result);
         console.log(keyNames);
 
     };

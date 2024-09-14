@@ -8,10 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPayload {
-    private Long masterID;
     private String username;
     private String email;
     private String password_hash;
-    private String registerCode;
+    private String hash;
     private String adminName;
 }

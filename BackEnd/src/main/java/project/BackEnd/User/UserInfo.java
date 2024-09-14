@@ -19,17 +19,11 @@ import project.BackEnd.TableVisitHistory.TableVisitHistory;
 @AllArgsConstructor
 public class UserInfo {
 
-    public UserInfo(String username, String email, String password_hash, boolean isAdmin) {
+    public UserInfo(String username, String email, String password_hash, boolean isAdmin, UserInfo admin) {
         this.username = username;
         this.email = email;
         this.password_hash = password_hash;
         this.isAdmin = isAdmin;
-    }
-
-    public UserInfo(String username, String email, String password_hash, UserInfo admin) {
-        this.username = username;
-        this.email = email;
-        this.password_hash = password_hash;
         this.admin = admin;
     }
 
@@ -75,6 +69,13 @@ public class UserInfo {
             columnDefinition = "TEXT"
     )
     private String password_hash;
+    @Column(
+            name = "is_admin",
+            updatable = true,
+            nullable = true,
+            columnDefinition = "BOOLEAN"
+    )
+    private boolean isAdmin;
 
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -89,12 +90,6 @@ public class UserInfo {
     @JsonIgnore
     private List<UserInfo> subordinates;
 
-    @Column(
-            name = "is_admin",
-            updatable = true,
-            nullable = true
-    )
-    private boolean isAdmin;
 
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

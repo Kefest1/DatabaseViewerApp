@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
+import project.BackEnd.OwnershipDetails.OwnershipDetailsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,16 @@ public class TableInfoController {
     @Autowired
     FieldInfoRepository fieldInfoRepository;
 
+    @Autowired
+    OwnershipDetailsRepository ownershipDetailsRepository;
+
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
         return tableInfoService.getAllTableInfo();
     }
 
     @PostMapping("/add")
-    public String saveInfo(@RequestParam("userInfo") TableInfo tableInfo) {
+    public String saveInfo(@RequestParam("tableInfo") TableInfo tableInfo) {
         System.out.println(tableInfo);
         tableInfoService.saveTableInfo(tableInfo);
         return "OK";
@@ -44,6 +48,33 @@ public class TableInfoController {
     @GetMapping("/getAvailableDatabases/{username}")
     public List<String> getAvailableTablesByUserName(@PathVariable("username") String userName) {
         return tableInfoRepository.findDatabasesByUserName(userName);
+    }
+
+
+    @GetMapping("/getAvailableTablesToAdd/{adminName}/{username}")
+    public List<Long> getAvailableTablesByUserName(@PathVariable("username") String userName,
+                                                   @PathVariable("adminName") String adminName) {
+
+        List<Long> adminTables = tableInfoRepository.findTableInfoByUserName(adminName);
+        List<Long> userTables = tableInfoRepository.findTableInfoByUserName(userName);
+
+        List<Long> availableTables = new ArrayList<>(adminTables);
+        availableTables.removeAll(userTables);
+
+        return availableTables;
+    }
+
+    @GetMapping("/getAllowedTables/{username}")
+    public List<Long> getAllowedTablesByUserName(@PathVariable("username") String userName,
+                                                   @PathVariable("adminName") String adminName) {
+
+        List<Long> adminTables = tableInfoRepository.findTableInfoByUserName(adminName);
+        List<Long> userTables = tableInfoRepository.findTableInfoByUserName(userName);
+
+        List<Long> availableTables = new ArrayList<>(adminTables);
+        availableTables.removeAll(userTables);
+
+        return availableTables;
     }
 
     @GetMapping("/getalljoined")
