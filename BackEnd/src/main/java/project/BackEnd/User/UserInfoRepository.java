@@ -9,7 +9,9 @@ import java.util.List;
 
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
+
     UserInfo findByUsername(String username);
+    UserInfo findByUsernameAndIsAdmin(String username, boolean isAdmin);
     UserInfo findByEmail(String email);
     UserInfo getUserInfoById(Long id);
 

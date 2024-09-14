@@ -22,15 +22,35 @@ public class UserInfoController {
 
     @PostMapping("/add")
     public String add(@RequestBody UserPayload userPayload) {
+        System.out.println(userPayload);
+        if (userInfoRepository.findByUsername(userPayload.getUsername()) != null) {
+            return "Username is already taken";
+        }
+        if (userInfoRepository.findByEmail(userPayload.getEmail()) != null) {
+            return "Email is already in use";
+        }
         try {
             UserInfo userInfo;
-            boolean isAdmin = Arrays.stream(availableHashes).toList().contains(userPayload.getRegisterCode());
+            boolean isAdmin = !userPayload.getHash().isEmpty();
 
             if (isAdmin) {
-                userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), true);
+                System.out.println("IsAdmin");
+
+                if (!Arrays.asList(availableHashes).contains(userPayload.getHash())) {
+                    System.out.println(userPayload.getHash());
+                    System.out.println("BadHash");
+                    return "Hash incorrect";
+                }
+
+                userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), true, null);
             } else {
+                System.out.println("user");
                 UserInfo admin = userInfoRepository.findByUsername(userPayload.getAdminName());
-                userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), admin);
+                if (admin == null) {
+                    System.out.println("Incorrect admin");
+                    return "Incorrect admin";
+                }
+                userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), false, admin);
             }
             usersService.saveUsers(userInfo);
         } catch (DataIntegrityViolationException  e) {
@@ -44,6 +64,17 @@ public class UserInfoController {
     @GetMapping("/getall")
     public List<UserInfo> list() {
         return usersService.getAllUsers();
+    }
+
+    @GetMapping("/checkifadmin/{userName}")
+    public boolean checkIfAdmin(@PathVariable("userName") String userName) {
+        return userInfoRepository.findByUsernameAndIsAdmin(userName, true) != null;
+    }
+
+
+    @GetMapping("/getsubordinates/{userName}")
+    public List<UserInfo> getSubordinates(@PathVariable("userName") String userName) {
+        return userInfoRepository.findByUsername(userName).getSubordinates();
     }
 
     @GetMapping("/getByUsername")

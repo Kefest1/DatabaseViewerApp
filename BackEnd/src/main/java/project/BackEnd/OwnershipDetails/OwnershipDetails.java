@@ -38,6 +38,12 @@ public class OwnershipDetails {
         tableInfo = new TableInfo();
     }
 
+    @Column(
+            name = "access_level",
+            nullable = true
+    )
+    private Integer accessLevel;
+
 //    public OwnershipDetails(OwnershipDetails ownershipDetails) {
 //        ownershipDetails.setId(ownershipDetails.getId());
 //    }

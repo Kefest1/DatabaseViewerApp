@@ -33,13 +33,17 @@ function LoginPage() {
 
         console.log(foundPassword);
         if (foundPassword === password) {
-            localStorage.setItem("Data1", "Value123OK");
-            sessionStorage.setItem("Data2", "V02");
-            setErrCode("Ok");
+            console.log("Login");
+            const response = await fetch('http://localhost:8080/api/userinfo/checkifadmin/' + username);
+            const isAdmin = await response.json();
+
+            setErrCode("Login successful");
             setIsVisible(true);
             const expirationTime = new Date();
             expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
             document.cookie = 'userName=' + username + '; expires=' + expirationTime.toUTCString() + '; secure; samesite=strict ';
+            document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
+
             window.location.href = 'http://localhost:3000';
         } else {
             console.log("Invalid password try again");
