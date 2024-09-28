@@ -1,133 +1,143 @@
 import React, { useEffect, useState } from 'react';
 import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import Box from "@mui/material/Box";
+import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import {Button, Stack} from "@mui/material";
 
 async function fetchAvailableDatabases(userName) {
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
-    return await tables.json();
+    return [
+        "northwind,categories",
+        "northwind,customers",
+        "northwind,employees",
+        "northwind,orderdetails",
+        "northwind,orders",
+        "northwind,products",
+        "northwind,shippers",
+        "northwind,suppliers",
+        "adventureworks,customers",
+        "adventureworks,orders",
+        "adventureworks,products"
+    ];
 }
 
-function organizeData(dataArray) {
-    const organizedData = {};
+function organizeData(data) {
+    let result = data.map(item => {
+        const [database, table] = item.split(',');
+        return `${database},${table}`;
+    });
+    console.log("organizedData");
+    console.log(result);
+    result = [...new Set(result)];
+    console.log(result);
 
-    dataArray.forEach(entry => {
-        const [database, table, field] = entry.split(',');
+    const res = {};
 
-        if (!organizedData[database]) {
-            organizedData[database] = {};
+    result.forEach(item => {
+        const [db, table] = item.split(',');
+
+        if (!res[db]) {
+            res[db] = {
+                id: db,
+                label: db,
+                children: []
+            };
         }
 
-        if (!organizedData[database][table]) {
-            organizedData[database][table] = [];
-        }
-
-        organizedData[database][table].push(field);
+        res[db].children.push({
+            id: `${db} ${table}`,
+            label: table
+        });
     });
 
-    return organizedData;
+    console.log(Object.values(res));
+    return Object.values(res);
 }
 
-const ColumnName = ({ name }) => {
-    return <div style={{ marginLeft: '20px' }}>{name}</div>;
-};
 
-const Tables = ({ columns, name }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggleFolder = () => {
-        setIsOpen(!isOpen);
-    };
-
-    return (
-        <div>
-            <div onClick={toggleFolder}>
-                {isOpen ? '[-]' : '[+]'} {name}
-            </div>
-            {isOpen && (
-                <div style={{ marginLeft: '20px' }}>
-                    {columns.map((item, index) => (
-                        <ColumnName key={index} name={item} />
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
-
-const Databases = ({ tables, name }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggleFolder = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const tableKeys = Object.keys(tables);
-
-    return (
-        <div>
-            <div onClick={toggleFolder}>
-                {isOpen ? '[-]' : '[+]'} {name}
-            </div>
-            {isOpen && (
-                <div style={{ marginLeft: '20px' }}>
-                    {tableKeys.map((key, index) => (
-                        <Tables key={index} columns={tables[key]} name={key} />
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
-
-const Tree = ({ databases }) => {
-    const dbKeys = Object.keys(databases);
-
-    return (
-        <div>
-            {'Available databases'}
-            <div style={{marginLeft: '20px'}}>
-                {dbKeys.map((key, index) => (
-                    <Databases key={index} tables={databases[key]} name={key}/>
-                ))}
-            </div>
-
-        </div>
-    );
-}
 
 const DatabaseInfoPanel = () => {
-    const [tablesData, setTablesData] = useState([]);
-    const [jsonData, setJsonData] = useState(null);
     const userName = getCookie("userName");
+    const [tablesData, setTablesData] = useState([]);
+
+    const [expandedItems, setExpandedItems] = React.useState([]);
+
+    const handleExpandedItemsChange = (event, itemIds) => {
+        setExpandedItems(itemIds);
+    };
+
+    const handleExpandClick = () => {
+        setExpandedItems((oldExpanded) =>
+            oldExpanded.length === 0 ? getAllItemsWithChildrenItemIds() : [],
+        );
+    };
+
+    const getAllItemsWithChildrenItemIds = () => {
+        const itemIds = [];
+        const registerItemId = (item) => {
+            if (item.children?.length) {
+                itemIds.push(item.id);
+                item.children.forEach(registerItemId);
+            }
+        };
+
+        tablesData.forEach(registerItemId);
+
+        return itemIds;
+    };
 
     useEffect(() => {
         fetchAvailableDatabases(userName)
             .then((data) => {
-                setTablesData(data);
+                const organizedData = organizeData(data);
+                setTablesData(organizedData);
+                console.log("Organized data:", organizedData);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
             });
     }, [userName]);
 
-    useEffect(() => {
-        if (tablesData.length > 0) {
-            const organizedData = organizeData(tablesData);
-            setJsonData(organizedData);
+
+    const handleNodeClick = (event, nodeId) => {
+        console.log("---------------");
+        const parentDatabase = tablesData.find((db) =>
+            db.children.some((child) => child.id === nodeId)
+        );
+
+        if (parentDatabase) {
+            const clickedTable = parentDatabase.children.find(
+                (child) => child.id === nodeId
+            );
+            console.log("Selected Table:", clickedTable.label);
+            console.log("Parent Database:", parentDatabase.label);
+        } else {
+            console.log("Selected Database:", nodeId);
         }
-    }, [tablesData]);
+    };
 
     return (
-        <div style={{ maxHeight: '95%', overflow: 'auto' }}>
-            <div style={{ maxHeight: '100%', overflow: 'auto' }}>
-                {jsonData ? (
-                    <Tree databases={jsonData} />
-                ) : (
-                    <p>Loading...</p>
-                )}
+        <Stack spacing={2}>
+            <div>
+                <Button onClick={handleExpandClick}>
+                    {expandedItems.length === 0 ? 'Expand all' : 'Collapse all'}
+                </Button>
             </div>
-        </div>
+
+                <Box sx={{minHeight: 352, minWidth: 250}}>
+                    <RichTreeView
+                        items={tablesData}
+                        expandedItems={expandedItems}
+                        onExpandedItemsChange={handleExpandedItemsChange}
+                        onItemClick={handleNodeClick}
+                    />
+                </Box>
+
+        </Stack>
+
     );
-}
+};
 
 export default DatabaseInfoPanel;

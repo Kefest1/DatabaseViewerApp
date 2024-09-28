@@ -13,6 +13,7 @@ const AdminPanel = ({ name }) => {
             `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`
         );
         const data = await response.json();
+        console.log(data);
         setSubordinates(data);
     };
 
@@ -32,8 +33,8 @@ const AdminPanel = ({ name }) => {
             <select value={selectedSubordinate} onChange={handleSelect}>
                 <option value="">Select a subordinate</option>
                 {subordinates.map((subordinate) => (
-                    <option key={subordinate.id} value={subordinate.id}>
-                        {subordinate.name}
+                    <option key={subordinate.id} value={subordinate.username}>
+                        {subordinate.username}
                     </option>
                 ))}
             </select>

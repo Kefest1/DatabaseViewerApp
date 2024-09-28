@@ -31,21 +31,21 @@ services:
       - my-network
     restart: unless-stopped
 
-  app:
-    container_name: spring_app
-    build:
-      context: ../BackEnd
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/database
-      SPRING_DATASOURCE_USERNAME: username
-      SPRING_DATASOURCE_PASSWORD: password
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - my-network
-    restart: unless-stopped
+  #app:
+   # container_name: spring_app
+    #build:
+     # context: ../BackEnd
+    #environment:
+     # SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/database
+      #SPRING_DATASOURCE_USERNAME: username
+      #SPRING_DATASOURCE_PASSWORD: password
+    #ports:
+     # - "8080:8080"
+    #depends_on:
+      #- postgres
+    #networks:
+      #- my-network
+    #restart: unless-stopped
 
   frontend:
     container_name: react_frontend
@@ -55,8 +55,8 @@ services:
       - "3000:3000"
     networks:
       - my-network
-    depends_on:
-      - app
+    #depends_on:
+     # - app
     restart: unless-stopped
     
 networks:

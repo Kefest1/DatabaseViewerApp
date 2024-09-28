@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../BackEnd/run.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/run.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Database/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../Database/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/Button1DbContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/Button1DbContent.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SzymonB5&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SzymonB5/DatabaseViewerApp.git&quot;,
+    &quot;accountId&quot;: &quot;9708236c-8f02-482b-8f80-864f47752607&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2mcWwATbxjvmwQB1sYcPVygRmJt" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Program Files (x86)\\JetBrains\\WebStorm 2023.3.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-WS-242.21829.149" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="" />
+      <created>1727376581001</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1727376581001</updated>
+      <workItem from="1727376582563" duration="780000" />
+      <workItem from="1727445139849" duration="6717000" />
+      <workItem from="1727466143678" duration="3905000" />
+      <workItem from="1727531344606" duration="4795000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

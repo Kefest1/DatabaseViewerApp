@@ -59,12 +59,17 @@ public class TableInfoController {
         List<String> adminTables = tableInfoRepository.findTableInfoAndDatabasesByUserName(adminName);
         List<String> userTables = tableInfoRepository.findTableInfoAndDatabasesByUserName(userName);
 
+
         List<String> availableTables = new ArrayList<>(adminTables);
         availableTables.removeAll(userTables);
 
         LinkedList<List<String>> retList = new LinkedList<>();
         retList.add(availableTables);
         retList.add(userTables);
+
+        System.out.println(adminTables);
+        System.out.println(userTables);
+        System.out.println(availableTables);
         return retList;
     }
 
