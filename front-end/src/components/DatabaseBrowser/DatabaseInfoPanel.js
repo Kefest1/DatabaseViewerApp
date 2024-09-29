@@ -57,8 +57,7 @@ function organizeData(data) {
 }
 
 
-
-const DatabaseInfoPanel = () => {
+const DatabaseInfoPanel = ({handleChange}) => {
     const userName = getCookie("userName");
     const [tablesData, setTablesData] = useState([]);
 
@@ -113,6 +112,7 @@ const DatabaseInfoPanel = () => {
             );
             console.log("Selected Table:", clickedTable.label);
             console.log("Parent Database:", parentDatabase.label);
+            handleChange(`${clickedTable.label},${parentDatabase.label}`);
         } else {
             console.log("Selected Database:", nodeId);
         }

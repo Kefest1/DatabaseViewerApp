@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import DatabaseInfoPanel from './DatabaseInfoPanel';
 import DatabaseContent from './DatabaseContent/DatabaseContent';
 import Header from "./Header";
@@ -8,6 +8,12 @@ const MainTest = () => {
     if (!getCookie("userName"))
         window.location.href = 'http://localhost:3000/login'
 
+    const [selectedTable, setSelectedTable] = useState("");
+
+    function handleSelectedTableChange(newTable) {
+        setSelectedTable(newTable);
+    }
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <div style={{ flex: '0 0 auto', background: 'lightblue' }}>
@@ -15,10 +21,10 @@ const MainTest = () => {
             </div>
             <div style={{ display: 'flex', flex: 1 }}>
                 <div style={{ flex: 1 , background: 'lightgray', border: '5px solid #FFF', borderRadius: '10px', padding: '10px' }}>
-                    <DatabaseInfoPanel />
+                    <DatabaseInfoPanel handleChange={handleSelectedTableChange} />
                 </div>
                 <div style={{ flex: 3 }}>
-                    <DatabaseContent />
+                    <DatabaseContent selectedTable={selectedTable} />
                 </div>
             </div>
         </div>

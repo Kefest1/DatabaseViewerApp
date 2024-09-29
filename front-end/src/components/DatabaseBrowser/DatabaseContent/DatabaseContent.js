@@ -13,9 +13,7 @@ const Component = ( {name} ) => {
 }
 
 
-const DatabaseContent = () => {
-    console.log("getCookie(\"isAdmin\")");
-    console.log(getCookie("isAdmin"));
+const DatabaseContent = ({selectedTable}) => {
     const isAdmin = getCookie("isAdmin");
 
     const [activeButton, setActiveButton] = useState(null);
@@ -45,7 +43,12 @@ const DatabaseContent = () => {
                 return null;
         }
     }
-
+    return (
+        <div>
+            <h1>{selectedTable}</h1>
+        </div>
+    );
+/*
     return (
         <div>
             <div className="header">
@@ -80,7 +83,7 @@ const DatabaseContent = () => {
             </div>
             {renderButtonContent()}
         </div>
-    );
+    );*/
 };
 
 export default DatabaseContent;
