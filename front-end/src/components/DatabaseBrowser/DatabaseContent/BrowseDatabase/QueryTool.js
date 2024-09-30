@@ -75,7 +75,7 @@ async function runQuery(database, table, columns) {
     }
 }
 
-const QueryTool = () => {
+const QueryTool = ({selectedDbTable}) => {
     const [databases, setDatabases] = useState([]);
     const [columnsByDatabase, setColumnsByDatabase] = useState({});
     const [selectedDatabase, setSelectedDatabase] = useState("");
@@ -154,7 +154,6 @@ const QueryTool = () => {
                         {
                             setSelectedDatabase(e.target.value);
                             logger.addLog("PUSHED");
-                            console.log("PUSHED");
                         }
                     }
                 >

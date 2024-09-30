@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './DatabaseContent.css';
 import './BrowseDatabase/QueryTool';
 import QueryTool from "./BrowseDatabase/QueryTool";
@@ -22,10 +22,19 @@ const DatabaseContent = ({selectedTable}) => {
         setActiveButton(buttonIndex);
     };
 
+    useEffect(() => {
+        if (selectedTable) {
+            console.log("From useEffect");
+            console.log(selectedTable);
+            handleButtonClick(1);
+        }
+    }, [selectedTable]);
+
+
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
-                return <QueryTool />;
+                return <QueryTool selectedTable={selectedTable} />;
             case 2:
                 return <Statistics/>;
             case 3:
@@ -46,11 +55,7 @@ const DatabaseContent = ({selectedTable}) => {
     return (
         <div>
             <h1>{selectedTable}</h1>
-        </div>
-    );
-/*
-    return (
-        <div>
+
             <div className="header">
                 <div className="button-container">
                     <div
@@ -83,7 +88,7 @@ const DatabaseContent = ({selectedTable}) => {
             </div>
             {renderButtonContent()}
         </div>
-    );*/
+    );
 };
 
 export default DatabaseContent;
