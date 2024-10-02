@@ -173,8 +173,7 @@ const QueryTool = ({selectedDbTable}) => {
             })
             .catch((error) => console.error("Error fetching databases:", error));
     }, [userName, selectedDbTable]);
-
-
+    
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
