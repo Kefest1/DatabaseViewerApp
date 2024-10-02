@@ -35,6 +35,8 @@ async function fetchAvailableDatabases(userName) {
             columnsByDatabase[database].push(column);
         }
     });
+    console.log("columnsByDatabase");
+    console.log(columnsByDatabase);
 
     return { databases, columnsByDatabase };
 }
@@ -53,6 +55,7 @@ function extractDatabaseNames(data) {
 }
 
 async function fetchColumnsForTable(userName, database, table) {
+    console.log(`http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`)
     const response = await fetch(
         `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
     );
@@ -233,6 +236,7 @@ const QueryTool = ({selectedDbTable}) => {
                                         .then(result => {
                                             setQueryResult(result);
                                             handleButtonPress();
+                                            setIsButtonPressed(true);
                                         })
                                         .catch(error => {
                                             console.error(error);
