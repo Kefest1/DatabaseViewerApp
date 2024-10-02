@@ -12,29 +12,32 @@ const Component = ( {name} ) => {
     return <div style={{ marginLeft: '20px' }}>{name}</div>;
 }
 
-
 const DatabaseContent = ({selectedTable}) => {
     const isAdmin = getCookie("isAdmin");
 
     const [activeButton, setActiveButton] = useState(null);
+    const [locSelectedTable, setLocSelectedTable] = useState("");
 
     const handleButtonClick = (buttonIndex) => {
+        if (buttonIndex === 1) {
+            setLocSelectedTable("");
+        }
+        setActiveButton(buttonIndex);
+    };
+
+    const handleChangeInSelectedTable = (buttonIndex) => {
+        setLocSelectedTable(selectedTable);
         setActiveButton(buttonIndex);
     };
 
     useEffect(() => {
-        if (selectedTable) {
-            console.log("From useEffect");
-            console.log(selectedTable);
-            handleButtonClick(1);
-        }
+        handleChangeInSelectedTable(1);
     }, [selectedTable]);
-
 
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
-                return <QueryTool selectedTable={selectedTable} />;
+                return <QueryTool selectedDbTable={locSelectedTable} />;
             case 2:
                 return <Statistics/>;
             case 3:
@@ -52,10 +55,9 @@ const DatabaseContent = ({selectedTable}) => {
                 return null;
         }
     }
+
     return (
         <div>
-            <h1>{selectedTable}</h1>
-
             <div className="header">
                 <div className="button-container">
                     <div

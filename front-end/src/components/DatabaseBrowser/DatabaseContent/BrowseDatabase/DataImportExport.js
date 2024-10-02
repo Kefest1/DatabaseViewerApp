@@ -15,7 +15,7 @@ function exportCsv(data) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${localStorage.getItem("selectedDatabase")}.csv`;
+    a.download = `${localStorage.getItem("")}.csv`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -39,7 +39,7 @@ function exportXml(data) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${localStorage.getItem("selectedDatabase")}.xml`;
+    a.download = `${localStorage.getItem("")}.xml`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -58,7 +58,7 @@ function exportJson(data) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${localStorage.getItem("selectedDatabase")}.json`;
+    a.download = `${localStorage.getItem("")}.json`;
     a.click();
     URL.revokeObjectURL(url);
 }

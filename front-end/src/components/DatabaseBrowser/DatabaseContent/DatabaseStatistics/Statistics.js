@@ -44,7 +44,6 @@ const Statistics = () => {
     }
 
     useEffect(() => {
-        console.log("---------");
         if (selectedColumn1) {
             console.log("****---------");
             GetXPlot();

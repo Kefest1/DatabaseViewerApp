@@ -11,8 +11,6 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
         const rows = [];
         const columns = {};
 
-        console.log(data);
-
         data.forEach((row, rowIndex) => {
             const rowObj = {id: row[0].columnId};
             row.forEach((column) => {
