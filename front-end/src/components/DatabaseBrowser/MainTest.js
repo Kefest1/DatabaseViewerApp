@@ -24,7 +24,7 @@ const MainTest = () => {
                     <DatabaseInfoPanel handleChange={handleSelectedTableChange} />
                 </div>
                 <div style={{ flex: 3 }}>
-                    <DatabaseContent selectedTable={selectedTable} />
+                    <DatabaseContent selectedTable={selectedTable} setSelectedTable={handleSelectedTableChange} />
                 </div>
             </div>
         </div>

@@ -28,10 +28,7 @@ function organizeData(data) {
         const [database, table] = item.split(',');
         return `${database},${table}`;
     });
-    console.log("organizedData");
-    console.log(result);
     result = [...new Set(result)];
-    console.log(result);
 
     const res = {};
 
@@ -52,7 +49,6 @@ function organizeData(data) {
         });
     });
 
-    console.log(Object.values(res));
     return Object.values(res);
 }
 
@@ -92,7 +88,6 @@ const DatabaseInfoPanel = ({handleChange}) => {
             .then((data) => {
                 const organizedData = organizeData(data);
                 setTablesData(organizedData);
-                console.log("Organized data:", organizedData);
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
@@ -101,7 +96,7 @@ const DatabaseInfoPanel = ({handleChange}) => {
 
 
     const handleNodeClick = (event, nodeId) => {
-        console.log("---------------");
+
         const parentDatabase = tablesData.find((db) =>
             db.children.some((child) => child.id === nodeId)
         );
@@ -110,11 +105,7 @@ const DatabaseInfoPanel = ({handleChange}) => {
             const clickedTable = parentDatabase.children.find(
                 (child) => child.id === nodeId
             );
-            console.log("Selected Table:", clickedTable.label);
-            console.log("Parent Database:", parentDatabase.label);
             handleChange(`${clickedTable.label},${parentDatabase.label}`);
-        } else {
-            console.log("Selected Database:", nodeId);
         }
     };
 

@@ -2,6 +2,21 @@ import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
 import Button1DbContent from "./Button1DbContent";
 import QueryLogger from './QueryLogger';
+import Select from '@mui/material/Select';
+import {Button, FormControl, InputLabel, MenuItem, OutlinedInput} from "@mui/material";
+import Checkbox from '@mui/material/Checkbox';
+import ListItemText from '@mui/material/ListItemText';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
+};
 
 async function fetchAvailableDatabases(userName) {
     const response = await fetch(
@@ -20,6 +35,8 @@ async function fetchAvailableDatabases(userName) {
             columnsByDatabase[database].push(column);
         }
     });
+    console.log("columnsByDatabase");
+    console.log(columnsByDatabase);
 
     return { databases, columnsByDatabase };
 }
@@ -38,6 +55,7 @@ function extractDatabaseNames(data) {
 }
 
 async function fetchColumnsForTable(userName, database, table) {
+    console.log(`http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`)
     const response = await fetch(
         `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
     );
@@ -75,44 +93,47 @@ async function runQuery(database, table, columns) {
     }
 }
 
+
+
 const QueryTool = ({selectedDbTable}) => {
-    const [databases, setDatabases] = useState([]);
-    const [columnsByDatabase, setColumnsByDatabase] = useState({});
+    const [availableDatabases, setAvailableDatabases] = useState([]);
+    const [columnsByDatabase, setColumnsByDatabase] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [selectedTable, setSelectedTable] = useState("");
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
-    const [selectedColumns, setSelectedColumns] = useState([]);
     const [availableColumns, setAvailableColumns] = useState([]);
-    const [isQueryRunning, setIsQueryRunning] = useState(false);
+    const [selectedColumns, setSelectedColumns] = useState([]);
+    const [isButtonPressed, setIsButtonPressed] = useState(false);
     const [queryResult, setQueryResult] = useState([]);
-
-    const logger = new QueryLogger();
-
-    function handleColumnCheckboxChange(column) {
-        setSelectedColumns((prevSelectedColumns) => {
-            if (prevSelectedColumns.includes(column)) {
-                return prevSelectedColumns.filter((col) => col !== column);
-            } else {
-                return [...prevSelectedColumns, column];
-            }
-        });
-    }
 
     const userName = getCookie("userName");
 
-    useEffect(() => {
-        fetchAvailableDatabases(userName)
-            .then(({ databases, columnsByDatabase }) => {
-                setDatabases(databases);
-                setColumnsByDatabase(columnsByDatabase);
-            })
-            .catch((error) => console.error("Error fetching databases:", error));
-    }, [userName]);
+    let info;
+    if (selectedDbTable) {
+        info = selectedDbTable.split(",");
+    }
+    else {
+        info = ["", ""];
+    }
+
+    function handleSelectOne(event) {
+        setSelectedDatabase(event.target.value);
+    }
+
+    function handleSelectTwo(event) {
+        setSelectedTable(event.target.value);
+    }
+
+    function handleSelectThree(event) {
+        setSelectedColumns(event.target.value);
+    }
+
+    const handleButtonPress = () => {
+        setIsButtonPressed(!isButtonPressed);
+    };
 
     useEffect(() => {
         if (selectedDatabase) {
-            setAvailableColumns(columnsByDatabase[selectedDatabase] || []);
-            console.log("Here");
             fetch(
                 `http://localhost:8080/api/tableinfo/getTables/${userName}/${selectedDatabase}`
             )
@@ -125,103 +146,121 @@ const QueryTool = ({selectedDbTable}) => {
     }, [userName, selectedDatabase, columnsByDatabase]);
 
     useEffect(() => {
-        if (selectedDatabase && selectedTable) {
-            localStorage.setItem("selectedDatabase", selectedDatabase);
-            setSelectedColumns([]);
+        if (selectedTable) {
+            console.log("SRAKEN");
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
-                .then((columns) => setAvailableColumns(columns))
+                .then((response) => {
+                    setAvailableColumns(response);
+                })
                 .catch((error) =>
                     console.error("Error fetching columns for the selected table:", error)
                 );
         }
-    }, [userName, selectedDatabase, selectedTable]);
+    }, [selectedDatabase, selectedTable, userName]);
+
+    useEffect(() => {
+        if (availableColumns.length > 0) {
+            setSelectedColumns(availableColumns);
+            console.log(availableColumns);
+        }
+    }, [availableColumns]);
+
+    useEffect(() => {
+        fetchAvailableDatabases(userName)
+            .then(({ databases, columnsByDatabase }) => {
+                setAvailableDatabases(databases);
+                setColumnsByDatabase(columnsByDatabase);
+            })
+            .catch((error) => console.error("Error fetching databases:", error));
+    }, [userName, selectedDbTable]);
+
 
     return (
-        <div>
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "left",
-                }}
-            >
-                <h5 style={{margin: "0 10px"}}>
-                    Create your own customizable query for{" "}
-                </h5>
-                <select
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
                     value={selectedDatabase}
-                    onChange={(e) =>
-                        {
-                            setSelectedDatabase(e.target.value);
-                            logger.addLog("PUSHED");
-                        }
-                    }
+                    label="Select Option"
+                    onChange={handleSelectOne}
+                    variant={"outlined"}
                 >
-                    <option value="">Select a database</option>
-                    {databases.map((database, index) => (
-                        <option key={index} value={database}>
-                            {database}
-                        </option>
+                    {availableDatabases.map((option, index) => (
+                        <MenuItem key={index} value={option}>
+                            {option}
+                        </MenuItem>
                     ))}
-                </select>
-
+                </Select>
                 {selectedDatabase && (
+                    <Select
+                        labelId="demo-simple-select-table"
+                        id="demo-simple-table"
+                        value={selectedTable}
+                        label="Select Table"
+                        onChange={handleSelectTwo}
+                        variant={"outlined"}
+                    >
+                        {tablesForSelectedDatabase.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
+                {selectedTable && (
                     <div>
-                        <label>{'\u00A0\u00A0\u00A0'}Select a table:{'\u00A0'}</label>
-
-                        <select
-                            value={selectedTable}
-                            onChange={(e) => setSelectedTable(e.target.value)}
+                        <FormControl sx={{ m: 1, width: 300 }}>
+                            <InputLabel id="demo-multiple-checkbox-label">All columns selected by default!</InputLabel>
+                            <Select
+                                labelId="demo-multiple-checkbox-label"
+                                id="demo-multiple-checkbox"
+                                multiple
+                                value={selectedColumns}
+                                onChange={handleSelectThree}
+                                input={<OutlinedInput label="All columns selected by default!" />}
+                                renderValue={(selected) => selected.join(', ')}
+                                MenuProps={MenuProps}
+                            >
+                                {selectedColumns.map((name) => (
+                                    <MenuItem key={name} value={name}>
+                                        <Checkbox checked={selectedColumns.includes(name)} />
+                                        <ListItemText primary={name} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button variant="contained" style={{ marginLeft: 16 }}
+                                onClick={() => {
+                                    runQuery(selectedDatabase, selectedTable, selectedColumns)
+                                        .then(result => {
+                                            setQueryResult(result);
+                                            setIsButtonPressed(true);
+                                        })
+                                        .catch(error => {
+                                            console.error(error);
+                                        });
+                                }}
                         >
-                            <option value="">Select a table</option>
-
-                            {tablesForSelectedDatabase.map((table, index) => (
-                                <option key={index} value={table}>
-                                    {table}
-                                </option>
-                            ))}
-                        </select>
+                            Contained
+                        </Button>
                     </div>
                 )}
             </div>
-
-
-            {selectedDatabase && selectedTable && (
-                <div style={{marginTop: "10px"}}>
-                    <label>Select columns:</label>
-                    {availableColumns.map((column, index) => (
-                        <div key={index}>
-                            <input
-                                type="checkbox"
-                                value={column}
-                                checked={selectedColumns.includes(column)}
-                                onChange={() => handleColumnCheckboxChange(column)}
-                            />
-                            <label>{column}</label>
-                        </div>
-                    ))}
+            {isButtonPressed && (
+                <div style={{ marginTop: '16px' }}>  {/* Adds space between the button and Button1DbContent */}
+                    <Button1DbContent
+                        data={queryResult.result}
+                        fetchTime={-1}
+                        tableName={selectedTable}
+                        databaseName={selectedDatabase}
+                        selectedColumns={selectedColumns}
+                    />
                 </div>
             )}
-
-            <div style={{marginTop: "10px"}}>
-                <button
-                    onClick={() => {
-                        runQuery(selectedDatabase, selectedTable, selectedColumns)
-                            .then(result => {
-                                setQueryResult(result);
-                                setIsQueryRunning(true);
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    }}
-                >
-                    Run
-                </button>
-            </div>
-            {isQueryRunning && <Button1DbContent data={queryResult.result} fetchTime={queryResult.fetchTime} tableName={selectedTable} databaseName={selectedDatabase} selectedColumns={selectedColumns} />}
         </div>
     );
+
 };
 
 export default QueryTool;
