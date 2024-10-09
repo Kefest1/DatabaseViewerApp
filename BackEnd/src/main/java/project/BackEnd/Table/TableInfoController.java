@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import project.BackEnd.DatabaseInfo.DatabaseInfo;
 import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
@@ -51,6 +52,12 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesByUserName(userName);
     }
 
+    @GetMapping("/getAvailableDatabasesObject/{username}")
+    public List<DatabaseInfo> getAvailableDatabasesByUserName(@PathVariable("username") String userName) {
+        System.out.println("Here");
+        return tableInfoRepository.findDatabasesObjectsByUserName(userName);
+    }
+
 
     @GetMapping("/getAvailableTablesToAdd/{adminName}/{username}")
     public List<List<String>> getAvailableTablesByUserName(@PathVariable("username") String userName,
@@ -73,17 +80,33 @@ public class TableInfoController {
         return retList;
     }
 
-    @GetMapping("/getAllowedTables/{username}")
-    public List<Long> getAllowedTablesByUserName(@PathVariable("username") String userName,
-                                                   @PathVariable("adminName") String adminName) {
 
-        List<Long> adminTables = tableInfoRepository.findTableInfoByUserName(adminName);
-        List<Long> userTables = tableInfoRepository.findTableInfoByUserName(userName);
+    @GetMapping("/getAvailableTablesAndDatabases/{adminName}/{username}/{databaseName}")
+    public List<String> getAvailableTablesAndDatabasesByUserName(@PathVariable("username") String userName,
+                                                                 @PathVariable("adminName") String adminName,
+                                                                 @PathVariable("databaseName") String databaseName) {
 
-        List<Long> availableTables = new ArrayList<>(adminTables);
+        List<String> adminTables = tableInfoRepository.findTableInfoAndByUserName(adminName, databaseName);
+        List<String> userTables = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
+
+        List<String> availableTables = new ArrayList<>(adminTables);
         availableTables.removeAll(userTables);
 
         return availableTables;
+    }
+
+    @GetMapping("/getAllowedTablesAndDatabases/{adminName}/{username}/{databaseName}")
+    public List<String> getAllowedTablesAndDatabasesByAdminName(@PathVariable("username") String userName,
+                                                                @PathVariable("adminName") String adminName,
+                                                                @PathVariable("databaseName") String databaseName) {
+
+        List<String> adminTables = tableInfoRepository.findTableInfoAndByUserName(adminName, databaseName);
+        List<String> userTables = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
+
+        List<String> commonTables = new ArrayList<>(adminTables);
+        commonTables.retainAll(userTables);
+
+        return commonTables;
     }
 
     @GetMapping("/getalljoined")

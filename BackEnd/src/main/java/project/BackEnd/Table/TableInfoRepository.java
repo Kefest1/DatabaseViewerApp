@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import project.BackEnd.DatabaseInfo.DatabaseInfo;
 import project.BackEnd.FieldInfo.FieldInfo;
 
 import java.util.List;
@@ -42,8 +43,14 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username")
     List<String> findDatabasesByUserName(@Param("username") String username);
 
+    @Query("SELECT DISTINCT db FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username")
+    List<DatabaseInfo> findDatabasesObjectsByUserName(@Param("username") String username);
+
     @Query("SELECT DISTINCT ti.id FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username")
     List<Long> findTableInfoByUserName(@Param("username") String username);
+
+    @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :database")
+    List<String> findTableInfoAndByUserName(@Param("username") String username, @Param("database") String database);
 
     @Query("SELECT DISTINCT ti.tableName, db.databaseName, od.accessLevel FROM TableInfo ti JOIN ti.databaseInfo JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username")
     List<String> findTableInfoAndDatabasesByUserName(@Param("username") String username);

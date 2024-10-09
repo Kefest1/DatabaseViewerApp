@@ -35,8 +35,6 @@ async function fetchAvailableDatabases(userName) {
             columnsByDatabase[database].push(column);
         }
     });
-    console.log("columnsByDatabase");
-    console.log(columnsByDatabase);
 
     return { databases, columnsByDatabase };
 }
@@ -93,13 +91,17 @@ async function runQuery(database, table, columns) {
     }
 }
 
-
-
 const QueryTool = ({selectedDbTable}) => {
+    let info;
+    info = ["", ""];
+    if (selectedDbTable) {
+        info = selectedDbTable.split(",");
+    }
+
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [columnsByDatabase, setColumnsByDatabase] = useState([]);
-    const [selectedDatabase, setSelectedDatabase] = useState("");
-    const [selectedTable, setSelectedTable] = useState("");
+    const [selectedDatabase, setSelectedDatabase] = useState(info[0]);
+    const [selectedTable, setSelectedTable] = useState(info[1]);
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
     const [availableColumns, setAvailableColumns] = useState([]);
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -107,14 +109,6 @@ const QueryTool = ({selectedDbTable}) => {
     const [queryResult, setQueryResult] = useState([]);
 
     const userName = getCookie("userName");
-
-    let info;
-    if (selectedDbTable) {
-        info = selectedDbTable.split(",");
-    }
-    else {
-        info = ["", ""];
-    }
 
     function handleSelectOne(event) {
         setSelectedDatabase(event.target.value);
@@ -143,7 +137,7 @@ const QueryTool = ({selectedDbTable}) => {
                     console.error("Error fetching tables for the selected database:", error)
                 );
         }
-    }, [userName, selectedDatabase, columnsByDatabase]);
+    }, [userName, selectedDatabase]);
 
     useEffect(() => {
         if (selectedTable) {
