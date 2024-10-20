@@ -1,6 +1,8 @@
 package project.BackEnd.OwnershipDetails;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +20,9 @@ public interface OwnershipDetailsRepository extends JpaRepository<OwnershipDetai
 //    List<OwnershipDetails> findWithUsersAndTables(Long id);
 
 
-
+    @Modifying
+    @Transactional
+    Long deleteOwnershipDetailsByUserInfoIdAndTableInfoId(Long userInfoId, Long tableInfoId);
 //
 //    @Query("SELECT od FROM OwnershipDetails od LEFT JOIN FETCH od.tables t")
 //    List<OwnershipDetails> findWithTables();

@@ -12,7 +12,7 @@ import project.BackEnd.User.UserInfo;
 @Table(name = "ownership_details")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "userInfo")
 public class OwnershipDetails {
 
     @Id
@@ -26,6 +26,7 @@ public class OwnershipDetails {
             joinColumns = @JoinColumn(name = "ownership_details_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
+    @JsonIgnore
     private UserInfo userInfo;
 
     @ManyToOne(fetch = FetchType.EAGER)

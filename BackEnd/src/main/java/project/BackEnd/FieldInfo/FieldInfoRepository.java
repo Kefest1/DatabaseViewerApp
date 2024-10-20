@@ -48,6 +48,9 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName IN :columnNames")
     List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("columnNames") Collection<String> columnNames, @Param("tableName") String tableName);
 
+    @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
+    List<Object[]> findFieldInfoTableName( @Param("tableName") String tableName);
+
     @Modifying
     @Query("DELETE FROM FieldInfo f WHERE f.columnId = :columnId")
     @Transactional
@@ -77,7 +80,6 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
         FieldInfo fieldInfoToDelete = findFieldWithUsersAndTables(tableName, columnName, dataValue);
         System.out.println(fieldInfoToDelete);
         if (fieldInfoToDelete != null) {
-            System.out.println("Here");
             delete(fieldInfoToDelete);
         } else {
 

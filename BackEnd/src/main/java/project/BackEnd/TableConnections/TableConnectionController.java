@@ -40,7 +40,7 @@ public class TableConnectionController {
     }
 
     @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")
-    public List<TableConnection> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
+    public List<String> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
         System.out.println("Here123");
         Long id = tableInfoRepository.getTableIdByTableName(tablename);
 
@@ -50,18 +50,19 @@ public class TableConnectionController {
 
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
 
-        List<TableConnection> retlist = new LinkedList<>();
+        List<String> retlist = new LinkedList<>();
 
         for (Long availableId : availableTables) {
             for (TableConnection tableConnectionOne : listOne) {
                 if (Objects.equals(tableConnectionOne.many.getId(), availableId)) {
-                    retlist.add(tableConnectionOne);
+                    retlist.add(tableConnectionOne.one.getTableName());
                 }
             }
         }
 
         return retlist;
     }
+
     @GetMapping("/checkifhasconnectedtables/{databasename}/{tablename}/{username}")
     public boolean checkIfHasConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
         Long id = tableInfoRepository.getTableIdByTableName(tablename);

@@ -17,8 +17,15 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class TableInfo {
+    @Override
+    public String toString() {
+        return "TableInfo{" +
+                "id=" + id +
+                ", tableName='" + tableName + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

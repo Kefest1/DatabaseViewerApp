@@ -108,6 +108,8 @@ const QueryTool = ({selectedDbTable}) => {
     const [isButtonPressed, setIsButtonPressed] = useState(false);
     const [queryResult, setQueryResult] = useState([]);
 
+    const logger = QueryLogger.getInstance();
+
     const userName = getCookie("userName");
 
     function handleSelectOne(event) {
@@ -119,6 +121,7 @@ const QueryTool = ({selectedDbTable}) => {
     }
 
     function handleSelectThree(event) {
+        // logger.addLog(`Selected from ${selectedDatabase} database and ${selectedDbTable} fields ${selectedColumns}`);
         setSelectedColumns(event.target.value);
     }
 
@@ -141,7 +144,6 @@ const QueryTool = ({selectedDbTable}) => {
 
     useEffect(() => {
         if (selectedTable) {
-            console.log("SRAKEN");
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
                 .then((response) => {
                     setAvailableColumns(response);
@@ -155,7 +157,6 @@ const QueryTool = ({selectedDbTable}) => {
     useEffect(() => {
         if (availableColumns.length > 0) {
             setSelectedColumns(availableColumns);
-            console.log(availableColumns);
         }
     }, [availableColumns]);
 
@@ -215,7 +216,7 @@ const QueryTool = ({selectedDbTable}) => {
                                 renderValue={(selected) => selected.join(', ')}
                                 MenuProps={MenuProps}
                             >
-                                {selectedColumns.map((name) => (
+                                {availableColumns.map((name) => (
                                     <MenuItem key={name} value={name}>
                                         <Checkbox checked={selectedColumns.includes(name)} />
                                         <ListItemText primary={name} />
@@ -242,7 +243,7 @@ const QueryTool = ({selectedDbTable}) => {
                 )}
             </div>
             {isButtonPressed && (
-                <div style={{ marginTop: '16px' }}>  {/* Adds space between the button and Button1DbContent */}
+                <div style={{ marginTop: '16px' }}>
                     <Button1DbContent
                         data={queryResult.result}
                         fetchTime={-1}

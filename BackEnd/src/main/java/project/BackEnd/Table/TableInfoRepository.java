@@ -37,6 +37,10 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
             "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
     List<Long> findAvailableTables(@Param("databasename") String databasename, @Param("username") String username);
 
+    @Query("SELECT ti " +
+            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
+    List<TableInfo> findAvailableTableInfo(@Param("databasename") String databasename, @Param("username") String username);
+
     @Query("SELECT ti.tableName FROM TableInfo ti")
     List<String> findDistinctTableNames();
 
@@ -63,6 +67,12 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
     List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+
+    @Query("SELECT DISTINCT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
+    Long getTableInfoID(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+
+    @Query("SELECT DISTINCT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od WHERE db.databaseName = :databasename AND ti.tableName = :tablename")
+    Long getTableInfoID(@Param("databasename") String databasename, @Param("tablename") String tablename);
 
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od WHERE db.databaseName = :databasename AND ti.tableName = :tablename AND fi.columnName IN (:columnNames)")
     List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("tablename") String tablename, @Param("columnNames") List<String> columnNames);

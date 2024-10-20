@@ -6,7 +6,7 @@ import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 
 
-const AdminPanel = ({}) => {
+const AdminPanel = () => {
     const [selectedSubordinate, setSelectedSubordinate] = useState("");
     const [subordinates, setSubordinates] = useState([]);
 
@@ -15,6 +15,9 @@ const AdminPanel = ({}) => {
 
     const [availableTables, setAvailableTables] = useState([]);
     const [allowedTables, setAllowedTables] = useState([]);
+
+    const [initialAvailableTables, setInitialAvailableTables] = useState([]);
+    const [initialAllowedTables, setInitialAllowedTables] = useState([]);
 
     const [checked, setChecked] = React.useState([]);
 
@@ -69,29 +72,29 @@ const AdminPanel = ({}) => {
         getDatabase();
     }, []);
 
-    const customList = (items) => ( // TODO Customize
-        <Paper sx={{ width: 200, height: 230, overflow: 'auto' }}>
+    const customList = (tablesInfo) => ( // TODO Customize
+        <Paper sx={{ width: 300, height: 360, overflow: 'auto' }}>
             <List dense component="div" role="list">
-                {items.map((value) => {
-                    const labelId = `transfer-list-item-${value}-label`;
+                {tablesInfo.map((val) => {
+                    const labelID = `list-${val}`;
 
                     return (
                         <ListItemButton
-                            key={value}
+                            key={val}
+                            onClick={handleToggle(val)}
                             role="listitem"
-                            onClick={handleToggle(value)}
                         >
                             <ListItemIcon>
                                 <Checkbox
-                                    checked={checked.includes(value)}
+                                    checked={checked.includes(val)}
+                                    inputProps={{
+                                        'aria-labelledby': labelID,
+                                    }}
                                     tabIndex={-1}
                                     disableRipple
-                                    inputProps={{
-                                        'aria-labelledby': labelId,
-                                    }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={`List item ${value}`} />
+                            <ListItemText id={labelID} primary={`Table: ${val}`} />
                         </ListItemButton>
                     );
                 })}
@@ -115,6 +118,8 @@ const AdminPanel = ({}) => {
 
         setAvailableTables(availableTables);
         setAllowedTables(allowedTables);
+        setInitialAvailableTables(availableTables);
+        setInitialAllowedTables(allowedTables);
     };
 
     const handleSelectDatabase = async (event) => {
@@ -129,7 +134,6 @@ const AdminPanel = ({}) => {
 
     useEffect(() => {
         if (selectedDatabase !== "" && selectedSubordinate !== "") {
-            console.log("SRAKEN");
             handleSelect().then(r => {});
         }
     }, [selectedSubordinate, selectedDatabase]);
@@ -158,8 +162,35 @@ const AdminPanel = ({}) => {
         setAllowedTables([]);
     };
 
+    function DEBUG() {
+        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
+        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        console.log(toRemoveTables);
+        console.log(toInsertTables);
+
+        fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
+            method: 'DELETE'
+        })
+            .then(response => response.text())
+            .then(data => console.log(data));
+
+        fetch(`http://localhost:8080/api/ownershipdetails/add/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toInsertTables.join('&tableNames=')} `, {
+            method: 'POST'
+        })
+            .then(response => response.text())
+            .then(data => console.log(data));
+    }
+
     return (
         <div style={{ marginLeft: '20px' }}>
+            <Button
+                onClick={DEBUG}
+            >
+                DEBUG
+            </Button>
             <Select
                 labelId="demo-simple-select-table"
                 id="demo-simple-table"

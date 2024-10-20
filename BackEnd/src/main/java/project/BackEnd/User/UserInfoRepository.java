@@ -10,7 +10,12 @@ import java.util.List;
 @Repository
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
 
+    @Query("SELECT ui FROM UserInfo ui WHERE ui.username = :username")
     UserInfo findByUsername(String username);
+
+    @Query("SELECT ui.id FROM UserInfo ui WHERE ui.username = :username")
+    Long findUserIDByUsername(String username);
+
     UserInfo findByUsernameAndIsAdmin(String username, boolean isAdmin);
     UserInfo findByEmail(String email);
     UserInfo getUserInfoById(Long id);

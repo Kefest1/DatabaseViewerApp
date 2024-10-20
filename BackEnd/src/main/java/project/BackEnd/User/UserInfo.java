@@ -14,7 +14,7 @@ import project.BackEnd.TableVisitHistory.TableVisitHistory;
 @Table(name = "UserInfo")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "ownershipDetails")
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfo {

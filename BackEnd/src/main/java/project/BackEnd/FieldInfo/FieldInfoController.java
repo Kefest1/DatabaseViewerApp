@@ -74,9 +74,10 @@ public class FieldInfoController {
     }
 
     @DeleteMapping("/delete")
-    public String deleteFieldInfo(@RequestBody Integer columnID) {
+    public String deleteFieldInfo(@RequestBody Long columnID) {
         try {
-            fieldInfoRepository.deleteByColumnId(columnID.longValue());
+            System.out.println(columnID);
+            fieldInfoRepository.deleteByColumnId(columnID);
             return "OK";
         } catch (Exception e) {
             return e.toString();
@@ -87,7 +88,7 @@ public class FieldInfoController {
     public String deleteFieldInfo(@RequestBody Long[] columnIds) {
         try {
             System.out.println(Arrays.toString(columnIds));
-            // fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
+             fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
             return "OK";
         } catch (Exception e) {
             return e.toString();

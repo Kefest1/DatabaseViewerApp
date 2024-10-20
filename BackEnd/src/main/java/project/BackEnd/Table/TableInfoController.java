@@ -54,7 +54,6 @@ public class TableInfoController {
 
     @GetMapping("/getAvailableDatabasesObject/{username}")
     public List<DatabaseInfo> getAvailableDatabasesByUserName(@PathVariable("username") String userName) {
-        System.out.println("Here");
         return tableInfoRepository.findDatabasesObjectsByUserName(userName);
     }
 
@@ -144,6 +143,16 @@ public class TableInfoController {
         return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
     }
 
+    @PostMapping("/getAllFieldsAllColumns")
+    public List<List<FieldInfo>> getFields(@RequestBody TableInfoBasicRequest request) {
+        List<Object[]> results = fieldInfoRepository.findFieldInfoTableName(request.getTable());
+
+        Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()
+                .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
+
+        return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
+    }
+
 
     @Setter
     @Getter
@@ -153,6 +162,16 @@ public class TableInfoController {
         private String database;
         private String table;
         private List<String> columns;
+    }
+
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TableInfoBasicRequest {
+        private String database;
+        private String table;
     }
 
 }
