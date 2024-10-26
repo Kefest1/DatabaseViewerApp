@@ -61,14 +61,9 @@ async function fetchColumnsForTable(userName, database, table) {
 }
 
 async function runQuery(database, table, columns) {
-    console.log(`Database: ${database}`);
-    console.log(`Table: ${table}`);
-    console.log(`Columns: ${columns}`);
-
     try {
         const requestBody = { database, table, columns: [...columns] };
 
-        console.log(JSON.stringify(requestBody));
         const url = 'http://localhost:8080/api/tableinfo/getAllFields';
         const startTime = performance.now();
         const response = await fetch(url, {

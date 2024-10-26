@@ -5,12 +5,12 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import {Button, MenuItem} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import Select from "@mui/material/Select";
+import {logDOM} from "@testing-library/react";
 
 async function fetchAvailableTables(databaseName, tableName) {
     const userName = getCookie("userName");
 
     const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`);
-    console.log(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`);
 
     return await response.json();
 }
@@ -24,7 +24,6 @@ async function fetchNewTable(database, table) {
 
     const requestBody = { database, table };
 
-    console.log(JSON.stringify(requestBody));
     const url = 'http://localhost:8080/api/tableinfo/getAllFieldsAllColumns';
 
     const response = await fetch(url, {
@@ -81,20 +80,36 @@ function basicProcessData(data) {
         });
 
         rows.push(rowObj);
-
-
     });
 
-    console.log(rows);
-    console.log(columns);
-
-    const resResult = {'Rows' : rows, 'Cols' : columns};
+    const resResult = {'Rows' : rows, 'Cols' : Object.values(columns)};
     console.log(resResult);
 
     return resResult;
 }
 
+function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables) {
+    console.log("--------------------");
+    console.log(joinRows);
+    console.log(joinColumns);
+    console.log(selectedTable);
+    console.log(rows);
+    console.log(columns);
+    console.log(availableTables[0].manyColumnName);
+    console.log(availableTables[0].oneColumnName);
+
+    const outputRows = rows.concat(joinRows);
+    // const mergedArray = rowsBase.concat(rowsJoin);
+    //
+    // const filteredArray = mergedArray.filter(item => item.field !== "actions");
+    //
+    // return  filteredArray.concat(mergedArray.filter(item => item.field === "actions"));
+}
+
 function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedColumns }) {
+    const [rows, setRows] = useState([]);
+    const [columns, setColumns] = useState([]);
+
     const JoinPanel = ({ tableName, databaseName }) => {
         const [connectableTables, setConnectableTables] = useState([]);
         const [loading, setLoading] = useState(true);
@@ -104,12 +119,22 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
         const [selectedTableContent, setSelectedTableContent] = useState([]);
         const [error, setError] = useState(null);
 
+        const [availableTables, setAvailableTables] = useState(null);
+
         const handleJoin = async (event) => {
             try {
                 const tables = await fetchNewTable(databaseName, selectedTable);
+                console.log(availableTables);
+
+                const joinTables = basicProcessData(tables);
+                const joinRows = joinTables.Rows;
+                const joinColumns = joinTables.Cols;
                 setSelectedTableContent(tables);
-                const processedData = basicProcessData(tables);
-                console.log(processedData);
+
+                let processedData = mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables);
+                // processedData = basicProcessData(tables);
+                // setColumns(processedData.Cols)
+                // setRows(processedData.Rows)
             } catch (error) {
                 setError(error.message);
             }
@@ -118,8 +143,21 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
         useEffect(() => {
             const fetchData = async () => {
                 try {
+
                     const tables = await fetchAvailableTables(databaseName, tableName);
-                    setConnectableTables(tables);
+
+                    setAvailableTables(tables);
+
+                    setConnectableTables(
+                        tables.map(item => {
+                            return item.oneTableName;
+                        }
+                    ));
+                    console.log(
+                        tables.map(item => {
+                            return item.oneTableName;
+                        }
+                    ));
                     setLoading(false);
                 } catch (error) {
                     setError(error.message);
@@ -173,19 +211,13 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
         );
     };
 
-    const [rows, setRows] = useState([]);
-    const [columns, setColumns] = useState([]);
-
     useEffect(() => {
         processData(data);
-        fetchAvailableTables(databaseName, tableName);
     }, [data]);
 
     function processData(data) {
         const rows = [];
         const columns = {};
-
-        console.log(data);
 
         data.forEach((row) => {
             const rowObj = { id: row[0].columnId };
@@ -236,10 +268,8 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
 
 
     const debugData = () => {
-        const newColumns = columns.slice(0, Math.floor(columns.length / 2));
         console.log(columns);
         console.log(rows);
-        // setColumns(newColumns);
     };
 
     return (

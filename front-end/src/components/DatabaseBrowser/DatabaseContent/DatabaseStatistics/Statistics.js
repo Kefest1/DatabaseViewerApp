@@ -45,15 +45,12 @@ const Statistics = () => {
 
     useEffect(() => {
         if (selectedColumn1) {
-            console.log("****---------");
             GetXPlot();
         }
     }, [selectedColumn1]);
 
     useEffect(() => {
-        console.log("---------");
         if (selectedColumn2) {
-            console.log("****---------");
             GetYPlot();
         }
     }, [selectedColumn2]);

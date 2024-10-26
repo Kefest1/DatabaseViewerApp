@@ -40,22 +40,27 @@ public class TableConnectionController {
     }
 
     @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")
-    public List<String> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
-        System.out.println("Here123");
+    public List<TableInfoPayload> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
         Long id = tableInfoRepository.getTableIdByTableName(tablename);
 
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
 
-        System.out.println(id + " " + tablename);
-
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
 
-        List<String> retlist = new LinkedList<>();
+        List<TableInfoPayload> retlist = new LinkedList<>();
 
         for (Long availableId : availableTables) {
             for (TableConnection tableConnectionOne : listOne) {
                 if (Objects.equals(tableConnectionOne.many.getId(), availableId)) {
-                    retlist.add(tableConnectionOne.one.getTableName());
+                    System.out.println(tableConnectionOne);
+                    retlist.add(
+                            new TableInfoPayload(
+                                    tableConnectionOne.getOneColumnName(),
+                                    tableConnectionOne.getManyColumnName(),
+                                    tableConnectionOne.one.getTableName(),
+                                    tableConnectionOne.many.getTableName()
+                            )
+                    );
                 }
             }
         }
