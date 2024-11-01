@@ -88,10 +88,26 @@ function basicProcessData(data) {
     return resResult;
 }
 
+const removeDuplicates = (arr) => {
+    const seenFields = new Set();
+    return arr.filter(item => {
+        if (seenFields.has(item.field)) {
+            return false;
+        } else {
+            seenFields.add(item.field);
+            return true;
+        }
+    });
+};
+
+function prepareColumns(joinColumns, columns) {
+    return removeDuplicates(columns.concat(joinColumns));
+}
+
 function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables) {
     console.log("--------------------");
     console.log(joinRows);
-    console.log(joinColumns);
+    // console.log(joinColumns);
     console.log(selectedTable);
     console.log(rows);
     console.log(columns);
@@ -99,11 +115,18 @@ function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availabl
     console.log(availableTables[0].oneColumnName);
 
     const outputRows = rows.concat(joinRows);
-    // const mergedArray = rowsBase.concat(rowsJoin);
-    //
-    // const filteredArray = mergedArray.filter(item => item.field !== "actions");
-    //
-    // return  filteredArray.concat(mergedArray.filter(item => item.field === "actions"));
+
+    return rows.map(item2 => {
+        const matchingItem = joinRows.find(item1 => item1[availableTables[0].manyColumnName] === item2[availableTables[0].oneColumnName]);
+        if (matchingItem) {
+            const { [availableTables[0].oneColumnName]: _, ...item2WithoutKey } = item2;
+            return {
+                ...matchingItem,
+                ...item2WithoutKey
+            };
+        }
+        return null; // Return null if no match is found
+    }).filter(item => item !== null); // Filter out null values
 }
 
 function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedColumns }) {
@@ -124,17 +147,20 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
         const handleJoin = async (event) => {
             try {
                 const tables = await fetchNewTable(databaseName, selectedTable);
-                console.log(availableTables);
 
                 const joinTables = basicProcessData(tables);
                 const joinRows = joinTables.Rows;
                 const joinColumns = joinTables.Cols;
                 setSelectedTableContent(tables);
 
-                let processedData = mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables);
-                // processedData = basicProcessData(tables);
-                // setColumns(processedData.Cols)
-                // setRows(processedData.Rows)
+                let processedRows = mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables);
+                let processedColumns = prepareColumns(columns, joinColumns);
+                console.log("----------------------");
+                console.log(processedRows);
+                console.log(processedColumns);
+
+                setColumns(processedColumns)
+                setRows(processedRows)
             } catch (error) {
                 setError(error.message);
             }
