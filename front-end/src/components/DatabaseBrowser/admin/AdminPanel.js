@@ -233,13 +233,13 @@ const AdminPanel = () => {
                         <Grid
                             container
                             spacing={2}
-                            sx={{ justifyContent: 'center', alignItems: 'center' }}
+                            sx={{justifyContent: 'center', alignItems: 'center'}}
                         >
-                            <Grid item>{customList(availableTables)}</Grid>
+                            <Grid item>Tables unassigned to user{customList(availableTables)}</Grid>
                             <Grid item>
-                                <Grid container direction="column" sx={{ alignItems: 'center' }}>
+                                <Grid container direction="column" sx={{alignItems: 'center'}}>
                                     <Button
-                                        sx={{ my: 0.5 }}
+                                        sx={{my: 0.5}}
                                         variant="outlined"
                                         size="small"
                                         onClick={handleAllRight}
@@ -249,7 +249,7 @@ const AdminPanel = () => {
                                         ≫
                                     </Button>
                                     <Button
-                                        sx={{ my: 0.5 }}
+                                        sx={{my: 0.5}}
                                         variant="outlined"
                                         size="small"
                                         onClick={handleCheckedRight}
@@ -259,7 +259,7 @@ const AdminPanel = () => {
                                         &gt;
                                     </Button>
                                     <Button
-                                        sx={{ my: 0.5 }}
+                                        sx={{my: 0.5}}
                                         variant="outlined"
                                         size="small"
                                         onClick={handleCheckedLeft}
@@ -269,7 +269,7 @@ const AdminPanel = () => {
                                         &lt;
                                     </Button>
                                     <Button
-                                        sx={{ my: 0.5 }}
+                                        sx={{my: 0.5}}
                                         variant="outlined"
                                         size="small"
                                         onClick={handleAllLeft}
@@ -280,7 +280,7 @@ const AdminPanel = () => {
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <Grid item>{customList(allowedTables)}</Grid>
+                            <Grid item>Tables assigned to user{customList(allowedTables)}</Grid>
                         </Grid>
                     </div>
 

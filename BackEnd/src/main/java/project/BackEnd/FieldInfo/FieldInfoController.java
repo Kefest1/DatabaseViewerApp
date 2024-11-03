@@ -64,7 +64,7 @@ public class FieldInfoController {
         try {
             for (UpdatePayload updatePayload : updatePayloads) {
                 System.out.println(updatePayload);
-                // Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
+                Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
             }
             return "Success";
         } catch (Exception e) {
@@ -87,7 +87,7 @@ public class FieldInfoController {
     @DeleteMapping("/deleteArray")
     public String deleteFieldInfo(@RequestBody Long[] columnIds) {
         try {
-            System.out.println(Arrays.toString(columnIds));
+             System.out.println(Arrays.toString(columnIds));
              fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
             return "OK";
         } catch (Exception e) {

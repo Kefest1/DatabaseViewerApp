@@ -5,7 +5,6 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import {Button, MenuItem} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import Select from "@mui/material/Select";
-import {logDOM} from "@testing-library/react";
 
 async function fetchAvailableTables(databaseName, tableName) {
     const userName = getCookie("userName");
@@ -13,10 +12,6 @@ async function fetchAvailableTables(databaseName, tableName) {
     const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`);
 
     return await response.json();
-}
-
-function mergeTwoTables(tableOne, tableTwo, rowsOne, rowsTwo) {
-
 }
 
 async function fetchNewTable(database, table) {
@@ -105,16 +100,6 @@ function prepareColumns(joinColumns, columns) {
 }
 
 function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables) {
-    console.log("--------------------");
-    console.log(joinRows);
-    // console.log(joinColumns);
-    console.log(selectedTable);
-    console.log(rows);
-    console.log(columns);
-    console.log(availableTables[0].manyColumnName);
-    console.log(availableTables[0].oneColumnName);
-
-    const outputRows = rows.concat(joinRows);
 
     return rows.map(item2 => {
         const matchingItem = joinRows.find(item1 => item1[availableTables[0].manyColumnName] === item2[availableTables[0].oneColumnName]);
@@ -132,6 +117,8 @@ function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availabl
 function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedColumns }) {
     const [rows, setRows] = useState([]);
     const [columns, setColumns] = useState([]);
+    const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
+    const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
 
     const JoinPanel = ({ tableName, databaseName }) => {
         const [connectableTables, setConnectableTables] = useState([]);
@@ -144,6 +131,7 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
 
         const [availableTables, setAvailableTables] = useState(null);
 
+
         const handleJoin = async (event) => {
             try {
                 const tables = await fetchNewTable(databaseName, selectedTable);
@@ -155,9 +143,6 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
 
                 let processedRows = mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availableTables);
                 let processedColumns = prepareColumns(columns, joinColumns);
-                console.log("----------------------");
-                console.log(processedRows);
-                console.log(processedColumns);
 
                 setColumns(processedColumns)
                 setRows(processedRows)
@@ -175,11 +160,6 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
                     setAvailableTables(tables);
 
                     setConnectableTables(
-                        tables.map(item => {
-                            return item.oneTableName;
-                        }
-                    ));
-                    console.log(
                         tables.map(item => {
                             return item.oneTableName;
                         }
@@ -255,6 +235,7 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
                         headerName: column.columnName,
                         width: column.dataValue.length * 5,
                         hide: column.columnName === 'columnId',
+                        editable: true
                     };
                 } else {
                     const maxLength = Math.max(columns[column.columnName].width, column.dataValue.length * 5);
@@ -293,9 +274,81 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
     };
 
 
+    const commitDeleteManyRows = () => {
+        console.log(selectedRowsIndex);
+
+        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(selectedRowsIndex)
+        })
+            .then(response => response.json())
+            .catch(error => console.error('Error:', error));
+    };
+
+
     const debugData = () => {
         console.log(columns);
         console.log(rows);
+        console.log(selectedRowsIndex);
+    };
+
+    const handleRowEditStop = (newRow) => {
+        console.log(newRow);
+    };
+
+    const handleEdit = (updatedRow, originalRow) => {
+        console.log(originalRow);
+        console.log(updatedRow);
+        let request = findDifference(originalRow, updatedRow);
+        request["rowIndex"] = originalRow.id;
+        addFieldToUpdate(request);
+    };
+
+    function findDifference(obj1, obj2) {
+        let differences = {};
+
+        for (const key in obj1) {
+            if (obj1.hasOwnProperty(key)) {
+                if (obj2.hasOwnProperty(key) && obj1[key] !== obj2[key]) {
+                    differences = {
+                        columnName: key,
+                        newDataValue: obj2[key]
+                    };
+                    break;
+                }
+            }
+        }
+
+        return differences;
+    }
+
+    const addFieldToUpdate = (newField) => {
+        setFieldsToUpdate((prevFields) => [...prevFields, newField]);
+    };
+
+    const logUpdatable = async () => {
+        console.log(fieldsToUpdate);
+        try {
+            const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(fieldsToUpdate),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            console.log(result);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     return (
@@ -305,6 +358,12 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
                 tableName={tableName}
                 databaseName={databaseName}>
             </JoinPanel>
+            <Button onClick={commitDeleteManyRows} rows>
+                Delete selected rows
+            </Button>
+            <Button onClick={logUpdatable} rows>
+                Update altered fields
+            </Button>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -314,7 +373,13 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
                 slots={{ toolbar: GridToolbar }}
                 onRowSelectionModelChange={(newRowSelectionModel) => {
                     console.log(newRowSelectionModel);
+                    setSelectedRowsIndex(newRowSelectionModel);
                 }}
+
+                editMode="row"
+                onRowModesModelChange={(e) => {}}
+                onRowEditStop={handleRowEditStop}
+                processRowUpdate={handleEdit}
             />
         </Box>
     );
