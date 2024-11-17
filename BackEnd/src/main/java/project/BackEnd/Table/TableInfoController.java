@@ -123,6 +123,14 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesByUserNameAndUsername(databaseName, userName);
     }
 
+    @GetMapping("/getKey/{databasename}/{tablename}")
+    public String getPrimaryKeyName(@PathVariable("tablename") String tableName, @PathVariable("databasename") String databaseName) {
+        String key = tableInfoRepository.findKeyNameByTable(tableName, databaseName);
+        System.out.println(tableName);
+        System.out.println(databaseName);
+        return key;
+    }
+
     @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
     public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
         return tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablename(databaseName, userName, tablename);

@@ -38,6 +38,12 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName = :columnName AND fi.dataValue = :dataValue")
     FieldInfo findFieldWithUsersAndTables(@Param("tableName") String tableName, @Param("columnName") String columnName, @Param("dataValue") String dataValue);
 
+    @Query("SELECT fi.dataValue FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName = :primaryKeyName")
+    List<String> findFirstFreeKeyFieldWithUsersAndTables(@Param("tableName") String tableName, @Param("primaryKeyName") String primaryKeyName);
+
+    @Query("SELECT MAX(fi.columnId) + 1 FROM FieldInfo fi")
+    Long findMaxColumnID();
+
     FieldInfo findByColumnNameAndTableInfo_TableNameAndDataValue(String columnName, String tableName, String dataValue);
 
     @Modifying

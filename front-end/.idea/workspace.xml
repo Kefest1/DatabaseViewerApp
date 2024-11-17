@@ -6,9 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/Button1DbContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/Button1DbContent.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +97,13 @@
       <workItem from="1730144361045" duration="1820000" />
       <workItem from="1730466945908" duration="5620000" />
       <workItem from="1730653398581" duration="4760000" />
+      <workItem from="1730835828642" duration="1155000" />
+      <workItem from="1731008435352" duration="693000" />
+      <workItem from="1731094222648" duration="2069000" />
+      <workItem from="1731249729241" duration="4033000" />
+      <workItem from="1731783470994" duration="2143000" />
+      <workItem from="1731830482847" duration="2363000" />
+      <workItem from="1731863221642" duration="641000" />
     </task>
     <servers />
   </component>

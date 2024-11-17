@@ -52,6 +52,9 @@ public class TableInfo {
     @Column(name = "table_name", length = 255, nullable = false)
     private String tableName;
 
+    @Column(name = "primary_key", length = 255, nullable = true)
+    private String primary_key;
+
     @Column(name = "created_at")
     private Timestamp createdAt;
 

@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -30,10 +32,39 @@ public class FieldInfoController {
     public List<String> getSingleColumnData(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
 
         List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
-        System.out.println("--------");
-        System.out.println(rows);
-
         return rows;
+    }
+
+    @GetMapping("/getsmallestfreekey/{databasename}/{tablename}")
+    public Integer getSmallestFreeKey(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename) {
+
+        String primaryKeyName = tableInfoRepository.findKeyNameByTable(tablename, databasename);
+        List<Integer> numbers = new ArrayList<>();
+
+        List<String> keys = fieldInfoRepository.findFirstFreeKeyFieldWithUsersAndTables(tablename, primaryKeyName);
+
+        for (String key : keys) {
+            try {
+                int num = Integer.parseInt(key);
+                if (num > 0) {
+                    numbers.add(num);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number format: " + key);
+            }
+        }
+        Collections.sort(numbers);
+
+        int smallestMissing = 1;
+        for (int num : numbers) {
+            if (num == smallestMissing)
+                smallestMissing++;
+            else if (num > smallestMissing)
+                break;
+
+        }
+
+        return smallestMissing;
     }
 
 //    @GetMapping("/bycolumnnames")
@@ -46,17 +77,41 @@ public class FieldInfoController {
 //        return fieldInfoRepository.findWithUsersAndTables(username);
 //    }
 
-    @PostMapping("/insertvalue")
-    public String insertValue(@RequestBody InsertPayload fieldInfo) {
+
+    @PostMapping("/insertvalues/{databasename}")
+    public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos) {
+        Long newID = getFreeColumnID();
+
+        Integer smallestKey = getSmallestFreeKey(databasename, fieldInfos.get(0).getTableName());
+        System.out.println(smallestKey);
+        InsertPayload insertPayloadPrimaryKey =
+                new InsertPayload(
+                    tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename),
+                    String.valueOf(smallestKey),
+                    fieldInfos.get(0).tableName
+                );
+
+        fieldInfos.add(insertPayloadPrimaryKey);
+        for (InsertPayload fieldInfo : fieldInfos) {
+            insertValueHelper(fieldInfo, newID);
+        }
+        return "OK";
+    }
+
+    private void insertValueHelper(InsertPayload fieldInfo, Long newID) {
         String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfo.columnName, fieldInfo.tableName);
         FieldInfo fieldInfoToSave = new FieldInfo();
         fieldInfoToSave.setDataType(datatype);
         fieldInfoToSave.setColumnName(fieldInfo.columnName);
         fieldInfoToSave.setDataValue(fieldInfo.dataValue);
+        fieldInfoToSave.setColumnId(newID);
         fieldInfoToSave.setTableInfo(tableInfoRepository.findByTableName(fieldInfo.tableName));
         System.out.println(fieldInfoToSave);
         fieldInfoRepository.save(fieldInfoToSave);
-        return "OK";
+    }
+
+    private Long getFreeColumnID() {
+        return fieldInfoRepository.findMaxColumnID();
     }
 
     @PostMapping("/update")

@@ -51,6 +51,8 @@ const DatabaseContent = ({selectedTable}) => {
                 else return null;
             case 5:
                 return <QueryLoggerComponent/>;
+            case 6:
+                return <QueryLoggerComponent/>;
             default:
                 return null;
         }
@@ -84,6 +86,12 @@ const DatabaseContent = ({selectedTable}) => {
                         onClick={() => handleButtonClick(4)}
                     >
                         Logger
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 5 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(5)}
+                    >
+                        Table Creator
                     </div>
 
                 </div>

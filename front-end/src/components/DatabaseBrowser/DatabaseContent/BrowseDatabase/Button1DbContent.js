@@ -13,10 +13,12 @@ async function fetchAvailableTables(databaseName, tableName) {
 
     return await response.json();
 }
+async function fetchKeyNameTables(databaseName, tableName) {
+    const response = await fetch(`http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`);
+    return await response.text();
+}
 
 async function fetchNewTable(database, table) {
-    const userName = getCookie("userName");
-
     const requestBody = { database, table };
 
     const url = 'http://localhost:8080/api/tableinfo/getAllFieldsAllColumns';
@@ -30,28 +32,6 @@ async function fetchNewTable(database, table) {
     return await response.json();
 }
 
-function basicProcessData1(data) {
-    const groupedData = data.reduce((acc, item) => {
-        if (!acc[item.columnId]) {
-            acc[item.columnId] = {};
-        }
-        acc[item.columnId][item.columnName] = item.dataValue;
-        return acc;
-    }, {});
-
-    const columnNames = Object.keys(groupedData[Object.keys(groupedData)[0]]);
-
-    const rows = Object.values(groupedData).map((group) => {
-        return columnNames.reduce((acc, columnName) => {
-            acc[columnName] = group[columnName];
-            return acc;
-        }, {});
-    });
-
-    console.log(columnNames);
-    console.log(rows);
-    return { columnNames, rows };
-}
 
 function basicProcessData(data) {
     const rows = [];
@@ -119,6 +99,8 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
     const [columns, setColumns] = useState([]);
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
+    const [addContent, setAddContent] = useState([]);
+    const [primaryKeyName, setPrimaryKeyName] = useState(null);
 
     const JoinPanel = ({ tableName, databaseName }) => {
         const [connectableTables, setConnectableTables] = useState([]);
@@ -156,8 +138,10 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
                 try {
 
                     const tables = await fetchAvailableTables(databaseName, tableName);
-
                     setAvailableTables(tables);
+
+                    const keyName = await fetchKeyNameTables(databaseName, tableName);
+                    setPrimaryKeyName(keyName);
 
                     setConnectableTables(
                         tables.map(item => {
@@ -330,7 +314,6 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
     };
 
     const logUpdatable = async () => {
-        console.log(fieldsToUpdate);
         try {
             const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
                 method: 'POST',
@@ -345,11 +328,87 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
             }
 
             const result = await response.json();
-            console.log(result);
         } catch (error) {
             console.error('Error:', error);
         }
     };
+
+    const [insertOn, setInsertOn] = useState(false);
+    const [newTable, setNewTable] = useState({});
+    const [newTableRows, setNewTableRows] = useState({});
+
+    function switchInsert() {
+
+        const sampleRow = rows[0];
+        const emptyObject = Object.keys(sampleRow).reduce((acc, key) => {
+            acc[key] = "";
+            return acc;
+        }, {});
+
+        const colCopy = [...columns]
+        emptyObject["id"] = 2137;
+
+        delete emptyObject[primaryKeyName];
+
+        console.log(colCopy);
+        const updatedArr = colCopy.filter(item => item.field !== primaryKeyName);
+
+        console.log(updatedArr);
+        console.log(emptyObject);
+        setNewTable([emptyObject]);
+        setNewTableRows(updatedArr.slice(0, -1));
+    }
+
+    useEffect(() => {
+        const isNewTableNotEmpty = Object.keys(newTable).length > 0;
+        const isNewTableRowsNotEmpty = newTableRows.length > 0;
+
+        if (isNewTableNotEmpty && isNewTableRowsNotEmpty) {
+            setInsertOn(!insertOn);
+        }
+
+    }, [newTable, newTableRows]);
+
+    const handleRowEditStop2 = (params) => {
+        console.log('Edited Row:', params);
+        setAddContent(params)
+        return params;
+    };
+
+    const addNewRow = (params) => {
+
+        console.log(addContent);
+        console.log(databaseName);
+        console.log(tableName);
+
+        const transformedData = Object.keys(addContent)
+            .filter(key => key !== 'id')
+            .map(key => ({
+                columnName: key,
+                dataValue: String(addContent[key]),
+                tableName: tableName
+            }));
+
+        const url = `http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(transformedData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.error('Error inserting values:', error));
+
+        console.log(transformedData);
+    }
 
     return (
         <Box sx={{ height: 400, width: 1100 }}>
@@ -364,10 +423,34 @@ function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedCo
             <Button onClick={logUpdatable} rows>
                 Update altered fields
             </Button>
+            <Button onClick={switchInsert}>
+               Insert new row
+            </Button>
+            {
+                insertOn && (
+                    <div>
+                        <Button onClick={addNewRow}>
+
+                            Insert new row
+                        </Button>
+                        <DataGrid
+                            rows={newTable}
+                            columns={newTableRows}
+                            onRowModesModelChange={(e) => {}}
+                            // processRowUpdate={handleNewEdit}
+                            processRowUpdate={handleRowEditStop2}
+                            minColumnWidth={300}
+                            // getRowHeight={() => 'auto'}
+                        />
+                    </div>
+                )
+            }
+
+
             <DataGrid
                 rows={rows}
                 columns={columns}
-                minColumnWidth={100}
+                minColumnWidth={300}
                 checkboxSelection
                 disableRowSelectionOnClick
                 slots={{ toolbar: GridToolbar }}
