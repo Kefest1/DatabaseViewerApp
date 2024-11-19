@@ -1,5 +1,6 @@
 package project.BackEnd.DatabaseInfo;
 import jakarta.persistence.*;
+import lombok.ToString;
 import project.BackEnd.Table.TableInfo;
 
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Entity(name = "database_info")
 @Table
+@ToString
 public class DatabaseInfo {
 
     @Id
@@ -21,10 +23,19 @@ public class DatabaseInfo {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
+    @Column(name = "description", nullable = true)
+    private String description;
+
     @OneToMany(mappedBy = "databaseInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TableInfo> tables;
 
+    public DatabaseInfo(String databaseName, String description) {
+        this.databaseName = databaseName;
+        this.description = description;
+    }
+
     public DatabaseInfo() {
+
     }
 
     public List<TableInfo> getTables() {

@@ -79,4 +79,8 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od WHERE db.databaseName = :databasename AND ti.tableName = :tablename AND fi.columnName IN (:columnNames)")
     List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("tablename") String tablename, @Param("columnNames") List<String> columnNames);
+
+    @Query("SELECT DISTINCT fi.columnName, fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE db.databaseName = :databasename AND ti.tableName = :tablename")
+    List<String> getTableInformation(@Param("databasename") String databasename, @Param("tablename") String tablename);
+
 }

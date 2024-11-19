@@ -66,6 +66,11 @@ public class UserInfoController {
         return usersService.getAllUsers();
     }
 
+    @GetMapping("/getID/{userName}")
+    public Long getID(@PathVariable("userName") String userName) {
+        return usersService.getIdByUsername(userName);
+    }
+
     @GetMapping("/checkifadmin/{userName}")
     public boolean checkIfAdmin(@PathVariable("userName") String userName) {
         return userInfoRepository.findByUsernameAndIsAdmin(userName, true) != null;

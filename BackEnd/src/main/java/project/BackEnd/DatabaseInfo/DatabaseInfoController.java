@@ -48,10 +48,12 @@ public class DatabaseInfoController {
         return getStats();
     }
 
-    @PostMapping("/add")
-    public int add(@RequestBody String databaseDescription) {
-        // int x = databaseInfoRepository.save(databaseDescription);
-        return 0;
+    @PostMapping("/add/{databaseName}/{databaseDescription}")
+    public Long add(@PathVariable("databaseName") String databaseName, @PathVariable("databaseDescription") String databaseDescription) {
+        DatabaseInfo databaseInfo = new DatabaseInfo(databaseName, databaseDescription);
+        System.out.println(databaseInfo);
+        DatabaseInfo savedDatabaseInfo = databaseInfoRepository.save(databaseInfo);
+        return savedDatabaseInfo.getId();
     }
 
     private DatabaseStatistics getStats() {

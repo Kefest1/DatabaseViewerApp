@@ -6,6 +6,7 @@ import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 import Statistics from "./DatabaseStatistics/Statistics";
 import {getCookie} from "../../getCookie";
 import AdminPanel from "../admin/AdminPanel";
+import TableCreator from "./BrowseDatabase/TableCreator";
 
 
 const Component = ( {name} ) => {
@@ -52,7 +53,7 @@ const DatabaseContent = ({selectedTable}) => {
             case 5:
                 return <QueryLoggerComponent/>;
             case 6:
-                return <QueryLoggerComponent/>;
+                return <TableCreator/>;
             default:
                 return null;
         }
@@ -88,8 +89,8 @@ const DatabaseContent = ({selectedTable}) => {
                         Logger
                     </div>
                     <div
-                        className={`wcPanelTab ${activeButton === 5 ? 'active' : ''}`}
-                        onClick={() => handleButtonClick(5)}
+                        className={`wcPanelTab ${activeButton === 6 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(6)}
                     >
                         Table Creator
                     </div>

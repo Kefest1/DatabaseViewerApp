@@ -29,16 +29,16 @@ public class DatabaseCreator {
             return;
         }
 
-//        String databaseName = setDatabaseName();
-//        int databaseID = getDatabaseID(databaseName);
-//
-//        Set<String> tableNames = getTableNames();
-//        setTableInfo(tableNames, databaseID);
-//
-//        setFieldInfo(tableNames);
+        String databaseName = setDatabaseName();
+        int databaseID = getDatabaseID(databaseName);
 
-        setTableConnections();
+        Set<String> tableNames = getTableNames();
+        setTableInfo(tableNames, databaseID);
 
+        setFieldInfo(tableNames);
+//
+//        setTableConnections();
+//
         try {
             clientConnection.close();
             serverConnection.close();

@@ -13,6 +13,7 @@ async function fetchAvailableTables(databaseName, tableName) {
 
     return await response.json();
 }
+
 async function fetchKeyNameTables(databaseName, tableName) {
     const response = await fetch(`http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`);
     return await response.text();

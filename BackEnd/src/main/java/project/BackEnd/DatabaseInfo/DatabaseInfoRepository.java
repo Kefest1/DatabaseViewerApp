@@ -15,6 +15,4 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
 
     long count();
 
-
-
 }

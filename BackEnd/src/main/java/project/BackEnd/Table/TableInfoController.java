@@ -125,10 +125,7 @@ public class TableInfoController {
 
     @GetMapping("/getKey/{databasename}/{tablename}")
     public String getPrimaryKeyName(@PathVariable("tablename") String tableName, @PathVariable("databasename") String databaseName) {
-        String key = tableInfoRepository.findKeyNameByTable(tableName, databaseName);
-        System.out.println(tableName);
-        System.out.println(databaseName);
-        return key;
+        return tableInfoRepository.findKeyNameByTable(tableName, databaseName);
     }
 
     @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
@@ -139,6 +136,11 @@ public class TableInfoController {
     @GetMapping("/getFields/{user}/{databasename}/{tablename}")
     public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
         return tableInfoRepository.getFields(databaseName, userName, tablename);
+    }
+
+    @GetMapping("/getFields/{databasename}/{tablename}")
+    public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
+        return tableInfoRepository.getTableInformation(databaseName, tablename);
     }
 
     @PostMapping("/getAllFields")
