@@ -23,14 +23,229 @@ import {getCookie} from "../../../getCookie";
 import {useEffect, useState} from "react";
 
 
+async function fetchStructure(databaseName, selectedTable) {
+    const userName = getCookie("userName");
+    const response = await fetch(
+        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`
+    );
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return await response.json();
+}
 
-function DataGridTable({databaseName}) {
+let idBuf = 3;
+
+function DataGridTable({ databaseName, selectedTable }) {
+
+    const [rows, setRows] = useState([])
+    const [rowModesModel, setRowModesModel] = useState({});
+    function EditToolbar(props) {
+        const { setRows, setRowModesModel } = props;
+
+        const handleClick = () => {
+            console.log(rows);
+            const id = idBuf;
+            idBuf++;
+
+            setRows((oldRows) => [
+                ...oldRows,
+                { id, columnName: '', columnType: '', isNew: true },
+            ]);
+            setRowModesModel((oldModel) => ({
+                ...oldModel,
+                [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
+            }));
+        };
+
+        return (
+            <GridToolbarContainer>
+                <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+                    Add record
+                </Button>
+                <Button color="primary" startIcon={<AddIcon />} onClick={handleCommit}>
+                    Debug?
+                </Button>
+            </GridToolbarContainer>
+        );
+    }
+
+
+    useEffect(() => {
+        const loadTableStructure = async () => {
+            try {
+                const structure = await fetchStructure(databaseName, selectedTable);
+                console.log(structure);
+                const rowsWithUniqueIds = structure.map(item => ({
+                    ...item,
+                    id: item.id || idBuf,
+                }));
+                idBuf++;
+                setRows(rowsWithUniqueIds);
+            } catch (error) {
+                console.error("Error loading table structure:", error);
+            }
+        };
+
+        if (databaseName && selectedTable) {
+            loadTableStructure();
+        }
+    }, [databaseName, selectedTable]);
+
+    const handleRowEditStop = (params, event) => {
+        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+            event.defaultMuiPrevented = true;
+        }
+    };
+
+    const handleEditClick = (id) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    };
+
+    function handleCommit() {
+        console.log("---------------");
+        console.log(rows);
+
+        fetch('http://localhost:8080/api/tableinfo/addFieldInformation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(rows),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    };
+
+    const handleSaveClick = (id) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+    };
+
+    const handleDeleteClick = (id) => () => {
+        setRows(rows.filter((row) => row.id !== id));
+    };
+
+    const handleCancelClick = (id) => () => {
+        setRowModesModel({
+            ...rowModesModel,
+            [id]: { mode: GridRowModes.View, ignoreModifications: true },
+        });
+
+        const editedRow = rows.find((row) => row.id === id);
+        if (editedRow.isNew) {
+            setRows(rows.filter((row) => row.id !== id));
+        }
+    };
+
+    const columns = [
+        { field: 'columnName', headerName: 'columnName', width: 180, editable: true },
+        {
+            field: 'columnType',
+            headerName: 'columnType',
+            // type: 'number',
+            width: 80,
+            align: 'left',
+            headerAlign: 'left',
+            editable: true,
+        },
+        {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            width: 100,
+            cellClassName: 'actions',
+            getActions: ({ id }) => {
+                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+                if (isInEditMode) {
+                    return [
+                        <GridActionsCellItem
+                            icon={<SaveIcon />}
+                            label="Save"
+                            sx={{
+                                color: 'primary.main',
+                            }}
+                            onClick={handleSaveClick(id)}
+                        />,
+                        <GridActionsCellItem
+                            icon={<CancelIcon />}
+                            label="Cancel"
+                            className="textPrimary"
+                            onClick={handleCancelClick(id)}
+                            color="inherit"
+                        />,
+                    ];
+                }
+
+                return [
+                    <GridActionsCellItem
+                        icon={<EditIcon />}
+                        label="Edit"
+                        className="textPrimary"
+                        onClick={handleEditClick(id)}
+                        color="inherit"
+                    />,
+                    <GridActionsCellItem
+                        icon={<DeleteIcon />}
+                        label="Delete"
+                        onClick={handleDeleteClick(id)}
+                        color="inherit"
+                    />,
+                ];
+            },
+        },
+    ];
+
+    const processRowUpdate = (newRow) => {
+        const updatedRow = { ...newRow, isNew: false };
+        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        return updatedRow;
+    };
+
+    const handleRowModesModelChange = (newRowModesModel) => {
+        setRowModesModel(newRowModesModel);
+    };
+
     return (
         <div>
-            <h1>{databaseName}</h1>
-            <h1>databaseName</h1>
+            <Box
+                sx={{
+                    height: 500,
+                    width: '100%',
+                    '& .actions': {
+                        color: 'text.secondary',
+                    },
+                    '& .textPrimary': {
+                        color: 'text.primary',
+                    },
+                }}
+            >
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    editMode="row"
+                    rowModesModel={rowModesModel}
+                    onRowModesModelChange={handleRowModesModelChange}
+                    onRowEditStop={handleRowEditStop}
+                    processRowUpdate={processRowUpdate}
+                    slots={{ toolbar: EditToolbar }}
+                    slotProps={{
+                        toolbar: { setRows, setRowModesModel },
+                    }}
+                />
+            </Box>
         </div>
-    )
+    );
 }
 
 export default DataGridTable;

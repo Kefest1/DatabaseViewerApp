@@ -7,10 +7,13 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.DatabaseInfo.DatabaseInfo;
+import project.BackEnd.DatabaseInfo.DatabaseInfoRepository;
 import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
-import project.BackEnd.OwnershipDetails.OwnershipDetails;
+import project.BackEnd.OwnershipDetails.OwnershipDetailsPayload;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsRepository;
+import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
+import project.BackEnd.User.UserInfoRepository;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -33,7 +36,15 @@ public class TableInfoController {
     FieldInfoRepository fieldInfoRepository;
 
     @Autowired
-    OwnershipDetailsRepository ownershipDetailsRepository;
+    UserInfoRepository userInfoRepository;
+
+    @Autowired
+    private DatabaseInfoRepository databaseInfoRepository;
+
+    @Autowired
+    private OwnershipDetailsRepository ownershipDetailsRepository;
+    @Autowired
+    private OwnershipDetailsService ownershipDetailsService;
 
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
@@ -47,9 +58,27 @@ public class TableInfoController {
         return "OK";
     }
 
+    @PostMapping("/addtable/{username}/{databasename}/{tableName}")
+    public String addTable(@PathVariable("username") String username, @PathVariable("databasename") String databasename, @PathVariable("tableName") String tableName) {
+        Long userID = userInfoRepository.findByUsername(username).getId();
+        DatabaseInfo databaseInfo = databaseInfoRepository.getDatabaseInfoByDatabaseName(databasename);
+
+        TableInfo tableInfo = new TableInfo(databaseInfo, tableName);
+        Long tableID = tableInfoService.saveTableInfo(tableInfo).getId();
+
+        OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
+        ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
+        return "OK";
+    }
+
     @GetMapping("/getAvailableDatabases/{username}")
     public List<String> getAvailableTablesByUserName(@PathVariable("username") String userName) {
         return tableInfoRepository.findDatabasesByUserName(userName);
+    }
+
+    @GetMapping("/getAvailableTables/{username}/{database}")
+    public List<String> getAvailableTables(@PathVariable("username") String userName, @PathVariable("database") String database) {
+        return tableInfoRepository.findAvailableTableNames(database, userName);
     }
 
     @GetMapping("/getAvailableDatabasesObject/{username}")
@@ -57,6 +86,58 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesObjectsByUserName(userName);
     }
 
+    @GetMapping("/getTableStructure/{username}/{databasename}/{tablename}")
+    public List<FieldInfoDTO> getAvailableDatabasesByUserName(
+            @PathVariable("username") String userName,
+            @PathVariable("databasename") String databasename,
+            @PathVariable("tablename") String tablename) {
+
+        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tablename, databasename).getFieldInformation();
+
+        // Map TableStructure to FieldInfoDTO, including the ID
+        List<FieldInfoDTO> fieldInfoDTOs = tableStructures.stream()
+                .map(ts -> new FieldInfoDTO(ts.getId(), ts.getColumnName(), ts.getColumnType()))
+                .collect(Collectors.toList());
+
+        return fieldInfoDTOs;
+    }
+
+    @PostMapping("/addFieldInformation")
+    public String receiveFieldInfo(@RequestBody FieldInfoDTO[] fieldInfoArray) {
+        for (FieldInfoDTO fieldInfo : fieldInfoArray) {
+            System.out.println("Column Name: " + fieldInfo.getColumnName() + ", Column Type: " + fieldInfo.getColumnType() + ", ID: " + fieldInfo.getId());
+        }
+
+        return "Field information received successfully";
+    }
+
+
+    public static class FieldInfoDTO {
+        private Long id;
+        private String columnName;
+        private String columnType;
+
+        public FieldInfoDTO() {}
+
+        public FieldInfoDTO(Long id, String columnName, String columnType) {
+            this.id = id;
+            this.columnName = columnName;
+            this.columnType = columnType;
+        }
+
+        // Getters
+        public Long getId() {
+            return id;
+        }
+
+        public String getColumnName() {
+            return columnName;
+        }
+
+        public String getColumnType() {
+            return columnType;
+        }
+    }
 
     @GetMapping("/getAvailableTablesToAdd/{adminName}/{username}")
     public List<List<String>> getAvailableTablesByUserName(@PathVariable("username") String userName,
@@ -183,5 +264,17 @@ public class TableInfoController {
         private String database;
         private String table;
     }
+
+
+    @Setter
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TableStructureDTO {
+        private String columnName;
+        private String table;
+    }
+
+
 
 }

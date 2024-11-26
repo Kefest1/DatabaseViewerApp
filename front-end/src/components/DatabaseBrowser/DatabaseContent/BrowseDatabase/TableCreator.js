@@ -13,25 +13,42 @@ async function fetchAvailableDatabases() {
     return await tables.json();
 }
 
-const actions = [
-    "Add new table",
-    "Modify Table",
-];
+async function fetchAvailableTables(selectedDatabase) {
+    const userName = getCookie("userName");
+    const url = "http://localhost:8080/api/tableinfo/getAvailableTables/" + userName + "/" + selectedDatabase;
+    const tables = await fetch(url);
+    return await tables.json();
+}
+
 
 function TableCreator() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
+    const [selectedTable, setSelectedTable] = useState("");
+
+    const [availableTables, setAvailableTables] = useState([]);
     const [availableDatabases, setAvailableDatabases] = useState([]);
 
     useEffect(() => {
         const loadDatabases = async () => {
-
             const availableDBs = await fetchAvailableDatabases();
             setAvailableDatabases(availableDBs);
-
         };
 
         loadDatabases();
     }, []);
+
+    useEffect(() => {
+        const loadTables = async () => {
+            if (selectedDatabase) { // Check if selectedDatabase is not an empty string
+                const availableTables = await fetchAvailableTables(selectedDatabase);
+                setAvailableTables(availableTables);
+            } else {
+                setAvailableTables([]); // Clear available tables if no database is selected
+            }
+        };
+
+        loadTables();
+    }, [selectedDatabase]); // Make sure to include selectedDatabase in the dependency array
 
 
     return (
@@ -52,11 +69,29 @@ function TableCreator() {
                     </MenuItem>
                 ))}
             </Select>
-
             {
                 selectedDatabase !== "" &&
                 (
-                    <DataGridTable databaseName={selectedDatabase}></DataGridTable>
+                    <Select
+                    labelId="demo-simple-select-table"
+                    id="demo-simple-table"
+                    value={selectedTable}
+                    label="Select Table"
+                    onChange={(event) => setSelectedTable(event.target.value)}
+                    variant={"outlined"}
+                    >
+                    {availableTables.map((option, index) => (
+                        <MenuItem key={index} value={option}>
+                            {option}
+                        </MenuItem>
+                    ))}
+                    </Select>
+                )
+            }
+            {
+                selectedTable !== "" && selectedDatabase !== "" &&
+                (
+                    <DataGridTable databaseName={selectedDatabase} selectedTable={selectedTable}></DataGridTable>
                 )
             }
         </div>

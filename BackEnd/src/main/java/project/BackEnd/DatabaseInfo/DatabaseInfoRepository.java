@@ -10,9 +10,11 @@ import java.util.List;
 @Repository
 public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long> {
 
-    @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName, fi.columnName FROM UserInfo ui JOIN ui.ownershipDetails od JOIN od.tableInfo ti JOIN ti.fields fi WHERE ui.username = :name ORDER BY 1, 2, 3")
+    @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName FROM UserInfo ui JOIN ui.ownershipDetails od JOIN od.tableInfo ti WHERE ui.username = :name ORDER BY 1, 2")
     List<String> findAllUsersTable(@Param("name") String name);
 
     long count();
+
+    DatabaseInfo getDatabaseInfoByDatabaseName(String databaseName);
 
 }

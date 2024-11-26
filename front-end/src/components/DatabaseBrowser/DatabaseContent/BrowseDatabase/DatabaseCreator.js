@@ -23,7 +23,7 @@ import {getCookie} from "../../../getCookie";
 import {useEffect, useState} from "react";
 import {TextField} from "@mui/material";
 
-function addDatabase(databaseName, databaseDescription) {
+function addDatabase(databaseName, databaseDescription, tableName) {
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${databaseDescription}`;
 
     fetch(url, {
@@ -50,6 +50,7 @@ function addDatabase(databaseName, databaseDescription) {
 function DatabaseCreator() {
     const [databaseName, setDatabaseName] = useState('');
     const [databaseDescription, setDatabaseDescription] = useState('');
+    const [tableName, setTableName] = useState('');
 
     const handleInputChange = (event) => {
         setDatabaseName(event.target.value);
@@ -59,8 +60,12 @@ function DatabaseCreator() {
         setDatabaseDescription(event.target.value);
     };
 
+    const handleInputTableNameChange = (event) => {
+        setTableName(event.target.value);
+    };
+
     const handleSubmit = () => {
-        addDatabase(databaseName, databaseDescription);
+        addDatabase(databaseName, databaseDescription, tableName);
     };
 
     return (
@@ -75,11 +80,19 @@ function DatabaseCreator() {
             />
             <TextField
                 id="outlined-basic"
+                label="Table Name"
+                variant="outlined"
+                value={tableName}
+                onChange={handleInputTableNameChange}
+            />
+            <TextField
+                id="outlined-basic"
                 label="DB description (optional)"
                 variant="outlined"
                 value={databaseDescription}
                 onChange={handleInputDescriptionChange}
             />
+            <br/>
             <Button variant="contained" onClick={handleSubmit}>
                 Add database
             </Button>

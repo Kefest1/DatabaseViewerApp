@@ -2,8 +2,6 @@ package project.BackEnd.Table;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.BackEnd.OwnershipDetails.OwnershipDetails;
-import project.BackEnd.User.UserInfo;
 
 import java.util.List;
 
@@ -19,8 +17,8 @@ public class TableInfoServiceImpl implements TableInfoService {
     }
 
     @Override
-    public void saveTableInfo(TableInfo tableInfo) {
-        tableInfoRepository.save(tableInfo);
+    public TableInfo saveTableInfo(TableInfo tableInfo) {
+        return tableInfoRepository.save(tableInfo);
     }
 
     @Override

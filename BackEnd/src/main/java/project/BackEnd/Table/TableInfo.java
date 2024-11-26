@@ -27,6 +27,11 @@ public class TableInfo {
                 '}';
     }
 
+    public TableInfo(DatabaseInfo databaseInfo, String tableName) {
+        this.databaseInfo = databaseInfo;
+        this.tableName = tableName;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "table_info_id")
@@ -45,6 +50,10 @@ public class TableInfo {
     @JsonIgnore
     private List<FieldInfo> fields;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "table_info_id")
+    private List<TableStructure> fieldInformation;
+
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<TableVisitHistory> visitHistory;
@@ -58,4 +67,21 @@ public class TableInfo {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
+}
+
+@Entity
+@Table(name = "table_structure")
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+class TableStructure {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String columnName;
+    private String columnType;
 }
