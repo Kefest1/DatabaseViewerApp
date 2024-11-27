@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 import Select from '@mui/material/Select';
-import {MenuItem} from "@mui/material";
+import {MenuItem, TextField} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import DataGridTable from "./DataGridTable";
 import DatabaseCreator from "./DatabaseCreator";
+import Button from "@mui/material/Button";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
@@ -13,20 +14,63 @@ async function fetchAvailableDatabases() {
     return await tables.json();
 }
 
-async function fetchAvailableTables(selectedDatabase) {
+function addTable(tableName, primaryColumnName, databaseName) {
+    const url = `http://localhost:8080/api/tableinfo/addenhanced`;
     const userName = getCookie("userName");
-    const url = "http://localhost:8080/api/tableinfo/getAvailableTables/" + userName + "/" + selectedDatabase;
-    const tables = await fetch(url);
-    return await tables.json();
+
+    console.log(tableName);
+    console.log(primaryColumnName);
+    console.log(databaseName);
+
+    const data = new URLSearchParams();
+    data.append('tableInfo', tableName);
+    data.append('username', userName);
+    data.append('databaseName', databaseName);
+    data.append('primaryKey', primaryColumnName);
+
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
 }
+
 
 
 function TableCreator() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
-    const [selectedTable, setSelectedTable] = useState("");
-
-    const [availableTables, setAvailableTables] = useState([]);
     const [availableDatabases, setAvailableDatabases] = useState([]);
+
+    const [tableName, setTableName] = useState('');
+    const [primaryColumnName, setPrimaryColumnName] = useState('');
+
+    const handleColumnName = (event) => {
+        setPrimaryColumnName(event.target.value);
+    };
+
+    const handleInputTableNameChange = (event) => {
+        setTableName(event.target.value);
+    };
+
+    const handleSubmit = () => {
+        addTable(tableName, primaryColumnName, selectedDatabase);
+    };
 
     useEffect(() => {
         const loadDatabases = async () => {
@@ -37,24 +81,8 @@ function TableCreator() {
         loadDatabases();
     }, []);
 
-    useEffect(() => {
-        const loadTables = async () => {
-            if (selectedDatabase) { // Check if selectedDatabase is not an empty string
-                const availableTables = await fetchAvailableTables(selectedDatabase);
-                setAvailableTables(availableTables);
-            } else {
-                setAvailableTables([]); // Clear available tables if no database is selected
-            }
-        };
-
-        loadTables();
-    }, [selectedDatabase]); // Make sure to include selectedDatabase in the dependency array
-
-
     return (
         <div>
-            <h1>Table create</h1>
-            <DatabaseCreator/>
             <Select
                 labelId="demo-simple-select-table"
                 id="demo-simple-table"
@@ -69,33 +97,33 @@ function TableCreator() {
                     </MenuItem>
                 ))}
             </Select>
-            {
-                selectedDatabase !== "" &&
-                (
-                    <Select
-                    labelId="demo-simple-select-table"
-                    id="demo-simple-table"
-                    value={selectedTable}
-                    label="Select Table"
-                    onChange={(event) => setSelectedTable(event.target.value)}
-                    variant={"outlined"}
-                    >
-                    {availableTables.map((option, index) => (
-                        <MenuItem key={index} value={option}>
-                            {option}
-                        </MenuItem>
-                    ))}
-                    </Select>
-                )
-            }
-            {
-                selectedTable !== "" && selectedDatabase !== "" &&
-                (
-                    <DataGridTable databaseName={selectedDatabase} selectedTable={selectedTable}></DataGridTable>
-                )
-            }
+
+            {selectedDatabase !== "" && (
+                <div>
+                    <TextField
+                        id="outlined-basic"
+                        label="Database Name"
+                        variant="outlined"
+                        value={tableName}
+                        onChange={handleInputTableNameChange}
+                    />
+
+                    <TextField
+                        id="outlined-basic"
+                        label="Table Name"
+                        variant="outlined"
+                        value={primaryColumnName}
+                        onChange={handleColumnName}
+                    />
+
+                    <Button variant="contained" onClick={handleSubmit}>
+                        Add database
+                    </Button>
+
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
 export default TableCreator;

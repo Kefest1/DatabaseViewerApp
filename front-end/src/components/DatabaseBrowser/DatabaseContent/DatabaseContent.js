@@ -6,7 +6,7 @@ import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 import Statistics from "./DatabaseStatistics/Statistics";
 import {getCookie} from "../../getCookie";
 import AdminPanel from "../admin/AdminPanel";
-import TableCreator from "./BrowseDatabase/TableCreator";
+import StructureModifier from "./BrowseDatabase/StructureModifier";
 
 
 const Component = ( {name} ) => {
@@ -53,7 +53,7 @@ const DatabaseContent = ({selectedTable}) => {
             case 5:
                 return <QueryLoggerComponent/>;
             case 6:
-                return <TableCreator/>;
+                return <StructureModifier/>;
             default:
                 return null;
         }

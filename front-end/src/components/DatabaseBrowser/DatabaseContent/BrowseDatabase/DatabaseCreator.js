@@ -1,32 +1,12 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
-import {
-    GridRowModes,
-    DataGrid,
-    GridToolbarContainer,
-    GridActionsCellItem,
-    GridRowEditStopReasons,
-} from '@mui/x-data-grid';
-import {
-    randomCreatedDate,
-    randomTraderName,
-    randomId,
-    randomArrayItem,
-} from '@mui/x-data-grid-generator';
-import {getCookie} from "../../../getCookie";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {TextField} from "@mui/material";
 
-function addDatabase(databaseName, databaseDescription, tableName) {
+function addDatabase(databaseName, databaseDescription) {
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${databaseDescription}`;
 
-    fetch(url, {
+    return fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -36,7 +16,67 @@ function addDatabase(databaseName, databaseDescription, tableName) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return 0;
+            return response.json(); // Parse the JSON response
+        })
+        .then(data => {
+            console.log('Success:', data);
+            return data; // Return the Long value from the response
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            throw error; // Re-throw the error if you want to handle it later
+        });
+}
+
+function addTable(tableName, databaseID, primaryColumnName) {
+    const url = `http://localhost:8080/api/tableinfo/add`;
+
+    const data = new URLSearchParams();
+    data.append('tableInfo', tableName);
+    data.append('databaseID', databaseID);
+    data.append('primaryKey', primaryColumnName);
+
+    console.log(data);
+
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+}
+
+function addStructure(columnName, tableID) {
+    const url = `http://localhost:8080/api/tableinfo/addFieldInfo/Long/${columnName}/${tableID}`;
+    console.log(columnName);
+    console.log(tableID);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
         })
         .then(data => {
             console.log('Success:', data);
@@ -46,11 +86,15 @@ function addDatabase(databaseName, databaseDescription, tableName) {
         });
 }
 
-
 function DatabaseCreator() {
     const [databaseName, setDatabaseName] = useState('');
     const [databaseDescription, setDatabaseDescription] = useState('');
     const [tableName, setTableName] = useState('');
+    const [primaryColumnName, setPrimaryColumnName] = useState('');
+
+    const handleColumnName = (event) => {
+        setPrimaryColumnName(event.target.value);
+    };
 
     const handleInputChange = (event) => {
         setDatabaseName(event.target.value);
@@ -65,7 +109,25 @@ function DatabaseCreator() {
     };
 
     const handleSubmit = () => {
-        addDatabase(databaseName, databaseDescription, tableName);
+        let databaseId; // Declare a variable to hold the result
+        let tableID; // Declare a variable to hold the result
+
+        addDatabase(databaseName, databaseDescription)
+            .then(id => {
+                databaseId = id;
+
+                addTable(tableName, databaseId, primaryColumnName)
+                    .then(id => {
+                        tableID = id; // Assign the result to the variable
+                        addStructure(primaryColumnName, tableID);
+                    })
+                    .catch(error => {
+                        console.error('Failed to add database:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('Failed to add database:', error);
+            });
     };
 
     return (
@@ -84,6 +146,13 @@ function DatabaseCreator() {
                 variant="outlined"
                 value={tableName}
                 onChange={handleInputTableNameChange}
+            />
+            <TextField
+                id="outlined-basic"
+                label="Primary key column name"
+                variant="outlined"
+                value={primaryColumnName}
+                onChange={handleColumnName}
             />
             <TextField
                 id="outlined-basic"
