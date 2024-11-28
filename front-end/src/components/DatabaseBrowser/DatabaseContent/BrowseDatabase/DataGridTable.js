@@ -34,19 +34,21 @@ async function fetchStructure(databaseName, selectedTable) {
     return await response.json();
 }
 
-let idBuf = 3;
+let idBuf = -1;
 
 function DataGridTable({ databaseName, selectedTable }) {
 
     const [rows, setRows] = useState([])
     const [rowModesModel, setRowModesModel] = useState({});
+    const [tablesToDelete, setTablesToDelete] = useState([]);
+
     function EditToolbar(props) {
         const { setRows, setRowModesModel } = props;
 
         const handleClick = () => {
             console.log(rows);
             const id = idBuf;
-            idBuf++;
+            idBuf--;
 
             setRows((oldRows) => [
                 ...oldRows,
@@ -80,7 +82,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                     ...item,
                     id: item.id || idBuf,
                 }));
-                idBuf++;
+                idBuf--;
                 setRows(rowsWithUniqueIds);
             } catch (error) {
                 console.error("Error loading table structure:", error);
@@ -102,11 +104,36 @@ function DataGridTable({ databaseName, selectedTable }) {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
-    function handleCommit() {
-        console.log("---------------");
-        console.log(rows);
+    function commitDelete(tablesToDelete) {
+        const url = `http://localhost:8080/api/tableinfo/deleteFieldInfo`
+        fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tablesToDelete),
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Failed to delete. Status: ' + response.status);
+                }
+            })
+            .then(result => {
+                console.log('Success:', result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 
-        fetch('http://localhost:8080/api/tableinfo/addFieldInformation', {
+    function handleCommit() {
+
+        commitDelete(tablesToDelete);
+
+        const userName = getCookie("userName");
+        fetch(`http://localhost:8080/api/tableinfo/addFieldInformation/${databaseName}/${selectedTable}/${userName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -117,7 +144,6 @@ function DataGridTable({ databaseName, selectedTable }) {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.text();
             })
             .then(data => {
                 console.log(data);
@@ -125,13 +151,17 @@ function DataGridTable({ databaseName, selectedTable }) {
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);
             });
-    };
+
+    }
 
     const handleSaveClick = (id) => () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
     };
 
     const handleDeleteClick = (id) => () => {
+        setTablesToDelete((prevTables) => [...prevTables, id]);
+        console.log(tablesToDelete);
+
         setRows(rows.filter((row) => row.id !== id));
     };
 

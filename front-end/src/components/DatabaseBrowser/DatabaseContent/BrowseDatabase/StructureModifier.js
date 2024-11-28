@@ -44,7 +44,7 @@ function StructureModifier() {
                 const availableTables = await fetchAvailableTables(selectedDatabase);
                 setAvailableTables(availableTables);
             } else {
-                setAvailableTables([]); // Clear available tables if no database is selected
+                setAvailableTables([]);
             }
         };
 

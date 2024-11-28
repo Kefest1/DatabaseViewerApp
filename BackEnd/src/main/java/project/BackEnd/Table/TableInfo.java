@@ -8,6 +8,7 @@ import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 import project.BackEnd.TableVisitHistory.TableVisitHistory;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -85,3 +86,6 @@ class TableStructure {
     private String columnName;
     private String columnType;
 }
+
+
+

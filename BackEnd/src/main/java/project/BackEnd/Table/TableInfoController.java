@@ -14,6 +14,7 @@ import project.BackEnd.OwnershipDetails.OwnershipDetailsPayload;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
 import project.BackEnd.User.UserInfoRepository;
+import project.BackEnd.Table.TableStructureRepository;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -36,6 +37,9 @@ public class TableInfoController {
     FieldInfoRepository fieldInfoRepository;
 
     @Autowired
+    TableStructureRepository tableStructureRepository;
+
+    @Autowired
     UserInfoRepository userInfoRepository;
 
     @Autowired
@@ -43,6 +47,7 @@ public class TableInfoController {
 
     @Autowired
     private OwnershipDetailsRepository ownershipDetailsRepository;
+
     @Autowired
     private OwnershipDetailsService ownershipDetailsService;
 
@@ -52,10 +57,36 @@ public class TableInfoController {
     }
 
     @PostMapping("/add")
-    public String saveInfo(@RequestParam("tableInfo") TableInfo tableInfo) {
-        System.out.println(tableInfo);
+    public Long saveInfo(@RequestParam("tableInfo") String tableName, @RequestParam("databaseID") Long databaseID, @RequestParam("primaryKey") String primaryKey) {
+        System.out.println(tableName);
+        System.out.println(databaseID);
+        System.out.println(primaryKey);
+        TableInfo tableInfo = new TableInfo();
+        tableInfo.setDatabaseInfo(databaseInfoRepository.getReferenceById(databaseID));
+        tableInfo.setTableName(tableName);
+        tableInfo.setPrimary_key(primaryKey);
+        TableInfo newTable = tableInfoService.saveTableInfo(tableInfo);
+        return newTable.getId();
+    }
+
+    @PostMapping("/addenhanced")
+    public String saveInfoEnhanced(@RequestParam("tableInfo") String tableName,
+                                 @RequestParam("databaseName") String databaseName,
+                                 @RequestParam("primaryKey") String primaryKey,
+                                 @RequestParam("username") String username
+
+    ) {
+
+        System.out.println(tableName);
+        System.out.println(databaseName);
+        System.out.println(primaryKey);
+
+        TableInfo tableInfo = new TableInfo();
+        tableInfo.setDatabaseInfo(databaseInfoRepository.getDatabaseInfoByDatabaseName(databaseName));
+        tableInfo.setTableName(tableName);
+        tableInfo.setPrimary_key(primaryKey);
         tableInfoService.saveTableInfo(tableInfo);
-        return "OK";
+        return "Ok";
     }
 
     @PostMapping("/addtable/{username}/{databasename}/{tableName}")
@@ -102,11 +133,66 @@ public class TableInfoController {
         return fieldInfoDTOs;
     }
 
-    @PostMapping("/addFieldInformation")
-    public String receiveFieldInfo(@RequestBody FieldInfoDTO[] fieldInfoArray) {
+    @PostMapping("/addFieldInformation/{databaseName}/{tableName}/{userName}")
+    public String receiveFieldInfo(@RequestBody FieldInfoDTO[] fieldInfoArray,
+                                   @PathVariable("databaseName") String databaseName,
+                                   @PathVariable("tableName") String tableName,
+                                   @PathVariable("userName") String userName
+    ) {
         for (FieldInfoDTO fieldInfo : fieldInfoArray) {
             System.out.println("Column Name: " + fieldInfo.getColumnName() + ", Column Type: " + fieldInfo.getColumnType() + ", ID: " + fieldInfo.getId());
+
+            if (fieldInfo.getId() > 0) {
+                TableStructure tableStructure = tableStructureRepository.getReferenceById(fieldInfo.getId());
+                tableStructure.setColumnName(fieldInfo.getColumnName());
+                tableStructure.setColumnType(fieldInfo.getColumnType());
+
+                tableStructureRepository.save(tableStructure);
+            }
+            else {
+                TableStructure tableStructure = new TableStructure();
+                tableStructure.setColumnName(fieldInfo.getColumnName());
+                tableStructure.setColumnType(fieldInfo.getColumnType());
+                tableStructureRepository.save(tableStructure);
+
+                TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databaseName);
+                tableInfo.getFieldInformation().add(tableStructure);
+
+                tableStructureRepository.save(tableStructure);
+            }
+
         }
+
+        return "Field information received successfully";
+    }
+
+
+    @DeleteMapping("/deleteFieldInfo")
+    public String deleteFieldInfoByIds(@RequestBody List<Long> ids) {
+        tableStructureRepository.deleteAllById(ids);
+        return "OK";
+    }
+
+    @PostMapping("/addFieldInfo/{datatype}/{columnName}/{tableid}")
+    public String addFieldInformation(
+            @PathVariable("datatype") String datatype,
+            @PathVariable("columnName") String columnName,
+            @PathVariable("tableid") Long tableid
+    ) {
+        TableStructure tableStructure = new TableStructure();
+        tableStructure.setColumnName(columnName);
+        tableStructure.setColumnType(datatype);
+
+        TableInfo tableInfoInstance = tableInfoRepository.getTableInfoById(tableid);
+
+        if (tableInfoInstance.getFieldInformation() == null) {
+            tableInfoInstance.setFieldInformation(new ArrayList<>());
+        }
+        tableInfoInstance.getFieldInformation().add(tableStructure);
+
+        tableStructureRepository.save(tableStructure);
+
+        tableInfoRepository.save(tableInfoInstance);
 
         return "Field information received successfully";
     }
