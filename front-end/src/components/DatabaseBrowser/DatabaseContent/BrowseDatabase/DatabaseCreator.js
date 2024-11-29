@@ -2,6 +2,7 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import {useState} from "react";
 import {TextField} from "@mui/material";
+import {getCookie} from "../../../getCookie";
 
 function addDatabase(databaseName, databaseDescription) {
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${databaseDescription}`;
@@ -86,6 +87,33 @@ function addStructure(columnName, tableID) {
         });
 }
 
+function addConnection(tableID) {
+    const url = `http://localhost:8080/api/ownershipdetails/addbyusername/${tableID}`;
+
+    const userName = getCookie("userName");
+    // const requestBody = JSON.stringify(userName);
+
+    // Send the POST request
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: userName
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('User added successfully');
+            } else {
+                console.log('Error adding user');
+            }
+        })
+        .catch(error => {
+            console.error('Request failed', error);
+        });
+}
+
+
 function DatabaseCreator() {
     const [databaseName, setDatabaseName] = useState('');
     const [databaseDescription, setDatabaseDescription] = useState('');
@@ -120,6 +148,7 @@ function DatabaseCreator() {
                     .then(id => {
                         tableID = id; // Assign the result to the variable
                         addStructure(primaryColumnName, tableID);
+                        addConnection(tableID);
                     })
                     .catch(error => {
                         console.error('Failed to add database:', error);

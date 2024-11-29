@@ -37,7 +37,7 @@ public class DatabaseCreator {
 
         setFieldInfo(tableNames);
 //
-//        setTableConnections();
+        setTableConnections();
 //
         try {
             clientConnection.close();

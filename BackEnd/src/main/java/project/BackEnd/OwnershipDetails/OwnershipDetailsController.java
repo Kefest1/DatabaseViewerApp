@@ -42,12 +42,29 @@ public class OwnershipDetailsController {
         return "OK";
     }
 
+    @PostMapping("/addbyusername/{tableid}")
+    public String addUserByName(@PathVariable("tableid") Long tableid, @RequestBody String username) {
+        System.out.println("\n\n\n");
+        System.out.println(tableid);
+        System.out.println(username);
+        Long userID = userInfoRepository.findUserIDByUsername(username);
+        System.out.println(userID);
+
+        ownershipDetailsService.addOwnershipDetails(new OwnershipDetailsPayload(userID, tableid));
+
+        return "OK";
+    }
+
 
     @PostMapping("/add/{userName}/{adminName}/{databaseName}")
     public String addUserByAdmin(@PathVariable("userName") String userName,
                                  @PathVariable("adminName") String adminName,
                                  @PathVariable("databaseName") String databaseName,
                                  @RequestParam("tableNames") String[] tableNames) {
+        System.out.println(userName);
+        System.out.println(adminName);
+        System.out.println(databaseName);
+        System.out.println(tableNames);
 
         UserInfo userInfo = userInfoRepository.findByUsername(userName);
         var userID = userInfo.getId();
@@ -57,7 +74,6 @@ public class OwnershipDetailsController {
             Long tableID = tableInfoRepository.getTableInfoID(databaseName, adminName, tableName);
             OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
             System.out.println(tableID);
-            // TODO Debug
             ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         }
         return "OK";

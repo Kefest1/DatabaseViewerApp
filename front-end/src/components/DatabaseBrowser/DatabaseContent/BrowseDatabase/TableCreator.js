@@ -51,8 +51,6 @@ function addTable(tableName, primaryColumnName, databaseName) {
         });
 }
 
-
-
 function TableCreator() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [availableDatabases, setAvailableDatabases] = useState([]);

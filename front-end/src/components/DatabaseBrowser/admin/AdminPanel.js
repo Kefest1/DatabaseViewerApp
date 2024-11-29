@@ -186,11 +186,7 @@ const AdminPanel = () => {
 
     return (
         <div style={{ marginLeft: '20px' }}>
-            <Button
-                onClick={DEBUG}
-            >
-                DEBUG
-            </Button>
+
             <Select
                 labelId="demo-simple-select-table"
                 id="demo-simple-table"
@@ -230,6 +226,11 @@ const AdminPanel = () => {
                         <h1>Select desired database:</h1>
                         <p>Selected subordinate: {selectedSubordinate}</p>
                         <p>Selected subordinate: {selectedDatabase}</p>
+                        <Button
+                            onClick={DEBUG}
+                        >
+                            Commit changes
+                        </Button>
                         <Grid
                             container
                             spacing={2}
