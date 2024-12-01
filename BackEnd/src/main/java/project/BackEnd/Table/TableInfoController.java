@@ -297,12 +297,23 @@ public class TableInfoController {
 
     @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
     public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
-        return tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablename(databaseName, userName, tablename);
+        List<TableStructure> tableStructures =  tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, userName, tablename);
+        return tableStructures.stream()
+                .map(TableStructure::getColumnName)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/getFields/{user}/{databasename}/{tablename}")
     public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
         return tableInfoRepository.getFields(databaseName, userName, tablename);
+    }
+
+    @GetMapping("/getStructure/{user}/{databasename}/{tablename}")
+    public List<TableStructure> getTableStructure(
+            @PathVariable("user") String userName,
+            @PathVariable("databasename") String databaseName,
+            @PathVariable("tablename") String tablename) {
+        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tablename, databaseName).getFieldInformation();
     }
 
     @GetMapping("/getFields/{databasename}/{tablename}")

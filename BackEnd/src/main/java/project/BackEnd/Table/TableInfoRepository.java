@@ -25,7 +25,7 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT t.id FROM TableInfo t WHERE t.tableName = :tableName")
     Long findIdByTableName(@Param("tableName") String tableName);
 
-    @Query("SELECT t.id FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
+    @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
     TableInfo findInstanceByTableNameAndDatabaseName(@Param("tableName") String tableName, @Param("databaseName") String databaseName);
 
     @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
@@ -74,6 +74,9 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     @Query("SELECT DISTINCT fi.columnName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.fields fi WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
     List<String> findColumnNamesByUserAndDatabaseAndTablename(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+
+    @Query("SELECT DISTINCT ti.fieldInformation FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
+    List<TableStructure> findColumnNamesByUserAndDatabaseAndTablenameFromStructure(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
 
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
     List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
