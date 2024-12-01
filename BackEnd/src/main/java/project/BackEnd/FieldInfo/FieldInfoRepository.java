@@ -30,7 +30,7 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     List<String> findDistinctColumnNamesByTableName(@Param("tableName") String tableName);
 
     @Query("SELECT DISTINCT fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti WHERE fi.columnName = :columnName AND ti.tableName = :tableName")
-    String findTopDataTypeByColumnNameOrdered(@Param("columnName") String columnName, @Param("tableName") String tableName);
+    List<String> findTopDataTypeByColumnNameOrdered(@Param("columnName") String columnName, @Param("tableName") String tableName);
 
 //    @Query("SELECT DISTINCT fi.columnName, ti.tableName FROM FieldInfo fi JOIN fi.tableInfo ti JOIN fi.tableInfo.ownershipDetails od JOIN od.user WHERE od.user.username = :username")
 //    List<String> findWithUsersAndTables(@Param("username") String username);

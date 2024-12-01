@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/fieldinfo")
@@ -84,22 +81,26 @@ public class FieldInfoController {
 
         Integer smallestKey = getSmallestFreeKey(databasename, fieldInfos.get(0).getTableName());
         System.out.println(smallestKey);
-        InsertPayload insertPayloadPrimaryKey =
-                new InsertPayload(
-                    tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename),
-                    String.valueOf(smallestKey),
-                    fieldInfos.get(0).tableName
-                );
+        String primaryKey = tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename);
 
-        fieldInfos.add(insertPayloadPrimaryKey);
+        FieldInfo insertPayloadPrimaryKey = new FieldInfo();
+        String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
+        insertPayloadPrimaryKey.setDataType(datatype);
+        insertPayloadPrimaryKey.setColumnName(fieldInfos.get(0).columnName);
+        insertPayloadPrimaryKey.setDataValue(smallestKey);
+        insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
+        insertPayloadPrimaryKey.setColumnId(newID);
+        fieldInfoRepository.save(insertPayloadPrimaryKey);
+
         for (InsertPayload fieldInfo : fieldInfos) {
-            insertValueHelper(fieldInfo, newID);
+            if (!Objects.equals(fieldInfo.columnName, primaryKey))
+                insertValueHelper(fieldInfo, newID);
         }
         return "OK";
     }
 
     private void insertValueHelper(InsertPayload fieldInfo, Long newID) {
-        String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfo.columnName, fieldInfo.tableName);
+        String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfo.columnName, fieldInfo.tableName).get(0);
         FieldInfo fieldInfoToSave = new FieldInfo();
         fieldInfoToSave.setDataType(datatype);
         fieldInfoToSave.setColumnName(fieldInfo.columnName);

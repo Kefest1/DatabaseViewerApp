@@ -59,8 +59,6 @@ function basicProcessData(data) {
     });
 
     const resResult = {'Rows' : rows, 'Cols' : Object.values(columns)};
-    console.log(resResult);
-
     return resResult;
 }
 
@@ -94,6 +92,7 @@ function mergeRows(joinRows, joinColumns, selectedTable, rows, columns, availabl
         return null; // Return null if no match is found
     }).filter(item => item !== null); // Filter out null values
 }
+
 
 function Button1DbContent({ data, fetchTime, tableName, databaseName, selectedColumns }) {
     const [rows, setRows] = useState([]);

@@ -6,6 +6,8 @@ import Select from '@mui/material/Select';
 import {Button, FormControl, InputLabel, MenuItem, OutlinedInput} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
+import TableBrowser from "./TableBrowser";
+import TableBrowserNew from "./TableBrowserNew";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -53,7 +55,6 @@ function extractDatabaseNames(data) {
 }
 
 async function fetchColumnsForTable(userName, database, table) {
-    console.log(`http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`)
     const response = await fetch(
         `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
     );
@@ -103,6 +104,8 @@ const QueryTool = ({selectedDbTable}) => {
     const [isButtonPressed, setIsButtonPressed] = useState(false);
     const [queryResult, setQueryResult] = useState([]);
 
+    const [tableBrowserKey, setTableBrowserKey] = useState(0);
+
     const logger = QueryLogger.getInstance();
 
     const userName = getCookie("userName");
@@ -138,6 +141,8 @@ const QueryTool = ({selectedDbTable}) => {
     }, [userName, selectedDatabase]);
 
     useEffect(() => {
+        setAvailableColumns([]);
+
         if (selectedTable) {
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
                 .then((response) => {
@@ -219,27 +224,30 @@ const QueryTool = ({selectedDbTable}) => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <Button variant="contained" style={{ marginLeft: 16 }}
-                                onClick={() => {
-                                    runQuery(selectedDatabase, selectedTable, selectedColumns)
-                                        .then(result => {
-                                            setQueryResult(result);
-                                            handleButtonPress();
-                                            setIsButtonPressed(true);
-                                        })
-                                        .catch(error => {
-                                            console.error(error);
-                                        });
-                                }}
+                        <Button
+                            variant="contained"
+                            style={{ marginLeft: 16 }}
+                            onClick={() => {
+                                runQuery(selectedDatabase, selectedTable, selectedColumns)
+                                    .then(result => {
+                                        setQueryResult(result);
+                                        setIsButtonPressed(true);
+                                        setTableBrowserKey(prevKey => prevKey + 1);
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                    });
+                            }}
                         >
-                            Contained
+                            Fetch Data
                         </Button>
                     </div>
                 )}
             </div>
             {isButtonPressed && (
                 <div style={{ marginTop: '16px' }}>
-                    <Button1DbContent
+                    <TableBrowserNew
+                        key={tableBrowserKey}
                         data={queryResult.result}
                         fetchTime={-1}
                         tableName={selectedTable}
