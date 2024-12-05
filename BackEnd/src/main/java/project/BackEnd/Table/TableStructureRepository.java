@@ -1,9 +1,12 @@
 package project.BackEnd.Table;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface TableStructureRepository extends JpaRepository<TableStructure, Long> {
-    // You can add custom query methods here if needed
 
+    @Modifying
+    @Transactional
     void deleteById(Long id);
 }

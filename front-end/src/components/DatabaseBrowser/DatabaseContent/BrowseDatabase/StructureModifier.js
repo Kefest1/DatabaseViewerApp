@@ -5,6 +5,7 @@ import {getCookie} from "../../../getCookie";
 import DataGridTable from "./DataGridTable";
 import DatabaseCreator from "./DatabaseCreator";
 import TableCreator from "./TableCreator";
+import DatabaseModifier from "./DatabaseModifier";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
@@ -40,7 +41,7 @@ function StructureModifier() {
 
     useEffect(() => {
         const loadTables = async () => {
-            if (selectedDatabase) { // Check if selectedDatabase is not an empty string
+            if (selectedDatabase) {
                 const availableTables = await fetchAvailableTables(selectedDatabase);
                 setAvailableTables(availableTables);
             } else {
@@ -49,7 +50,7 @@ function StructureModifier() {
         };
 
         loadTables();
-    }, [selectedDatabase]); // Make sure to include selectedDatabase in the dependency array
+    }, [selectedDatabase]);
 
 
     return (
@@ -58,7 +59,9 @@ function StructureModifier() {
             <DatabaseCreator/>
             <h1>Table create</h1>
             <TableCreator/>
-            <h1>Modify structure</h1>
+            <h1>Modify database structure</h1>
+            <DatabaseModifier/>
+            <h1>Modify table structure</h1>
 
             <Select
                 labelId="demo-simple-select-table"

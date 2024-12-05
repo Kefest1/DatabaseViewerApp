@@ -1,10 +1,12 @@
 package project.BackEnd.Table;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import project.BackEnd.DatabaseInfo.DatabaseInfo;
 import project.BackEnd.FieldInfo.FieldInfo;
 
@@ -93,4 +95,16 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT DISTINCT fi.columnName, fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE db.databaseName = :databasename AND ti.tableName = :tablename")
     List<String> getTableInformation(@Param("databasename") String databasename, @Param("tablename") String tablename);
 
+    @Query("SELECT COUNT(fi) FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.fields fi WHERE ti.tableName = :tableName AND db.databaseName = :databaseName")
+    Integer countRecords(@Param("databaseName") String databaseName, @Param("tableName") String tableName);
+    
+    @Modifying
+    @Query("DELETE FROM TableInfo ti WHERE ti.id IN (:tableIds)")
+    @Transactional
+    void deleteTableInfoByIds(@Param("tableIds") List<Long> tableIds);
+
+    @Modifying
+    @Query("DELETE FROM TableInfo ti WHERE ti.id = :tableIds")
+    @Transactional
+    void deleteTableInfoById(@Param("tableId") Long tableId);
 }

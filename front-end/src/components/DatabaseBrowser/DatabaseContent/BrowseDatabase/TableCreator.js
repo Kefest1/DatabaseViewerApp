@@ -23,7 +23,7 @@ function addTable(tableName, primaryColumnName, databaseName) {
     console.log(databaseName);
 
     const data = new URLSearchParams();
-    data.append('tableInfo', tableName);
+    data.append('tableName', tableName);
     data.append('username', userName);
     data.append('databaseName', databaseName);
     data.append('primaryKey', primaryColumnName);

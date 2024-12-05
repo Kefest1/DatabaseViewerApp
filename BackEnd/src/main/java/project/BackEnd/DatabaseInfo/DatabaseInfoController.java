@@ -10,10 +10,7 @@ import project.BackEnd.Table.TableInfoRepository;
 import project.BackEnd.User.UserInfo;
 
 import javax.xml.crypto.Data;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/databaseinfo")
@@ -40,6 +37,24 @@ public class DatabaseInfoController {
     @GetMapping("/getfoldermap/{username}")
     public List<String> getFolderMap(@PathVariable String username) {
         return databaseInfoRepository.findAllUsersTable(username);
+    }
+
+    @GetMapping("/getDatabaseStructure/{username}/{databaseName}")
+    public List<String> getDatabaseStructure(@PathVariable String databaseName, @PathVariable String username) {
+        List<String> databaseStructure = databaseInfoRepository.findTablesForDatabase(username, databaseName);
+        List<String> modifiedDatabaseStructure = new ArrayList<>();
+
+        for (String tableKeyPair : databaseStructure) {
+            String tableName = tableKeyPair.split(",")[0];
+
+            Integer recordCount = tableInfoRepository.countRecords(databaseName, tableName);
+            boolean isEmpty = (recordCount == 0);
+
+            String modifiedTableKeyPair = tableKeyPair + "," + isEmpty;
+            modifiedDatabaseStructure.add(modifiedTableKeyPair);
+        }
+
+        return modifiedDatabaseStructure;
     }
 
     @GetMapping("/getStatistics/{database}")  // TODO check database's name

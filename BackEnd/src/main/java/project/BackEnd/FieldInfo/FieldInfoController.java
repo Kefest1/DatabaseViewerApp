@@ -87,7 +87,7 @@ public class FieldInfoController {
         String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
         insertPayloadPrimaryKey.setDataType(datatype);
         insertPayloadPrimaryKey.setColumnName(fieldInfos.get(0).columnName);
-        insertPayloadPrimaryKey.setDataValue(smallestKey);
+        insertPayloadPrimaryKey.setDataValue(String.valueOf(smallestKey));
         insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
         insertPayloadPrimaryKey.setColumnId(newID);
         fieldInfoRepository.save(insertPayloadPrimaryKey);
@@ -143,7 +143,6 @@ public class FieldInfoController {
     @DeleteMapping("/deleteArray")
     public String deleteFieldInfo(@RequestBody Long[] columnIds) {
         try {
-             System.out.println(Arrays.toString(columnIds));
              fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
             return "OK";
         } catch (Exception e) {

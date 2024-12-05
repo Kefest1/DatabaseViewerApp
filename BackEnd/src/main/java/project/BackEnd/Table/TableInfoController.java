@@ -1,10 +1,10 @@
 package project.BackEnd.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.DatabaseInfo.DatabaseInfo;
 import project.BackEnd.DatabaseInfo.DatabaseInfoRepository;
@@ -16,10 +16,7 @@ import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
 import project.BackEnd.User.UserInfoRepository;
 import project.BackEnd.Table.TableStructureRepository;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -58,9 +55,7 @@ public class TableInfoController {
 
     @PostMapping("/add")
     public Long saveInfo(@RequestParam("tableInfo") String tableName, @RequestParam("databaseID") Long databaseID, @RequestParam("primaryKey") String primaryKey) {
-        System.out.println(tableName);
-        System.out.println(databaseID);
-        System.out.println(primaryKey);
+
         TableInfo tableInfo = new TableInfo();
         tableInfo.setDatabaseInfo(databaseInfoRepository.getReferenceById(databaseID));
         tableInfo.setTableName(tableName);
@@ -70,24 +65,79 @@ public class TableInfoController {
     }
 
     @PostMapping("/addenhanced")
-    public String saveInfoEnhanced(@RequestParam("tableInfo") String tableName,
-                                 @RequestParam("databaseName") String databaseName,
-                                 @RequestParam("primaryKey") String primaryKey,
-                                 @RequestParam("username") String username
+    public String saveInfoEnhanced(@RequestParam("tableName") String tableName,
+                                   @RequestParam("databaseName") String databaseName,
+                                   @RequestParam("primaryKey") String primaryKey,
+                                   @RequestParam("username") String username
 
     ) {
 
-        System.out.println(tableName);
-        System.out.println(databaseName);
-        System.out.println(primaryKey);
 
         TableInfo tableInfo = new TableInfo();
         tableInfo.setDatabaseInfo(databaseInfoRepository.getDatabaseInfoByDatabaseName(databaseName));
         tableInfo.setTableName(tableName);
         tableInfo.setPrimary_key(primaryKey);
-        tableInfoService.saveTableInfo(tableInfo);
+
+        Long tableID = tableInfoService.saveTableInfo(tableInfo).getId();
+        Long userID = userInfoRepository.findByUsername(username).getId();
+
+        OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
+        ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         return "Ok";
     }
+
+    @DeleteMapping("/deletetable")
+    public ResponseEntity<String> deleteTable(@RequestBody Long id) {
+        try {
+            tableInfoRepository.deleteTableInfoById(id);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Cannot delete table that is not empty");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Table deleted successfully");
+    }
+
+    @DeleteMapping("/deletetableindexes")
+    public ResponseEntity<String> deleteTable(@RequestBody Long[] id) {
+        System.out.println(Arrays.toString(id));
+        try {
+            tableInfoRepository.deleteTableInfoByIds(Arrays.asList(id));
+        }
+        catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Cannot delete table that is not empty");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Table deleted successfully");
+    }
+
+    @PutMapping("/updateTable")
+    public String updateTable(@RequestBody UpdateTableRequest tableRequest) {
+        TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableRequest.getTableName(), tableRequest.getDatabaseName());
+        tableInfo.setPrimary_key(tableRequest.getPrimaryKey());
+        tableInfo.setTableName(tableRequest.getTableName());
+
+        tableInfoRepository.save(tableInfo);
+
+        return "OK";
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ToString
+    static class UpdateTableRequest {
+        private String tableName;
+        private String databaseName;
+        private String primaryKey;
+        private String username;
+    }
+
 
     @PostMapping("/addtable/{username}/{databasename}/{tableName}")
     public String addTable(@PathVariable("username") String username, @PathVariable("databasename") String databasename, @PathVariable("tableName") String tableName) {
@@ -140,7 +190,6 @@ public class TableInfoController {
                                    @PathVariable("userName") String userName
     ) {
         for (FieldInfoDTO fieldInfo : fieldInfoArray) {
-            System.out.println("Column Name: " + fieldInfo.getColumnName() + ", Column Type: " + fieldInfo.getColumnType() + ", ID: " + fieldInfo.getId());
 
             if (fieldInfo.getId() > 0) {
                 TableStructure tableStructure = tableStructureRepository.getReferenceById(fieldInfo.getId());
@@ -240,9 +289,6 @@ public class TableInfoController {
         retList.add(availableTables);
         retList.add(userTables);
 
-        System.out.println(adminTables);
-        System.out.println(userTables);
-        System.out.println(availableTables);
         return retList;
     }
 
@@ -339,6 +385,16 @@ public class TableInfoController {
                 .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
 
         return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
+    }
+
+    @DeleteMapping("/deleteArray")
+    public String deleteFieldInfo(@RequestBody Long[] columnIds) {
+        try {
+            tableInfoRepository.deleteTableInfoByIds(Arrays.asList(columnIds));
+            return "OK";
+        } catch (Exception e) {
+            return e.toString();
+        }
     }
 
 
