@@ -1,12 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
-import Button1DbContent from "./Button1DbContent";
 import QueryLogger from './QueryLogger';
 import Select from '@mui/material/Select';
 import {Button, FormControl, InputLabel, MenuItem, OutlinedInput} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
-import TableBrowser from "./TableBrowser";
 import TableBrowserNew from "./TableBrowserNew";
 
 const ITEM_HEIGHT = 48;

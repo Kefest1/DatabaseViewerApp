@@ -33,7 +33,7 @@ function addTable(tableName, primaryColumnName, databaseName) {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: data
+        body: data.toString()
     })
         .then(response => {
             if (!response.ok) {
@@ -100,7 +100,7 @@ function TableCreator() {
                 <div>
                     <TextField
                         id="outlined-basic"
-                        label="Database Name"
+                        label="Table Name"
                         variant="outlined"
                         value={tableName}
                         onChange={handleInputTableNameChange}
@@ -108,7 +108,7 @@ function TableCreator() {
 
                     <TextField
                         id="outlined-basic"
-                        label="Table Name"
+                        label="Primary key Name"
                         variant="outlined"
                         value={primaryColumnName}
                         onChange={handleColumnName}
