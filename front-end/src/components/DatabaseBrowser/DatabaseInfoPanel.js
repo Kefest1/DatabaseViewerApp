@@ -8,19 +8,7 @@ import {Button, Stack} from "@mui/material";
 
 async function fetchAvailableDatabases(userName) {
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
-    return [
-        "northwind,categories",
-        "northwind,customers",
-        "northwind,employees",
-        "northwind,orderdetails",
-        "northwind,orders",
-        "northwind,products",
-        "northwind,shippers",
-        "northwind,suppliers",
-        "adventureworks,customers",
-        "adventureworks,orders",
-        "adventureworks,products"
-    ];
+    return await tables.json();
 }
 
 function organizeData(data) {

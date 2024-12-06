@@ -13,13 +13,12 @@ import {
     GridActionsCellItem,
     GridRowEditStopReasons, GridToolbar,
 } from '@mui/x-data-grid';
-import {
-    randomId,
-} from '@mui/x-data-grid-generator';
+
 import {useEffect, useState} from "react";
 
-function prepareColumns(selectedColumns) {
+function prepareColumns(selectedColumns, primaryKey) {
     let columns = []
+    console.log(primaryKey);
 
     selectedColumns.forEach(
         columnName => {
@@ -27,7 +26,7 @@ function prepareColumns(selectedColumns) {
                 field: columnName,
                 headerName: columnName,
                 width: 100,
-                editable: true,
+                editable: (columnName !== primaryKey),
                 align: 'left',
                 headerAlign: 'left'
             }
@@ -59,9 +58,9 @@ const logUpdatable = async (fieldsToUpdate) => {
     }
 };
 
-let newid = -1;
+let newId = -1;
 
-function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns }) {
+function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
     const [rows, setRows] = useState([]);
     const [unused, setColumns] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
@@ -70,7 +69,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
 
-    let columns = prepareColumns(selectedColumns);
+    let columns = prepareColumns(selectedColumns, primaryKey);
     columns.push(
         {
             field: 'actions',
@@ -158,7 +157,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const processRowUpdate = (newRow, originalRow) => {
-        if (typeof newRow.id === 'string' || typeof originalRow.id === 'string') {
+        console.log(newRow);
+        console.log(originalRow);
+        if (newRow.id < 0 || originalRow.id < 0) {
+            console.log("++++++++++++++++++++++");
             setNewRows(prevRows => [...prevRows, newRow]);
             const updatedRow = { ...newRow, isNew: false };
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
@@ -166,7 +168,8 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             return updatedRow;
         }
         else {
-            console.log(newRow, originalRow);
+
+            console.log("---------------------");
 
             const updatedRow = { ...newRow, isNew: false };
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
@@ -185,6 +188,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const commitDeleteSingleRow = (params) => {
+        console.log(params);
+        if (params < 0) {
+            return;
+        }
         fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
             method: 'DELETE',
             headers: {
@@ -246,6 +253,9 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     function Debug() {
         console.log(rows);
         console.log(columns);
+        console.log(columns[0].isPrimary);
+        console.log(columns[1].isPrimary);
+        console.log(columns[2].isPrimary);
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
@@ -375,15 +385,21 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         // const { setRows, setRowModesModel } = props;
 
         const handleClick = () => {
-            const id = "randomId" + newid;
+            const id = newId;
             console.log(id);
-            newid--;
+            newId--;
 
             const newRow = {id};
 
             selectedColumns.forEach(
                 (column) => {
-                    newRow[column] = ''
+                    console.log(column);
+                    if (column === primaryKey) {
+                        newRow[column] = 'will be generated';
+                    }
+                    else {
+                        newRow[column] = '';
+                    }
                 }
             )
             newRow["isNew"] = true;

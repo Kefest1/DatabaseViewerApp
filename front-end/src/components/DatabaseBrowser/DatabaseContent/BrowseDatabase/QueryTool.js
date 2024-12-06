@@ -59,6 +59,12 @@ async function fetchColumnsForTable(userName, database, table) {
     return await response.json();
 }
 
+async function fetchPrimaryKeyName(database, table) {
+    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
+    const response = await fetch(url);
+    return await response.text();
+}
+
 async function runQuery(database, table, columns) {
     try {
         const requestBody = { database, table, columns: [...columns] };
@@ -101,6 +107,8 @@ const QueryTool = ({selectedDbTable}) => {
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [isButtonPressed, setIsButtonPressed] = useState(false);
     const [queryResult, setQueryResult] = useState([]);
+    
+    const [primaryKeyName, setPrimaryKeyName] = useState("");
 
     const [tableBrowserKey, setTableBrowserKey] = useState(0);
 
@@ -157,6 +165,18 @@ const QueryTool = ({selectedDbTable}) => {
             setSelectedColumns(availableColumns);
         }
     }, [availableColumns]);
+
+    useEffect(() => {
+        if (selectedDatabase && selectedTable) {
+            fetchPrimaryKeyName(selectedDatabase, selectedTable)
+                .then((response) => {
+                    setPrimaryKeyName(response);
+                })
+                .catch((error) =>
+                    console.error("Error fetching columns for the selected table:", error)
+                );
+        }
+    }, [selectedDatabase, selectedTable]);
 
     useEffect(() => {
         fetchAvailableDatabases(userName)
@@ -251,6 +271,7 @@ const QueryTool = ({selectedDbTable}) => {
                         tableName={selectedTable}
                         databaseName={selectedDatabase}
                         selectedColumns={selectedColumns}
+                        primaryKey={primaryKeyName}
                     />
                 </div>
             )}

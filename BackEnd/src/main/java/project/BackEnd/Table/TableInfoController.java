@@ -14,7 +14,6 @@ import project.BackEnd.OwnershipDetails.OwnershipDetailsPayload;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
 import project.BackEnd.User.UserInfoRepository;
-import project.BackEnd.Table.TableStructureRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,6 +49,7 @@ public class TableInfoController {
 
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
+        System.out.println();
         return tableInfoService.getAllTableInfo();
     }
 
@@ -167,13 +167,13 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesObjectsByUserName(userName);
     }
 
-    @GetMapping("/getTableStructure/{username}/{databasename}/{tablename}")
+    @GetMapping("/getTableStructure/{username}/{databasename}/{tableName}")
     public List<FieldInfoDTO> getAvailableDatabasesByUserName(
             @PathVariable("username") String userName,
             @PathVariable("databasename") String databasename,
-            @PathVariable("tablename") String tablename) {
+            @PathVariable("tableName") String tableName) {
 
-        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tablename, databasename).getFieldInformation();
+        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databasename).getFieldInformation();
 
         // Map TableStructure to FieldInfoDTO, including the ID
         List<FieldInfoDTO> fieldInfoDTOs = tableStructures.stream()
@@ -246,32 +246,13 @@ public class TableInfoController {
         return "Field information received successfully";
     }
 
-
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class FieldInfoDTO {
         private Long id;
         private String columnName;
         private String columnType;
-
-        public FieldInfoDTO() {}
-
-        public FieldInfoDTO(Long id, String columnName, String columnType) {
-            this.id = id;
-            this.columnName = columnName;
-            this.columnType = columnType;
-        }
-
-        // Getters
-        public Long getId() {
-            return id;
-        }
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public String getColumnType() {
-            return columnType;
-        }
     }
 
     @GetMapping("/getAvailableTablesToAdd/{adminName}/{username}")
@@ -336,35 +317,43 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesByUserNameAndUsername(databaseName, userName);
     }
 
-    @GetMapping("/getKey/{databasename}/{tablename}")
-    public String getPrimaryKeyName(@PathVariable("tablename") String tableName, @PathVariable("databasename") String databaseName) {
+    @GetMapping("/getKey/{databasename}/{tableName}")
+    public String getPrimaryKeyName(@PathVariable("tableName") String tableName, @PathVariable("databasename") String databaseName) {
         return tableInfoRepository.findKeyNameByTable(tableName, databaseName);
     }
 
-    @GetMapping("/getColumns/{user}/{databasename}/{tablename}")
-    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
-        List<TableStructure> tableStructures =  tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, userName, tablename);
+    @GetMapping("/getColumns/{user}/{databasename}/{tableName}")
+    public List<String> getTablesForUserAndDatabase(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
+        List<TableStructure> tableStructures =  tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, userName, tableName);
         return tableStructures.stream()
                 .map(TableStructure::getColumnName)
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/getFields/{user}/{databasename}/{tablename}")
-    public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
-        return tableInfoRepository.getFields(databaseName, userName, tablename);
+    @GetMapping("/getFields/{user}/{databasename}/{tableName}")
+    public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
+        return tableInfoRepository.getFields(databaseName, userName, tableName);
     }
 
-    @GetMapping("/getStructure/{user}/{databasename}/{tablename}")
+    @GetMapping("/getStructure/{user}/{databasename}/{tableName}")
     public List<TableStructure> getTableStructure(
             @PathVariable("user") String userName,
             @PathVariable("databasename") String databaseName,
-            @PathVariable("tablename") String tablename) {
-        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tablename, databaseName).getFieldInformation();
+            @PathVariable("tableName") String tableName) {
+        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tableName, databaseName).getFieldInformation();
     }
 
-    @GetMapping("/getFields/{databasename}/{tablename}")
-    public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tablename") String tablename) {
-        return tableInfoRepository.getTableInformation(databaseName, tablename);
+    @GetMapping("/checkIfTaken/{user}/{databasename}/{tableName}")
+    public Boolean checkIfTaken(
+            @PathVariable("user") String userName,
+            @PathVariable("databasename") String databaseName,
+            @PathVariable("tableName") String tableName) {
+        return tableInfoRepository.findWithUsersAndTables(userName, tableName, databaseName).isPresent();
+    }
+
+    @GetMapping("/getFields/{databasename}/{tableName}")
+    public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
+        return tableInfoRepository.getTableInformation(databaseName, tableName);
     }
 
     @PostMapping("/getAllFields")
