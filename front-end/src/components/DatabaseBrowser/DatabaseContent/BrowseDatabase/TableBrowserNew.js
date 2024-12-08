@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -7,18 +8,19 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import {
-    GridRowModes,
     DataGrid,
-    GridToolbarContainer,
     GridActionsCellItem,
-    GridRowEditStopReasons, GridToolbar,
+    GridRowEditStopReasons,
+    GridRowModes,
+    GridToolbar,
+    GridToolbarContainer,
 } from '@mui/x-data-grid';
-
-import {useEffect, useState} from "react";
+import {getCookie} from "../../../getCookie";
+import {MenuItem} from "@mui/material";
+import Select from "@mui/material/Select";
 
 function prepareColumns(selectedColumns, primaryKey) {
     let columns = []
-    console.log(primaryKey);
 
     selectedColumns.forEach(
         columnName => {
@@ -41,7 +43,7 @@ function prepareColumns(selectedColumns, primaryKey) {
 const logUpdatable = async (fieldsToUpdate) => {
     try {
         const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -58,19 +60,156 @@ const logUpdatable = async (fieldsToUpdate) => {
     }
 };
 
+const fetchJoinInfo = async (databaseName, tableName) => {
+    const userName = getCookie("userName");
+    const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`)
+    return await response.json();
+}
+
+const fetchJoinTable = async (databaseName, tableName) => {
+    const userName = getCookie("userName");
+    const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`)
+    const result = await response.json();
+    return result;
+}
+
 let newId = -1;
 
 function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
     const [rows, setRows] = useState([]);
-    const [unused, setColumns] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
 
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
 
-    let columns = prepareColumns(selectedColumns, primaryKey);
-    columns.push(
+    const [joinInfo, setJoinInfo] = useState([]);
+    const [joinAbleTables, setJoinAbleTables] = useState([]);
+    const [selectedJoinTable, setSelectedJoinTable] = useState("");
+
+    const JoinPanel = () => {
+        if (joinAbleTables !== []) {
+            return (
+                <div>
+                    <Select
+                        labelId="demo-simple-select-table"
+                        id="demo-simple-table"
+                        value={selectedJoinTable}
+                        label="Select Table To Join"
+                        onChange={onSelectJoin}
+                        variant={"outlined"}
+                    >
+                        {joinAbleTables.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <Button onClick={() => performJoin()}>
+                        Perform join on selected table
+                    </Button>
+                </div>
+            )
+        }
+    }
+
+    function onSelectJoin(e) {
+        setSelectedJoinTable(e.target.value);
+    }
+
+    function performJoin() {
+        let informationJoin = [];
+        joinInfo.forEach(info => {
+            if (info.oneTableName === selectedJoinTable) {
+                informationJoin = info;
+            }
+        })
+        console.log(informationJoin);
+        fetchJoinTable(databaseName, informationJoin.oneTableName)
+            .then(fetchedJoinTable => {
+                mergeTwoTables(fetchedJoinTable, (fetchedJoinTable[0].map(column => column.columnName))
+                    .filter(item => item !== informationJoin.oneColumnName), informationJoin);
+            })
+            .catch(error => {
+                console.error('Error fetching join table:', error);
+            });
+
+    }
+
+    function mergeTwoTables(rowsToMerge, columnsToMerge, informationJoin) {
+        let finalRows = [];
+
+        const deepCopyRows = JSON.parse(JSON.stringify(rows));
+        deepCopyRows.forEach(row => {
+            const joinId = row[informationJoin.manyColumnName];
+            const nodes = findRowToJoin(rowsToMerge, informationJoin.oneColumnName, joinId);
+
+            nodes.forEach(item => {
+                const key = Object.keys(item)[0];
+                const value = item[key];
+                row[key] = value;
+            });
+            finalRows.push(row);
+        });
+
+        const newColNames = findColumnsToJoin(rowsToMerge, informationJoin.oneColumnName);
+
+        let newColumns = []
+        newColNames.forEach(col => {
+            let nod = {};
+            nod["field"] = col;
+            nod["headerName"] = col;
+            nod["width"] = 100;
+            nod["editable"] = false;
+            nod["headerAlign"] = "left";
+            nod["align"] = "left";
+
+            newColumns.push(nod);
+        });
+
+        const columnsCopy = JSON.parse(JSON.stringify(columns));
+        const mergedArray = [...columnsCopy, ...newColumns];
+
+        const finalColumns = mergedArray.sort((a, b) => {
+            if (a.field === "actions") return 1;
+            if (b.field === "actions") return -1;
+            return 0;
+        });
+
+        console.log(finalRows);
+        console.log(finalColumns);
+
+        setRows(finalRows);
+        setColumns(finalColumns);
+    }
+
+    function findRowToJoin(rowsToMerge, oneColumnName, joinId) {
+        for (const row of rowsToMerge) {
+            for (const item of row) {
+                if (item.columnName === oneColumnName && item.dataValue === joinId) {
+                    return row
+                        .filter(item => item.columnName !== oneColumnName)
+                        .map(item => ({ [item.columnName]: item.dataValue }));
+                }
+            }
+        }
+        return null;
+    }
+
+    function findColumnsToJoin(rowsToMerge, oneColumnName) {
+        const node = rowsToMerge[0];
+        let ret = [];
+        node.forEach(col => {
+            if (col.columnName !== oneColumnName) {
+                ret.push(col.columnName);
+            }
+        })
+
+        return ret;
+    }
+
+    let colBuf = prepareColumns(selectedColumns, primaryKey);
+    colBuf.push(
         {
             field: 'actions',
             type: 'actions',
@@ -119,8 +258,96 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         },
     );
 
+    const [columns, setColumns] = useState(colBuf);
+
+    const processData = (data, setRows, setColumns, selectedColumns) => {
+        const rows = [];
+        const columns = {};
+
+        data.forEach((row) => {
+            const rowObj = { id: row[0].columnId };
+            row.forEach((column) => {
+                rowObj[column.columnName] = column.dataValue;
+            });
+            rows.push(rowObj);
+        });
+
+        selectedColumns.forEach((column) => {
+            columns[column] = {
+                field: column,
+                headerName: column,
+                width: column.length * 10,
+                hide: false,
+                editable: true
+            }
+        });
+
+        columns['actions'] = {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            width: 100,
+            cellClassName: 'actions',
+            getActions: ({ id }) => {
+                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+                if (isInEditMode) {
+                    return [
+                        <GridActionsCellItem
+                            icon={<SaveIcon />}
+                            label="Save"
+                            sx={{
+                                color: 'primary.main',
+                            }}
+                            onClick={handleSaveClick(id)}
+                        />,
+                        <GridActionsCellItem
+                            icon={<CancelIcon />}
+                            label="Cancel"
+                            className="textPrimary"
+                            onClick={handleCancelClick(id)}
+                            color="inherit"
+                        />,
+                    ];
+                }
+
+                return [
+                    <GridActionsCellItem
+                        icon={<EditIcon />}
+                        label="Edit"
+                        className="textPrimary"
+                        onClick={handleEditClick(id)}
+                        color="inherit"
+                    />,
+                    <GridActionsCellItem
+                        icon={<DeleteIcon />}
+                        label="Delete"
+                        onClick={handleDeleteClick(id)}
+                        color="inherit"
+                    />,
+                ];
+            },
+        };
+
+        setRows(rows);
+    }
+
     useEffect(() => {
         processData(data, setRows, setColumns, selectedColumns);
+    }, [data, selectedColumns]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await fetchJoinInfo(databaseName, tableName);
+            setJoinInfo(response);
+            let tables = [];
+            response.forEach(r => {
+                tables.push(r.oneTableName);
+            })
+            setJoinAbleTables(tables);
+        };
+
+        fetchData();
     }, []);
 
     const handleEditClick = (id) => () => {
@@ -129,7 +356,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
 
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            console.log("stop");
             event.defaultMuiPrevented = true;
         }
     };
@@ -157,10 +383,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const processRowUpdate = (newRow, originalRow) => {
-        console.log(newRow);
-        console.log(originalRow);
         if (newRow.id < 0 || originalRow.id < 0) {
-            console.log("++++++++++++++++++++++");
             setNewRows(prevRows => [...prevRows, newRow]);
             const updatedRow = { ...newRow, isNew: false };
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
@@ -168,9 +391,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             return updatedRow;
         }
         else {
-
-            console.log("---------------------");
-
             const updatedRow = { ...newRow, isNew: false };
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
 
@@ -253,9 +473,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     function Debug() {
         console.log(rows);
         console.log(columns);
-        console.log(columns[0].isPrimary);
-        console.log(columns[1].isPrimary);
-        console.log(columns[2].isPrimary);
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
@@ -283,7 +500,8 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             <Button onClick={Debug} rows>
                 Debug
             </Button>
-
+            <br/>
+            <JoinPanel/>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -307,78 +525,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         </Box>
     );
 
-    function processData(data, setRows, setColumns, selectedColumns) {
-        const rows = [];
-        const columns = {};
-
-        data.forEach((row) => {
-            const rowObj = { id: row[0].columnId };
-            row.forEach((column) => {
-                rowObj[column.columnName] = column.dataValue;
-            });
-            rows.push(rowObj);
-        });
-
-        selectedColumns.forEach((column) => {
-            columns[column] = {
-                field: column,
-                headerName: column,
-                width: column.length * 10,
-                hide: false,
-                editable: true
-            }
-        });
-
-        columns['actions'] = {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
-            },
-        };
-
-        setRows(rows);
-        console.log(rows)
-    }
 
     function EditToolbar() {
 

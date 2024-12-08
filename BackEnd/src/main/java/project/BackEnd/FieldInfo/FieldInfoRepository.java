@@ -54,6 +54,9 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName IN :columnNames")
     List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("columnNames") Collection<String> columnNames, @Param("tableName") String tableName);
 
+    @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE ti.tableName = :tableName AND db.databaseName = :databaseName")
+    List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("tableName") String tableName, @Param("databaseName") String databaseName);
+
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
     List<Object[]> findFieldInfoTableName( @Param("tableName") String tableName);
 
