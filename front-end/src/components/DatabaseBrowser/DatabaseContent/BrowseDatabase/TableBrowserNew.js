@@ -14,10 +14,23 @@ import {
     GridRowModes,
     GridToolbar,
     GridToolbarContainer,
+    useGridApiRef,
 } from '@mui/x-data-grid';
 import {getCookie} from "../../../getCookie";
 import {MenuItem} from "@mui/material";
 import Select from "@mui/material/Select";
+
+import {
+    ReactFlow,
+    MiniMap,
+    Controls,
+    Background,
+    useNodesState,
+    useEdgesState,
+    addEdge,
+} from '@xyflow/react';
+
+import '@xyflow/react/dist/style.css';
 
 function prepareColumns(selectedColumns, primaryKey) {
     let columns = []
@@ -68,7 +81,8 @@ const fetchJoinInfo = async (databaseName, tableName) => {
 
 const fetchJoinTable = async (databaseName, tableName) => {
     const userName = getCookie("userName");
-    const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`)
+    const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
+    console.log(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
     const result = await response.json();
     return result;
 }
@@ -76,6 +90,8 @@ const fetchJoinTable = async (databaseName, tableName) => {
 let newId = -1;
 
 function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
+    const apiRef = useGridApiRef();
+
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
@@ -143,12 +159,14 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         deepCopyRows.forEach(row => {
             const joinId = row[informationJoin.manyColumnName];
             const nodes = findRowToJoin(rowsToMerge, informationJoin.oneColumnName, joinId);
-
+            console.log(rowsToMerge);
+            console.log(informationJoin.oneColumnName);
+            console.log(joinId);
             nodes.forEach(item => {
                 const key = Object.keys(item)[0];
-                const value = item[key];
-                row[key] = value;
+                row[key] = item[key];
             });
+
             finalRows.push(row);
         });
 
@@ -180,7 +198,20 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         console.log(finalColumns);
 
         setRows(finalRows);
-        setColumns(finalColumns);
+        console.log(newColumns);
+        const buffer = [{
+            field: "test",
+            headerName: "test",
+            width: 100,
+            editable: true,
+            align: "left",
+            headerAlign: "left"
+        }];
+        console.log(buffer);
+        apiRef.current.updateColumns(finalColumns);
+        console.log("--------------");
+
+        // setColumns(finalColumns);
     }
 
     function findRowToJoin(rowsToMerge, oneColumnName, joinId) {
@@ -208,8 +239,8 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         return ret;
     }
 
-    let colBuf = prepareColumns(selectedColumns, primaryKey);
-    colBuf.push(
+    let columns = prepareColumns(selectedColumns, primaryKey);
+    columns.push(
         {
             field: 'actions',
             type: 'actions',
@@ -258,11 +289,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         },
     );
 
-    const [columns, setColumns] = useState(colBuf);
+    const [unused, setColumns] = useState([]);
 
     const processData = (data, setRows, setColumns, selectedColumns) => {
         const rows = [];
-        const columns = {};
 
         data.forEach((row) => {
             const rowObj = { id: row[0].columnId };
@@ -271,63 +301,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             });
             rows.push(rowObj);
         });
-
-        selectedColumns.forEach((column) => {
-            columns[column] = {
-                field: column,
-                headerName: column,
-                width: column.length * 10,
-                hide: false,
-                editable: true
-            }
-        });
-
-        columns['actions'] = {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
-            },
-        };
 
         setRows(rows);
     }
@@ -483,7 +456,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             </GridToolbarContainer>
         );
     };
-
     return (
         <Box
             sx={{ height: 400, width: 1000 }}
@@ -501,10 +473,11 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                 Debug
             </Button>
             <br/>
-            <JoinPanel/>
+            {/*<JoinPanel/>*/}
             <DataGrid
                 rows={rows}
                 columns={columns}
+                apiRef={apiRef}
                 editMode="row"
                 checkboxSelection
                 rowModesModel={rowModesModel}

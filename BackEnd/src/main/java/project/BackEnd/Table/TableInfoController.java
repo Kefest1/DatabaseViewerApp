@@ -352,7 +352,7 @@ public class TableInfoController {
     }
 
     @GetMapping("/getFields/{databasename}/{tableName}")
-    public List<String> getTableInfo(@PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
+    public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
         return tableInfoRepository.getTableInformation(databaseName, tableName);
     }
 
@@ -365,19 +365,6 @@ public class TableInfoController {
 
         return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
     }
-
-    @GetMapping("/getAllFieldsAllColumns/{databaseName}/{tableName}")
-    public List<List<FieldInfo>> getFields(@PathVariable("databaseName") String databaseName, @PathVariable("tableName") String tableName) {
-        System.out.println(databaseName);
-        System.out.println(tableName);
-        List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(tableName, databaseName);
-
-        Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()
-                .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
-
-        return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
-    }
-
 
     @PostMapping("/getAllFieldsAllColumns")
     public List<List<FieldInfo>> getFields(@RequestBody TableInfoBasicRequest request) {
