@@ -1,0 +1,8 @@
+.custom-table-row {
+    height: 20px; /* Adjust this value to control row height */
+}
+
+.custom-table-cell {
+    padding: 2px 4px; /* Adjust padding to control cell height */
+    font-size: 8px; /* Adjust font size if needed */
+}

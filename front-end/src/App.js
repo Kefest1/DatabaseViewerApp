@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import RegisterPage from "./components/WelcomePages/RegisterPage";
 import React from 'react';
 import MainTest from "./components/DatabaseBrowser/MainTest";
+import './index.css';
 
 function App() {
 

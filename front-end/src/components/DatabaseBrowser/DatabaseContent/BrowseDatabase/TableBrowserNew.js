@@ -20,17 +20,6 @@ import {getCookie} from "../../../getCookie";
 import {MenuItem} from "@mui/material";
 import Select from "@mui/material/Select";
 
-import {
-    ReactFlow,
-    MiniMap,
-    Controls,
-    Background,
-    useNodesState,
-    useEdgesState,
-    addEdge,
-} from '@xyflow/react';
-
-import '@xyflow/react/dist/style.css';
 
 function prepareColumns(selectedColumns, primaryKey) {
     let columns = []

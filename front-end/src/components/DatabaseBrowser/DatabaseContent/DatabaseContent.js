@@ -7,7 +7,7 @@ import Statistics from "./DatabaseStatistics/Statistics";
 import {getCookie} from "../../getCookie";
 import AdminPanel from "../admin/AdminPanel";
 import StructureModifier from "./BrowseDatabase/StructureModifier";
-
+import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
 
 const Component = ( {name} ) => {
     return <div style={{ marginLeft: '20px' }}>{name}</div>;
@@ -54,6 +54,8 @@ const DatabaseContent = ({selectedTable}) => {
                 return <QueryLoggerComponent/>;
             case 6:
                 return <StructureModifier/>;
+            case 7:
+                return <DatabaseScheme/>;
             default:
                 return null;
         }
@@ -93,6 +95,12 @@ const DatabaseContent = ({selectedTable}) => {
                         onClick={() => handleButtonClick(6)}
                     >
                         Table Creator
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 7 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(7)}
+                    >
+                        Test
                     </div>
 
                 </div>
