@@ -24,7 +24,7 @@ export function DatabaseSchemaNode({
                 <TableBody>
                     {data.schema.map((entry) => (
                         <TableRow key={entry.title} className="text-xs">
-                        <TableCell className="pl-0 pr-1 py-0 font-light" style={{ fontSize: '8px' }}>
+                            <TableCell className="pl-0 pr-1 py-0 font-light" style={{ fontSize: '8px' }}>
                                 <LabeledHandle
                                     id={entry.title}
                                     title={entry.title}

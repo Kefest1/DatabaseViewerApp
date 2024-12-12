@@ -6,7 +6,6 @@ import React, {useEffect, useRef, useState} from "react";
 import Box from '@mui/material/Box';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
-
 const defaultNodes = [
     {
         id: "1",
@@ -55,7 +54,7 @@ const defaultNodes = [
     },
 ];
 
-const defaultEdges = [
+const defaultEdges: Edge[] = [
     {
         id: "products-warehouses",
         source: "1",
@@ -76,58 +75,21 @@ const nodeTypes = {
     databaseSchema: DatabaseSchemaNode,
 };
 
-const nodeWidth = 172;
-const nodeHeight = 36;
-
-function getLayoutedElements(nodes, edges) {
-    const g = new dagre.Graph();
-    g.setGraph({ rankdir: 'TB' });
-    g.setDefaultEdgeLabel(() => ({}));
-
-    // Add nodes to the graph
-    nodes.forEach((node) => {
-        g.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-    });
-
-    // Add edges to the graph
-    edges.forEach((edge) => {
-        g.setEdge(edge.source, edge.target);
-    });
-
-    // Calculate the layout
-    dagre.layout(g);
-
-    // Get the layouted nodes
-    const layoutedNodes = nodes.map((node) => {
-        const { x, y } = g.node(node.id);
-        node.position = { x: x - nodeWidth / 2, y: y - nodeHeight / 2 };
-        return node;
-    });
-
-    return { layoutedNodes, edges };
-}
-
 function DatabaseScheme() {
-    const [elements, setElements] = useState({ nodes: defaultNodes, edges: defaultEdges });
-
-    useEffect(() => {
-        const { layoutedNodes, edges } = getLayoutedElements(defaultNodes, defaultEdges);
-        setElements({ nodes: layoutedNodes, edges });
-    }, []);
-
     return (
-        <Box sx={{ height: 1010, width: 1700 }}>
+        <div className="h-full w-full" style={{height: 1000, width: 1800}}>
             <ReactFlow
-                nodes={elements.nodes}
-                edges={elements.edges}
+                defaultNodes={defaultNodes}
+                defaultEdges={defaultEdges}
                 nodeTypes={nodeTypes}
                 fitView
-                draggable={true}
+                nodesConnectable={false}
+                edgesFocusable={false}
             >
                 <Background />
                 <MiniMap />
             </ReactFlow>
-        </Box>
+        </div>
     );
 }
 
