@@ -36,15 +36,20 @@ public class DatabaseCreator {
         setTableInfo(tableNames, databaseID);
 
         setFieldInfo(tableNames);
-//
+
         setTableConnections();
-//
+        setTableStructure();
+
         try {
             clientConnection.close();
             serverConnection.close();
         } catch (SQLException ignored) {
 
         }
+
+    }
+
+    private void setTableStructure() {
 
     }
 

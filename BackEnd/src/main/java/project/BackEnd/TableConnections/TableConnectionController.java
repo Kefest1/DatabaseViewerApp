@@ -1,5 +1,6 @@
 package project.BackEnd.TableConnections;
 
+import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tableconnection")
@@ -23,10 +25,9 @@ public class TableConnectionController {
     @Autowired
     TableInfoRepository tableInfoRepository;
 
-
-    @GetMapping("/getall")
-    public List<TableConnection> getAll() {
-        return tableConnectionRepository.findAll();
+    @GetMapping("/getAll")
+    public List<TableInfo> getAllTableConnections() {
+        return tableInfoRepository.findAll();
     }
 
     @PostMapping("/addconnection")
@@ -68,6 +69,40 @@ public class TableConnectionController {
         return retlist;
     }
 
+    @GetMapping("/getDatabaseConnection/{databaseName}/{username}")
+    public List<TableConnectionDTO> getDatabaseConnection(@PathVariable("username") String username, @PathVariable("databaseName") String databaseName) {
+        List<TableConnection> tableConnections = tableConnectionRepository.getTableConnectionForDatabase(databaseName, username);
+
+        List<TableConnectionDTO> tableConnectionDTOs = tableConnections.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return tableConnectionDTOs;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class TableConnectionDTO {
+        String oneColumnName;
+        String manyColumnName;
+
+        String oneTableName;
+        String manyTableName;
+    }
+
+    // Method to convert TableConnection to TableConnectionDTO
+    private TableConnectionDTO convertToDTO(TableConnection tableConnection) {
+        TableConnectionDTO dto = new TableConnectionDTO();
+        dto.oneColumnName = tableConnection.getOneColumnName();
+        dto.manyColumnName = tableConnection.getManyColumnName();
+
+        // Assuming you have a method to get the table name from TableInfo
+        dto.oneTableName = tableConnection.getOne().getTableName();
+        dto.manyTableName = tableConnection.getMany().getTableName();
+
+        return dto;
+    }
     @GetMapping("/checkifhasconnectedtables/{databasename}/{tablename}/{username}")
     public boolean checkIfHasConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
         Long id = tableInfoRepository.getTableIdByTableName(tablename);

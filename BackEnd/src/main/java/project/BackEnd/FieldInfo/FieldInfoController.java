@@ -76,21 +76,33 @@ public class FieldInfoController {
 
 
     @PostMapping("/insertvalues/{databasename}")
-    public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos) {
+    public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
+        for (List<InsertPayload> fieldInfoList : fieldInfos) {
+            insertValuesBuff(databasename, fieldInfoList);
+        }
+        return "OK";
+    }
+
+
+    public String insertValuesBuff(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos) {
+
         Long newID = getFreeColumnID();
 
         Integer smallestKey = getSmallestFreeKey(databasename, fieldInfos.get(0).getTableName());
-        System.out.println(smallestKey);
         String primaryKey = tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename);
 
         FieldInfo insertPayloadPrimaryKey = new FieldInfo();
         String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
         insertPayloadPrimaryKey.setDataType(datatype);
-        insertPayloadPrimaryKey.setColumnName(fieldInfos.get(0).columnName);
+        insertPayloadPrimaryKey.setColumnName(tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename));
         insertPayloadPrimaryKey.setDataValue(String.valueOf(smallestKey));
         insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
         insertPayloadPrimaryKey.setColumnId(newID);
         fieldInfoRepository.save(insertPayloadPrimaryKey);
+
+        System.out.println("insertPayloadPrimaryKey");
+        System.out.println(insertPayloadPrimaryKey);
+        System.out.println("insertPayloadPrimaryKey");
 
         for (InsertPayload fieldInfo : fieldInfos) {
             if (!Objects.equals(fieldInfo.columnName, primaryKey))
@@ -99,7 +111,7 @@ public class FieldInfoController {
         return "OK";
     }
 
-    private void insertValueHelper(InsertPayload fieldInfo, Long newID) {
+    private FieldInfo insertValueHelper(InsertPayload fieldInfo, Long newID) {
         String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfo.columnName, fieldInfo.tableName).get(0);
         FieldInfo fieldInfoToSave = new FieldInfo();
         fieldInfoToSave.setDataType(datatype);
@@ -108,7 +120,7 @@ public class FieldInfoController {
         fieldInfoToSave.setColumnId(newID);
         fieldInfoToSave.setTableInfo(tableInfoRepository.findByTableName(fieldInfo.tableName));
         System.out.println(fieldInfoToSave);
-        fieldInfoRepository.save(fieldInfoToSave);
+        return fieldInfoRepository.save(fieldInfoToSave);
     }
 
     private Long getFreeColumnID() {

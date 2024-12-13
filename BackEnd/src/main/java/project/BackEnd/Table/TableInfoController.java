@@ -1,6 +1,7 @@
 package project.BackEnd.Table;
 
 import lombok.*;
+import org.hibernate.id.enhanced.DatabaseStructure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -354,6 +355,27 @@ public class TableInfoController {
     @GetMapping("/getFields/{databasename}/{tableName}")
     public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
         return tableInfoRepository.getTableInformation(databaseName, tableName);
+    }
+
+    @GetMapping("/getDatabaseStructure/{databaseName}")
+    public List<TableStructureInformationDTO> getDatabaseStructure(@PathVariable("databaseName") String databaseName) {
+        List<TableInfo> list = tableInfoRepository.getTableStructure(databaseName);
+
+        return list.stream()
+                .map(node -> new TableStructureInformationDTO(node.getFieldInformation(), node.getTableName()))
+                .collect(Collectors.toList());
+    }
+
+    @ToString
+    @Getter
+    public class TableStructureInformationDTO {
+        String tableName;
+        List<TableStructure> tableStructures;
+
+        public TableStructureInformationDTO(List<TableStructure> tableStructures, String tableName) {
+            this.tableStructures = tableStructures;
+            this.tableName = tableName;
+        }
     }
 
     @PostMapping("/getAllFields")

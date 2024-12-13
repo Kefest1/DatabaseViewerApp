@@ -8,6 +8,7 @@ import {getCookie} from "../../getCookie";
 import AdminPanel from "../admin/AdminPanel";
 import StructureModifier from "./BrowseDatabase/StructureModifier";
 import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
+import BrowseMultipleTables from "./BrowseDatabase/BrowseMultipleTables";
 
 const Component = ( {name} ) => {
     return <div style={{ marginLeft: '20px' }}>{name}</div>;
@@ -40,16 +41,14 @@ const DatabaseContent = ({selectedTable}) => {
             case 1:
                 return <QueryTool selectedDbTable={locSelectedTable} />;
             case 2:
-                return <Statistics/>;
+                return <BrowseMultipleTables />;
             case 3:
+                return <Statistics/>;
+            case 4:
                 if (isAdmin)
                     return <AdminPanel name={"Admin panel"}/>;
                 else
                     return <Component name={"TODO"}/>;
-            case 4:
-                if (isAdmin)
-                    return <QueryLoggerComponent/>;
-                else return null;
             case 5:
                 return <QueryLoggerComponent/>;
             case 6:
@@ -69,24 +68,31 @@ const DatabaseContent = ({selectedTable}) => {
                         className={`wcPanelTab ${activeButton === 1 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        Browse content
+                        Single table CRUD
 
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 2 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        Statistics
+                        Browse multiple tables
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        Admin Panel
+                        Statistics
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 4 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(4)}
+                    >
+                        Admin Panel
+
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 5 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(5)}
                     >
                         Logger
                     </div>
@@ -94,13 +100,13 @@ const DatabaseContent = ({selectedTable}) => {
                         className={`wcPanelTab ${activeButton === 6 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(6)}
                     >
-                        Table Creator
+                        Structure modifier
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 7 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(7)}
                     >
-                        Test
+                        Browse database scheme
                     </div>
 
                 </div>

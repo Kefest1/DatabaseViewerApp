@@ -442,6 +442,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             <GridToolbarContainer>
                 <EditToolbar props={{setRows, setRowModesModel}} />
                 <GridToolbar />
+                <ImportDataToolbar />
             </GridToolbarContainer>
         );
     };
@@ -487,6 +488,122 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         </Box>
     );
 
+    function ImportDataToolbar() {
+        const fileInputRef = React.useRef(null);
+
+        const handleClick = () => {
+            if (fileInputRef.current) {
+                fileInputRef.current.click();
+            }
+        };
+
+        function transformCSVToInsertPayload(csvContent) {
+            const lines = csvContent.split('\n');
+            let header = lines[0].split(',');
+            const payloadList = [];
+
+            if (!header.includes(primaryKey)) {
+                header.push(primaryKey);
+            }
+            header = header.map(item => item.replace(/\r/g, ''));
+
+            console.log(header);
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = line.split(',');
+                    const rowPayload = [];
+
+                    for (let j = 0; j < header.length; j++) {
+                        if (header[j].trim() === primaryKey) {
+                            const payload = {
+                                columnName: primaryKey,
+                                dataValue: '1',
+                                tableName: tableName
+                            };
+                            rowPayload.push(payload);
+                        }
+                        else {
+                            const payload = {
+                                columnName: header[j].trim(),
+                                dataValue: values[j] ? values[j].trim() : '',
+                                tableName: tableName
+                            };
+                            rowPayload.push(payload);
+                        }
+                    }
+
+                    payloadList.push(rowPayload);
+                }
+            }
+
+            return payloadList;
+        }
+
+        const handleFileChange = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const fileType = file.type;
+                const validTypes = ['application/json', 'text/csv', 'application/xml', 'text/xml'];
+
+                if (!validTypes.includes(fileType)) {
+                    console.error('Invalid file type. Please upload a JSON, CSV, or XML file.');
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = async (e) => {
+                    const content = e.target.result;
+                    console.log(fileType);
+                    if (fileType === 'application/json') {
+                        console.log('JSON File content:\n', content);
+                        // Further process the JSON content here
+                    } else if (fileType === 'text/csv') {
+                        console.log('CSV File content:\n', content);
+                        const payloadList = transformCSVToInsertPayload(content);
+                        console.log(payloadList);
+                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(payloadList),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+
+                        const result = await response.text();
+                        console.log(result);
+
+                    } else if (fileType === 'application/xml' || fileType === 'text/xml') {
+                        console.log('XML File content:\n', content);
+                    }
+                };
+
+                // Read the file as text
+                reader.readAsText(file);
+            }
+        };
+
+        return (
+            <GridToolbarContainer>
+                <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+                    Import From File
+                </Button>
+                <input
+                    type="file"
+                    accept=".json,.csv,.xml"
+                    style={{ display: 'none' }}
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                />
+            </GridToolbarContainer>
+        );
+    }
 
     function EditToolbar() {
 
