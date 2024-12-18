@@ -32,7 +32,7 @@ function prepareColumns(selectedColumns, primaryKey) {
                 field: columnName,
                 headerName: columnName,
                 width: 100,
-                editable: (columnName !== primaryKey),
+                editable: false,
                 align: 'left',
                 headerAlign: 'left'
             }
@@ -72,15 +72,36 @@ const fetchJoinInfo = async (databaseName, tableName) => {
 
 const fetchJoinTable = async (databaseName, tableName) => {
     const userName = getCookie("userName");
-    const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
-    console.log(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
-    const result = await response.json();
-    return result;
+
+    const requestBody = {
+        table: tableName
+    };
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userName}`
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
 }
 
 let newId = -1;
 
-function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
+function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
     const apiRef = useGridApiRef();
 
     const [rows, setRows] = useState([]);
@@ -93,6 +114,8 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     const [joinInfo, setJoinInfo] = useState([]);
     const [joinAbleTables, setJoinAbleTables] = useState([]);
     const [selectedJoinTable, setSelectedJoinTable] = useState("");
+
+    const [columns, setColumns] = useState([]);
 
     const JoinPanel = () => {
         if (joinAbleTables !== []) {
@@ -189,20 +212,9 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         console.log(finalColumns);
 
         setRows(finalRows);
-        console.log(newColumns);
-        const buffer = [{
-            field: "test",
-            headerName: "test",
-            width: 100,
-            editable: true,
-            align: "left",
-            headerAlign: "left"
-        }];
-        console.log(buffer);
-        apiRef.current.updateColumns(finalColumns);
-        console.log("--------------");
 
-        // setColumns(finalColumns);
+        apiRef.current.updateColumns(finalColumns);
+
     }
 
     function findRowToJoin(rowsToMerge, oneColumnName, joinId) {
@@ -211,7 +223,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                 if (item.columnName === oneColumnName && item.dataValue === joinId) {
                     return row
                         .filter(item => item.columnName !== oneColumnName)
-                        .map(item => ({ [item.columnName]: item.dataValue }));
+                        .map(item => ({[item.columnName]: item.dataValue}));
                 }
             }
         }
@@ -230,61 +242,17 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         return ret;
     }
 
-    let columns = prepareColumns(selectedColumns, primaryKey);
-    columns.push(
-        {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
-            },
-        },
-    );
+    useEffect(() => {
+        const col = prepareColumns(selectedColumns, primaryKey);
+        setColumns(col);
+    }, []);
 
     const processData = (data, setRows) => {
         const rows = [];
 
         data.forEach((row) => {
-            const rowObj = { id: row[0].columnId };
+            const rowObj = {id: row[0].columnId};
             row.forEach((column) => {
                 rowObj[column.columnName] = column.dataValue;
             });
@@ -312,9 +280,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         fetchData();
     }, []);
 
-    const handleEditClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-    };
 
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -322,38 +287,15 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         }
     };
 
-    const handleSaveClick = (id) => () => {
-        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-    };
-
-    const handleDeleteClick = (id) => () => {
-        console.log(id);
-        setRows(rows.filter((row) => row.id !== id));
-        commitDeleteSingleRow(id);
-    };
-
-    const handleCancelClick = (id) => () => {
-        setRowModesModel({
-            ...rowModesModel,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
-        });
-
-        const editedRow = rows.find((row) => row.id === id);
-        if (editedRow.isNew) {
-            setRows(rows.filter((row) => row.id !== id));
-        }
-    };
-
     const processRowUpdate = (newRow, originalRow) => {
         if (newRow.id < 0 || originalRow.id < 0) {
             setNewRows(prevRows => [...prevRows, newRow]);
-            const updatedRow = { ...newRow, isNew: false };
+            const updatedRow = {...newRow, isNew: false};
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
 
             return updatedRow;
-        }
-        else {
-            const updatedRow = { ...newRow, isNew: false };
+        } else {
+            const updatedRow = {...newRow, isNew: false};
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
 
             let request = findDifference(originalRow, updatedRow);
@@ -437,24 +379,23 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         console.log(columns);
     }
 
-    const CustomToolbar = ({ setRows, setRowModesModel }) => {
+    const CustomToolbar = ({setRows, setRowModesModel}) => {
         return (
             <GridToolbarContainer>
-                <EditToolbar props={{setRows, setRowModesModel}} />
-                <GridToolbar />
-                <ImportDataToolbar />
+                <GridToolbar/>
             </GridToolbarContainer>
         );
     };
 
     return (
-        <Box sx={{ height: 600, width: 1200 }}>
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Box sx={{height: 600, width: 1200}}>
+            <Box sx={{display: 'flex', gap: 1, mb: 2}}>
                 <Button onClick={() => logUpdatable(fieldsToUpdate)}>Update altered fields</Button>
                 <Button onClick={commitDeleteManyRows}>Delete selected rows</Button>
                 <Button onClick={commitInsertNewRows}>Commit Insertion</Button>
                 <Button onClick={Debug}>Debug</Button>
             </Box>
+            <JoinPanel/>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -471,169 +412,12 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                     toolbar: CustomToolbar,
                 }}
                 slotProps={{
-                    toolbar: { setRows, setRowModesModel },
+                    toolbar: {setRows, setRowModesModel},
                 }}
             />
         </Box>
     );
 
-    function ImportDataToolbar() {
-        const fileInputRef = React.useRef(null);
-
-        const handleClick = () => {
-            if (fileInputRef.current) {
-                fileInputRef.current.click();
-            }
-        };
-
-        function transformCSVToInsertPayload(csvContent) {
-            const lines = csvContent.split('\n');
-            let header = lines[0].split(',');
-            const payloadList = [];
-
-            if (!header.includes(primaryKey)) {
-                header.push(primaryKey);
-            }
-            header = header.map(item => item.replace(/\r/g, ''));
-
-            console.log(header);
-
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line) {
-                    const values = line.split(',');
-                    const rowPayload = [];
-
-                    for (let j = 0; j < header.length; j++) {
-                        if (header[j].trim() === primaryKey) {
-                            const payload = {
-                                columnName: primaryKey,
-                                dataValue: '1',
-                                tableName: tableName
-                            };
-                            rowPayload.push(payload);
-                        }
-                        else {
-                            const payload = {
-                                columnName: header[j].trim(),
-                                dataValue: values[j] ? values[j].trim() : '',
-                                tableName: tableName
-                            };
-                            rowPayload.push(payload);
-                        }
-                    }
-
-                    payloadList.push(rowPayload);
-                }
-            }
-
-            return payloadList;
-        }
-
-        const handleFileChange = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const fileType = file.type;
-                const validTypes = ['application/json', 'text/csv', 'application/xml', 'text/xml'];
-
-                if (!validTypes.includes(fileType)) {
-                    console.error('Invalid file type. Please upload a JSON, CSV, or XML file.');
-                    return;
-                }
-
-                const reader = new FileReader();
-
-                reader.onload = async (e) => {
-                    const content = e.target.result;
-                    console.log(fileType);
-                    if (fileType === 'application/json') {
-                        console.log('JSON File content:\n', content);
-                        // Further process the JSON content here
-                    } else if (fileType === 'text/csv') {
-                        console.log('CSV File content:\n', content);
-                        const payloadList = transformCSVToInsertPayload(content);
-                        console.log(payloadList);
-                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(payloadList),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok ' + response.statusText);
-                        }
-
-                        const result = await response.text();
-                        console.log(result);
-
-                    } else if (fileType === 'application/xml' || fileType === 'text/xml') {
-                        console.log('XML File content:\n', content);
-                    }
-                };
-
-                // Read the file as text
-                reader.readAsText(file);
-            }
-        };
-
-        return (
-            <GridToolbarContainer>
-                <Button color="primary" startIcon={<UploadFile />} onClick={handleClick}>
-                    Import From File
-                </Button>
-                <input
-                    type="file"
-                    accept=".json,.csv,.xml"
-                    style={{ display: 'none' }}
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                />
-            </GridToolbarContainer>
-        );
-    }
-
-    function EditToolbar() {
-
-        const handleClick = () => {
-            const id = newId;
-            console.log(id);
-            newId--;
-
-            const newRow = {id};
-
-            selectedColumns.forEach(
-                (column) => {
-                    console.log(column);
-                    if (column === primaryKey) {
-                        newRow[column] = 'will be generated';
-                    }
-                    else {
-                        newRow[column] = '';
-                    }
-                }
-            )
-            newRow["isNew"] = true;
-
-            setRows((oldRows) => [
-                newRow,
-                ...oldRows,
-            ]);
-            setRowModesModel((oldModel) => ({
-                ...oldModel,
-                [id]: { mode: GridRowModes.Edit, fieldToFocus: selectedColumns[0] },
-            }));
-        };
-
-        return (
-            <GridToolbarContainer>
-                <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                    Add record
-                </Button>
-            </GridToolbarContainer>
-        );
-    }
 
     function findDifference(obj1, obj2) {
         let differences = {};
@@ -652,8 +436,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
 
         return differences;
     }
-
-
 }
 
-export default TableBrowserNew;
+export default TableJoiner;
