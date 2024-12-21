@@ -400,32 +400,32 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const commitInsertNewRows = () => {
-        console.log(newRows);
-        let dtoArray = [];
-        newRows.forEach(item => {
-            for (const key in item) {
-                if (key !== 'id' && key !== 'isNew') {
-                    dtoArray.push(
-                        {
-                            tableName: tableName,
-                            dataValue: item[key],
-                            columnName: key,
-                        }
-                    );
+        const filteredData = newRows.map(({ id, isNew, ...rest }) => rest);
+        let finalList = [];
+        filteredData.forEach(innerArray => {
+            console.log(innerArray);
+            let nodeList = [];
+
+            for (let key in innerArray) {
+                if (innerArray.hasOwnProperty(key)) {
+                    nodeList.push({
+                        columnName: key,
+                        dataValue: innerArray[key],
+                        tableName: tableName
+                    })
                 }
             }
+            finalList.push(nodeList);
         });
 
-        console.log(dtoArray);
-        // fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(dtoArray)
-        // })
-        //     .then(response => response.json())
-        //     .catch(error => console.error('Error:', error));
+        console.log(finalList);
+        fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(finalList)
+        })
+            .then(response => response.json())
+            .catch(error => console.error('Error:', error));
     }
 
     function processError(params) {
@@ -433,8 +433,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     function Debug() {
-        console.log(rows);
-        console.log(columns);
+        console.log(selectedRowsIndex);
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
@@ -446,6 +445,11 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             </GridToolbarContainer>
         );
     };
+
+    function handleRowSelectionChange(e) {
+        console.log(e);
+        setSelectedRowsIndex(e);
+    }
 
     return (
         <Box sx={{ height: 600, width: 1200 }}>
@@ -464,7 +468,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
-                // onRowSelectionModelChange={handleRowSelectionChange}
+                onRowSelectionModelChange={handleRowSelectionChange}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={processError}
                 slots={{

@@ -22,7 +22,6 @@ async function fetchAvailableTables(selectedDatabase) {
     return await tables.json();
 }
 
-
 function StructureModifier() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [selectedTable, setSelectedTable] = useState("");

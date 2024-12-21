@@ -1,14 +1,20 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import DatabaseInfoPanel from './DatabaseInfoPanel';
 import DatabaseContent from './DatabaseContent/DatabaseContent';
 import Header from "./Header";
 import {getCookie} from "../getCookie";
 
 const MainTest = () => {
-    if (!getCookie("userName"))
-        window.location.href = 'http://localhost:3000/login'
-
     const [selectedTable, setSelectedTable] = useState("");
+
+    useEffect(() => {
+        document.title = "Database viewer app";
+    }, []);
+
+    if (!getCookie("userName")) {
+        window.location.href = 'http://localhost:3000/login';
+        return;
+    }
 
     function handleSelectedTableChange(newTable) {
         setSelectedTable(newTable);

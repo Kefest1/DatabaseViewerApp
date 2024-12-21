@@ -68,7 +68,7 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
     List<String> findDatabasesByUserNameAndUsername(@Param("databasename") String databasename, @Param("username") String username);
 
-    @Query("SELECT DISTINCT ti.fieldInformation FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
+    @Query("SELECT DISTINCT ti.tableStructure FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
     List<TableStructure> findColumnNamesByUserAndDatabaseAndTablenameFromStructure(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
 
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
@@ -89,7 +89,7 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     void deleteTableInfoByIds(@Param("tableIds") List<Long> tableIds);
 
     @Modifying
-    @Query("DELETE FROM TableInfo ti WHERE ti.id = :tableIds")
+    @Query("DELETE FROM TableInfo ti WHERE ti.id = :tableId")
     @Transactional
     void deleteTableInfoById(@Param("tableId") Long tableId);
 

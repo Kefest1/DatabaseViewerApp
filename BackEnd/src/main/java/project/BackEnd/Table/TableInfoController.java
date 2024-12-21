@@ -89,10 +89,13 @@ public class TableInfoController {
 
     @DeleteMapping("/deletetable")
     public ResponseEntity<String> deleteTable(@RequestBody Long id) {
+        System.out.println(id);
         try {
+            tableStructureRepository.deleteTableStructureByTableInfo(id);
             tableInfoRepository.deleteTableInfoById(id);
         }
         catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Cannot delete table that is not empty");
         }
@@ -118,9 +121,10 @@ public class TableInfoController {
 
     @PutMapping("/updateTable")
     public String updateTable(@RequestBody UpdateTableRequest tableRequest) {
+        System.out.println(tableRequest);
         TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableRequest.getTableName(), tableRequest.getDatabaseName());
         tableInfo.setPrimary_key(tableRequest.getPrimaryKey());
-        tableInfo.setTableName(tableRequest.getTableName());
+        tableInfo.setTableName(tableRequest.getNewTableName());
 
         tableInfoRepository.save(tableInfo);
 
@@ -134,6 +138,7 @@ public class TableInfoController {
     @ToString
     static class UpdateTableRequest {
         private String tableName;
+        private String newTableName;
         private String databaseName;
         private String primaryKey;
         private String username;
@@ -174,7 +179,7 @@ public class TableInfoController {
             @PathVariable("databasename") String databasename,
             @PathVariable("tableName") String tableName) {
 
-        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databasename).getFieldInformation();
+        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databasename).getTableStructure();
 
         // Map TableStructure to FieldInfoDTO, including the ID
         List<FieldInfoDTO> fieldInfoDTOs = tableStructures.stream()
@@ -192,6 +197,11 @@ public class TableInfoController {
     ) {
         for (FieldInfoDTO fieldInfo : fieldInfoArray) {
 
+            TableStructure ts = tableStructureRepository.findTableStructuresByColumnNameAndTableName(fieldInfo.columnName, tableName, userName);
+            if (ts != null) {
+                continue;
+            }
+
             if (fieldInfo.getId() > 0) {
                 TableStructure tableStructure = tableStructureRepository.getReferenceById(fieldInfo.getId());
                 tableStructure.setColumnName(fieldInfo.getColumnName());
@@ -206,7 +216,7 @@ public class TableInfoController {
                 tableStructureRepository.save(tableStructure);
 
                 TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databaseName);
-                tableInfo.getFieldInformation().add(tableStructure);
+                tableInfo.getTableStructure().add(tableStructure);
 
                 tableStructureRepository.save(tableStructure);
             }
@@ -223,10 +233,11 @@ public class TableInfoController {
         return "OK";
     }
 
-    @PostMapping("/addFieldInfo/{datatype}/{columnName}/{tableid}")
+    @PostMapping("/addFieldInfo/{datatype}/{columnName}/{tableid}/{userName}")
     public String addFieldInformation(
             @PathVariable("datatype") String datatype,
             @PathVariable("columnName") String columnName,
+            @PathVariable("userName") String userName,
             @PathVariable("tableid") Long tableid
     ) {
         TableStructure tableStructure = new TableStructure();
@@ -234,15 +245,24 @@ public class TableInfoController {
         tableStructure.setColumnType(datatype);
 
         TableInfo tableInfoInstance = tableInfoRepository.getTableInfoById(tableid);
+        String tableName = tableInfoInstance.getTableName();
 
-        if (tableInfoInstance.getFieldInformation() == null) {
-            tableInfoInstance.setFieldInformation(new ArrayList<>());
+        TableStructure ts = tableStructureRepository.findTableStructuresByColumnNameAndTableName(columnName, tableName, userName);
+
+        if (ts == null) {
+            System.out.println("Table already exists");
+            return "Table already exists";
         }
-        tableInfoInstance.getFieldInformation().add(tableStructure);
+
+        if (tableInfoInstance.getTableStructure() == null) {
+            tableInfoInstance.setTableStructure(new ArrayList<>());
+        }
+        tableInfoInstance.getTableStructure().add(tableStructure);
 
         tableStructureRepository.save(tableStructure);
 
         tableInfoRepository.save(tableInfoInstance);
+        System.out.println("Field information received successfully");
 
         return "Field information received successfully";
     }
@@ -341,7 +361,7 @@ public class TableInfoController {
             @PathVariable("user") String userName,
             @PathVariable("databasename") String databaseName,
             @PathVariable("tableName") String tableName) {
-        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tableName, databaseName).getFieldInformation();
+        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tableName, databaseName).getTableStructure();
     }
 
     @GetMapping("/checkIfTaken/{user}/{databasename}/{tableName}")
@@ -362,7 +382,7 @@ public class TableInfoController {
         List<TableInfo> list = tableInfoRepository.getTableStructure(databaseName);
 
         return list.stream()
-                .map(node -> new TableStructureInformationDTO(node.getFieldInformation(), node.getTableName()))
+                .map(node -> new TableStructureInformationDTO(node.getTableStructure(), node.getTableName()))
                 .collect(Collectors.toList());
     }
 

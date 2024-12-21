@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import {Link} from "react-router-dom";
@@ -17,6 +17,10 @@ function RegisterPage() {
     const [caption, setCaption] = useState('');
 
     const [users, setUsers] = useState('');
+
+    useEffect(() => {
+        document.title = "Register Page";
+    }, []);
 
     const ValidatePassword = () => {
         console.log(users);

@@ -1,8 +1,10 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import {useState} from "react";
-import {TextField} from "@mui/material";
+import {TextField, Snackbar, IconButton, SnackbarContent, Button} from "@mui/material";
 import {getCookie} from "../../../getCookie";
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorIcon from '@mui/icons-material/Error';
+
 
 function addDatabase(databaseName, databaseDescription) {
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${databaseDescription}`;
@@ -17,15 +19,15 @@ function addDatabase(databaseName, databaseDescription) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json(); // Parse the JSON response
+            return response.json();
         })
         .then(data => {
             console.log('Success:', data);
-            return data; // Return the Long value from the response
+            return data;
         })
         .catch(error => {
             console.error('Error:', error);
-            throw error; // Re-throw the error if you want to handle it later
+            throw error;
         });
 }
 
@@ -63,7 +65,9 @@ function addTable(tableName, databaseID, primaryColumnName) {
 }
 
 function addStructure(columnName, tableID) {
-    const url = `http://localhost:8080/api/tableinfo/addFieldInfo/Long/${columnName}/${tableID}`;
+    const userName = getCookie("userName");
+
+    const url = `http://localhost:8080/api/tableinfo/addFieldInfo/Long/${columnName}/${tableID}/${userName}`;
     console.log(columnName);
     console.log(tableID);
 
@@ -91,9 +95,6 @@ function addConnection(tableID) {
     const url = `http://localhost:8080/api/ownershipdetails/addbyusername/${tableID}`;
 
     const userName = getCookie("userName");
-    // const requestBody = JSON.stringify(userName);
-
-    // Send the POST request
     fetch(url, {
         method: 'POST',
         headers: {
@@ -119,6 +120,8 @@ function DatabaseCreator() {
     const [databaseDescription, setDatabaseDescription] = useState('');
     const [tableName, setTableName] = useState('');
     const [primaryColumnName, setPrimaryColumnName] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleColumnName = (event) => {
         setPrimaryColumnName(event.target.value);
@@ -136,9 +139,43 @@ function DatabaseCreator() {
         setTableName(event.target.value);
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
+    const isValidName = (name) => {
+        const regex = /^[A-Za-z_][A-Za-z0-9_]*$/;
+        return regex.test(name) && name.length <= 63;
+    };
+
+
     const handleSubmit = () => {
-        let databaseId; // Declare a variable to hold the result
-        let tableID; // Declare a variable to hold the result
+        if (databaseName === "" || tableName === "" || primaryColumnName === "") {
+            setErrorMessage('Fill all necessary text fields');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        if (!isValidName(databaseName)) {
+            setErrorMessage('Invalid database name. Must start with a letter or underscore and contain only letters, digits, and underscores.');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        if (!isValidName(tableName)) {
+            setErrorMessage('Invalid table name. Must start with a letter or underscore and contain only letters, digits, and underscores.');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        if (!isValidName(primaryColumnName)) {
+            setErrorMessage('Invalid primary key column name. Must start with a letter or underscore and contain only letters, digits, and underscores.');
+            setOpenSnackbar(true);
+            return;
+        }
+
+        let databaseId;
+        let tableID;
 
         addDatabase(databaseName, databaseDescription)
             .then(id => {
@@ -146,16 +183,24 @@ function DatabaseCreator() {
 
                 addTable(tableName, databaseId, primaryColumnName)
                     .then(id => {
-                        tableID = id; // Assign the result to the variable
+                        tableID = id;
                         addStructure(primaryColumnName, tableID);
                         addConnection(tableID);
+                        setDatabaseName("");
+                        setTableName("");
+                        setPrimaryColumnName("");
+                        setDatabaseDescription("");
                     })
                     .catch(error => {
-                        console.error('Failed to add database:', error);
+                        console.error('Failed to add table:', error);
+                        setErrorMessage('Failed to add table. Please try again.');
+                        setOpenSnackbar(true);
                     });
             })
             .catch(error => {
                 console.error('Failed to add database:', error);
+                setErrorMessage('Failed to add database. Please try again.');
+                setOpenSnackbar(true);
             });
     };
 
@@ -194,6 +239,31 @@ function DatabaseCreator() {
             <Button variant="contained" onClick={handleSubmit}>
                 Add database
             </Button>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#f44336' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {errorMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </div>
     );
 }

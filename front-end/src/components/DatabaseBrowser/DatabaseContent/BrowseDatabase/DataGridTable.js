@@ -21,6 +21,8 @@ import {
 } from '@mui/x-data-grid-generator';
 import {getCookie} from "../../../getCookie";
 import {useEffect, useState} from "react";
+import {FormControl, InputLabel, MenuItem} from "@mui/material";
+import Select from "@mui/material/Select";
 
 
 async function fetchStructure(databaseName, selectedTable) {
@@ -105,6 +107,7 @@ function DataGridTable({ databaseName, selectedTable }) {
     };
 
     function commitDelete(tablesToDelete) {
+        console.log(tablesToDelete);
         const url = `http://localhost:8080/api/tableinfo/deleteFieldInfo`
         fetch(url, {
             method: 'DELETE',
@@ -122,6 +125,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             })
             .then(result => {
                 console.log('Success:', result);
+                setTablesToDelete([]);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -131,14 +135,23 @@ function DataGridTable({ databaseName, selectedTable }) {
     function handleCommit() {
 
         commitDelete(tablesToDelete);
+        let rowsDTO = [];
 
+        rows.forEach(row => {
+            console.log(row);
+            if (row.columnName.length >= 3 && row.columnType !== '') {
+                rowsDTO.push(row)
+            }
+        });
+
+        console.log(rowsDTO);
         const userName = getCookie("userName");
         fetch(`http://localhost:8080/api/tableinfo/addFieldInformation/${databaseName}/${selectedTable}/${userName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(rows),
+            body: JSON.stringify(rowsDTO),
         })
             .then(response => {
                 if (!response.ok) {
@@ -160,8 +173,6 @@ function DataGridTable({ databaseName, selectedTable }) {
 
     const handleDeleteClick = (id) => () => {
         setTablesToDelete((prevTables) => [...prevTables, id]);
-        console.log(tablesToDelete);
-
         setRows(rows.filter((row) => row.id !== id));
     };
 
@@ -176,6 +187,15 @@ function DataGridTable({ databaseName, selectedTable }) {
             setRows(rows.filter((row) => row.id !== id));
         }
     };
+    const handleTypeChange = (id, newType) => {
+        const updatedRows = rows.map((row) => {
+            if (row.id === id) {
+                return { ...row, columnType: newType };
+            }
+            return row;
+        });
+        setRows(updatedRows);
+    };
 
     const columns = [
         { field: 'columnName', headerName: 'columnName', width: 180, editable: true },
@@ -183,10 +203,28 @@ function DataGridTable({ databaseName, selectedTable }) {
             field: 'columnType',
             headerName: 'columnType',
             // type: 'number',
-            width: 80,
-            align: 'left',
-            headerAlign: 'left',
-            editable: true,
+            width: 150,
+            // align: 'left',
+            // headerAlign: 'left',
+            // editable: true,
+            renderCell: (params) => (
+                <FormControl fullWidth>
+                    <InputLabel id={`select-label-${params.id}`}>Type</InputLabel>
+                    <Select
+                        labelId={`select-label-${params.id}`}
+                        value={params.value}
+                        onChange={(event) => handleTypeChange(params.id, event.target.value)}
+                        variant={"outlined"}
+                    >
+                        <MenuItem value="Long">Long</MenuItem>
+                        <MenuItem value="Integer">Integer</MenuItem>
+                        <MenuItem value="Double">Double</MenuItem>
+                        <MenuItem value="Number">Number</MenuItem>
+                        <MenuItem value="Boolean">Boolean</MenuItem>
+                        <MenuItem value="String">String</MenuItem>
+                    </Select>
+                </FormControl>
+            ),
         },
         {
             field: 'actions',
@@ -237,6 +275,11 @@ function DataGridTable({ databaseName, selectedTable }) {
     ];
 
     const processRowUpdate = (newRow) => {
+
+        if (newRow["columnName"].length < 3 || newRow["columnType"].length < 1) {
+            return null;
+        }
+
         const updatedRow = { ...newRow, isNew: false };
         setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         return updatedRow;

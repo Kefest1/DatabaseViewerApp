@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import InvalidDataLabel from "./InvalidDataLabel";
-
+import { FaUser , FaLock } from 'react-icons/fa';
 
 function LoginPage() {
     const [IsVisible, setIsVisible] = useState(false)
@@ -13,7 +13,9 @@ function LoginPage() {
 
     const [errCode, setErrCode] = useState('');
 
-
+    useEffect(() => {
+        document.title = "Login Page";
+    }, []);
 
     const Login = async () => {
         if (username.length === 0) {
@@ -26,13 +28,26 @@ function LoginPage() {
             setIsVisible(true);
             return;
         }
-        const response = await fetch('http://localhost:8080/api/userinfo/getByUsername?userName=' + username);
-        const text = await response.json();
 
-        let foundPassword = text.password_hash;
+        let data;
+        try {
+            const response = await fetch('http://localhost:8080/api/userinfo/getByUsername?userName=' + username);
 
-        console.log(foundPassword);
-        if (foundPassword === password) {
+            if (!response.ok) {
+                console.error('Fetch error:', response.status, response.statusText);
+                throw new Error('Network response was not ok');
+            }
+
+            data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+            setPassword("");
+            setErrCode("There was a problem with the fetch operation. Please try again later");
+            return;
+        }
+
+        if (data.password_hash === password) {
             console.log("Login");
             const response = await fetch('http://localhost:8080/api/userinfo/checkifadmin/' + username);
             const isAdmin = await response.json();
@@ -49,39 +64,55 @@ function LoginPage() {
             console.log("Invalid password try again");
             setErrCode("Invalid user or password");
             setIsVisible(true);
+            setPassword("");
         }
-
     }
 
     return (
         <div>
-            <div align="center">Database Viewer app</div>
-            <div style={BackGroundStyle}
-                 className="d-flex justify-content-center align-items-center vh-100">
-                <div className='bg-white p-3 rounded w-25'>
-                    {/*<form>*/}
-                        <div className='mb-3'>
-                            <label htmlFor="username"><strong>Username</strong></label>
-                            <input className='form-control rounded-0' type="text" placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)}/>
+            <div align="center" className="mb-2">
+                <h3>Database Viewer App</h3>
+            </div>
+            <div style={BackGroundStyle} className="d-flex justify-content-center align-items-center vh-100" >
+                <div className='bg-white p-4 rounded shadow w-25'>
+                    <h2 className="text-center mb-4">Log in</h2>
+                    <div className='mb-3'>
+                        <label htmlFor="username"><strong>Username</strong></label>
+                        <div className="input-group">
+                            <span className="input-group-text"><FaUser  /></span>
+                            <input
+                                className='form-control rounded-0'
+                                type="text"
+                                placeholder="Enter Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                style={{ height: '50px', fontSize: '16px', padding: '10px' }}
+                            />
                         </div>
-                        <div className='mb-3'>
-                            <label htmlFor="password"><strong>Password</strong></label>
-                            <input className='form-control rounded-0' type="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="password"><strong>Password</strong></label>
+                        <div className="input-group">
+                            <span className="input-group-text"><FaLock /></span>
+                            <input
+                                className='form-control rounded-0'
+                                type="password"
+                                placeholder="Enter Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                style={{ height: '50px', fontSize: '16px', padding: '10px' }}
+                            />
                         </div>
-                        <button onClick={Login} className='btn btn-success w-100'>Log in</button>
-                        <p></p>
-                        <Link to="/register">
-                            <button
-                                className='btn btn-light border-dark w-100'
-                                style={{ marginTop: '10px' }}
-                            >Register</button>
-                        </Link>
-                        {IsVisible && <InvalidDataLabel errCode={errCode}/>}
-                    {}
+                    </div>
+                    <button onClick={Login} className='btn btn-success w-100 mb-2'>Log in</button>
+                    <Link to="/register">
+                        <button className='btn btn-light border-dark w-100'>Register</button>
+                    </Link>
+                    {IsVisible && <InvalidDataLabel errCode={errCode} />}
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default LoginPage;

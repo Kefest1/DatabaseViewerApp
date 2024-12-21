@@ -115,7 +115,7 @@ function TableCreator() {
                     />
 
                     <Button variant="contained" onClick={handleSubmit}>
-                        Add database
+                        Add table
                     </Button>
 
                 </div>

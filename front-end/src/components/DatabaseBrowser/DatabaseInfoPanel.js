@@ -105,14 +105,14 @@ const DatabaseInfoPanel = ({handleChange}) => {
                 </Button>
             </div>
 
-                <Box sx={{minHeight: 352, minWidth: 250}}>
-                    <RichTreeView
-                        items={tablesData}
-                        expandedItems={expandedItems}
-                        onExpandedItemsChange={handleExpandedItemsChange}
-                        onItemClick={handleNodeClick}
-                    />
-                </Box>
+            <Box sx={{minHeight: 352, minWidth: 250}}>
+                <RichTreeView
+                    items={tablesData}
+                    expandedItems={expandedItems}
+                    onExpandedItemsChange={handleExpandedItemsChange}
+                    onItemClick={handleNodeClick}
+                />
+            </Box>
 
         </Stack>
 

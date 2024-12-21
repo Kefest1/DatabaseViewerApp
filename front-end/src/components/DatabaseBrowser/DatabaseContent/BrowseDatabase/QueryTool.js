@@ -245,24 +245,28 @@ const QueryTool = ({selectedDbTable}) => {
                         <Grid2 item>
                             <FormControl variant="outlined">
                                 <InputLabel id="demo-multiple-checkbox-label">Select Columns</InputLabel>
-                                <Select
-                                    labelId="demo-multiple-checkbox-label"
-                                    id="demo-multiple-checkbox"
-                                    multiple
-                                    value={selectedColumns}
-                                    onChange={handleSelectThree}
-                                    input={<OutlinedInput label="Select Columns"/>}
-                                    renderValue={(selected) => selected.join(', ')}
-                                    variant={"outlined"}
-                                    style={{ width: '175px' }}
-                                >
-                                    {availableColumns.map((name) => (
-                                        <MenuItem key={name} value={name}>
-                                            <Checkbox checked={selectedColumns.includes(name)}/>
-                                            <ListItemText primary={name}/>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
+                                {availableColumns.length === 0 ? (
+                                    <div style={{ padding: '10px', color: 'gray' }}>No columns available to select</div>
+                                ) : (
+                                    <Select
+                                        labelId="demo-multiple-checkbox-label"
+                                        id="demo-multiple-checkbox"
+                                        multiple
+                                        value={selectedColumns}
+                                        onChange={handleSelectThree}
+                                        input={<OutlinedInput label="Select Columns"/>}
+                                        renderValue={(selected) => selected.join(', ')}
+                                        variant={"outlined"}
+                                        style={{ width: '175px' }}
+                                    >
+                                        {availableColumns.map((name) => (
+                                            <MenuItem key={name} value={name}>
+                                                <Checkbox checked={selectedColumns.includes(name)}/>
+                                                <ListItemText primary={name}/>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                )}
                             </FormControl>
                         </Grid2>
                     )}

@@ -53,7 +53,8 @@ public class TableInfo {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "table_info_id")
-    private List<TableStructure> fieldInformation;
+    @JsonIgnore
+    private List<TableStructure> tableStructure;
 
     @OneToMany(mappedBy = "tableInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -69,23 +70,3 @@ public class TableInfo {
     private Timestamp createdAt;
 
 }
-
-@Entity
-@Table(name = "table_structure")
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
-class TableStructure {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String columnName;
-    private String columnType;
-}
-
-
-

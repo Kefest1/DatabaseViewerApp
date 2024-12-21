@@ -237,7 +237,8 @@ function DatabaseModifier() {
                 const userName = getCookie("userName");
 
                 const requestBody = {
-                    tableName: obj.tableName,
+                    tableName: obj.oldTableName,
+                    newTableName: obj.tableName,
                     databaseName: selectedDatabase,
                     primaryKey: obj.primaryKey,
                     username: userName
@@ -317,7 +318,7 @@ function DatabaseModifier() {
             .catch(error => {
                 console.error('Error:', error);
             });
-
+        setRows(rows.filter((row) => row.id !== id));
     };
 
     const handleCancelClick = (id) => () => {
@@ -354,8 +355,8 @@ function DatabaseModifier() {
     }
 
     const processRowUpdate = (newRow, oldRow) => {
-        const updatedRow = {...newRow, isNew: false};
-        console.log(compareObject(oldRow, newRow));
+        console.log(oldRow);
+        const updatedRow = {...newRow, isNew: false, oldTableName: oldRow["tableName"]};
         if (!compareObject(oldRow, newRow)) {
             setUpdatedRows([...updatedRows, updatedRow])
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
