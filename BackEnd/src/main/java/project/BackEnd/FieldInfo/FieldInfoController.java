@@ -128,7 +128,7 @@ public class FieldInfoController {
         return fieldInfoRepository.findMaxColumnID();
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public String updateFieldInfo(@RequestBody List<UpdatePayload> updatePayloads) {
         try {
             for (UpdatePayload updatePayload : updatePayloads) {

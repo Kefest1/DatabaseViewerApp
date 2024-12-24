@@ -150,7 +150,7 @@ public class TableInfoController {
         Long userID = userInfoRepository.findByUsername(username).getId();
         DatabaseInfo databaseInfo = databaseInfoRepository.getDatabaseInfoByDatabaseName(databasename);
 
-        TableInfo tableInfo = new TableInfo(databaseInfo, tableName);
+        TableInfo tableInfo = new TableInfo(databaseInfo, tableName, "primaryKey");
         Long tableID = tableInfoService.saveTableInfo(tableInfo).getId();
 
         OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);

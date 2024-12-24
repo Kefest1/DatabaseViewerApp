@@ -6,8 +6,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
 
 
-function addDatabase(databaseName, databaseDescription) {
-    const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${databaseDescription}`;
+function addDatabase(databaseName, databaseDescription, primaryColumnName, tableName) {
+    if (databaseDescription === "") {
+        databaseDescription = "No description";
+    }
+    const userName = getCookie("userName");
+    const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`;
 
     return fetch(url, {
         method: 'POST',
@@ -177,26 +181,8 @@ function DatabaseCreator() {
         let databaseId;
         let tableID;
 
-        addDatabase(databaseName, databaseDescription)
-            .then(id => {
-                databaseId = id;
+        addDatabase(databaseName, databaseDescription, primaryColumnName, tableName)
 
-                addTable(tableName, databaseId, primaryColumnName)
-                    .then(id => {
-                        tableID = id;
-                        addStructure(primaryColumnName, tableID);
-                        addConnection(tableID);
-                        setDatabaseName("");
-                        setTableName("");
-                        setPrimaryColumnName("");
-                        setDatabaseDescription("");
-                    })
-                    .catch(error => {
-                        console.error('Failed to add table:', error);
-                        setErrorMessage('Failed to add table. Please try again.');
-                        setOpenSnackbar(true);
-                    });
-            })
             .catch(error => {
                 console.error('Failed to add database:', error);
                 setErrorMessage('Failed to add database. Please try again.');

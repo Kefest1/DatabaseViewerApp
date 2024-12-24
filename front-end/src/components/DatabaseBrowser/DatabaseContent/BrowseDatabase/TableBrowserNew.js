@@ -16,11 +16,8 @@ import {
     GridRowModes,
     GridToolbar,
     GridToolbarContainer,
-    useGridApiRef,
 } from '@mui/x-data-grid';
 import {getCookie} from "../../../getCookie";
-import {MenuItem} from "@mui/material";
-import Select from "@mui/material/Select";
 
 
 function prepareColumns(selectedColumns, primaryKey) {
@@ -45,9 +42,10 @@ function prepareColumns(selectedColumns, primaryKey) {
 }
 
 const logUpdatable = async (fieldsToUpdate) => {
+    console.log(fieldsToUpdate);
     try {
         const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
-            method: 'GET',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -64,24 +62,9 @@ const logUpdatable = async (fieldsToUpdate) => {
     }
 };
 
-const fetchJoinInfo = async (databaseName, tableName) => {
-    const userName = getCookie("userName");
-    const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`)
-    return await response.json();
-}
-
-const fetchJoinTable = async (databaseName, tableName) => {
-    const userName = getCookie("userName");
-    const response = await fetch(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
-    console.log(`http://localhost:8080/api/tableinfo/getAllFieldsAllColumns/${databaseName}/${tableName}`);
-    const result = await response.json();
-    return result;
-}
-
 let newId = -1;
 
 function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
-    const apiRef = useGridApiRef();
 
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
@@ -89,146 +72,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
 
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
-
-    const [joinInfo, setJoinInfo] = useState([]);
-    const [joinAbleTables, setJoinAbleTables] = useState([]);
-    const [selectedJoinTable, setSelectedJoinTable] = useState("");
-
-    const JoinPanel = () => {
-        if (joinAbleTables !== []) {
-            return (
-                <div>
-                    <Select
-                        labelId="demo-simple-select-table"
-                        id="demo-simple-table"
-                        value={selectedJoinTable}
-                        label="Select Table To Join"
-                        onChange={onSelectJoin}
-                        variant={"outlined"}
-                    >
-                        {joinAbleTables.map((option, index) => (
-                            <MenuItem key={index} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Button onClick={() => performJoin()}>
-                        Perform join on selected table
-                    </Button>
-                </div>
-            )
-        }
-    }
-
-    function onSelectJoin(e) {
-        setSelectedJoinTable(e.target.value);
-    }
-
-    function performJoin() {
-        let informationJoin = [];
-        joinInfo.forEach(info => {
-            if (info.oneTableName === selectedJoinTable) {
-                informationJoin = info;
-            }
-        })
-        console.log(informationJoin);
-        fetchJoinTable(databaseName, informationJoin.oneTableName)
-            .then(fetchedJoinTable => {
-                mergeTwoTables(fetchedJoinTable, (fetchedJoinTable[0].map(column => column.columnName))
-                    .filter(item => item !== informationJoin.oneColumnName), informationJoin);
-            })
-            .catch(error => {
-                console.error('Error fetching join table:', error);
-            });
-
-    }
-
-    function mergeTwoTables(rowsToMerge, columnsToMerge, informationJoin) {
-        let finalRows = [];
-
-        const deepCopyRows = JSON.parse(JSON.stringify(rows));
-        deepCopyRows.forEach(row => {
-            const joinId = row[informationJoin.manyColumnName];
-            const nodes = findRowToJoin(rowsToMerge, informationJoin.oneColumnName, joinId);
-            console.log(rowsToMerge);
-            console.log(informationJoin.oneColumnName);
-            console.log(joinId);
-            nodes.forEach(item => {
-                const key = Object.keys(item)[0];
-                row[key] = item[key];
-            });
-
-            finalRows.push(row);
-        });
-
-        const newColNames = findColumnsToJoin(rowsToMerge, informationJoin.oneColumnName);
-
-        let newColumns = []
-        newColNames.forEach(col => {
-            let nod = {};
-            nod["field"] = col;
-            nod["headerName"] = col;
-            nod["width"] = 100;
-            nod["editable"] = false;
-            nod["headerAlign"] = "left";
-            nod["align"] = "left";
-
-            newColumns.push(nod);
-        });
-
-        const columnsCopy = JSON.parse(JSON.stringify(columns));
-        const mergedArray = [...columnsCopy, ...newColumns];
-
-        const finalColumns = mergedArray.sort((a, b) => {
-            if (a.field === "actions") return 1;
-            if (b.field === "actions") return -1;
-            return 0;
-        });
-
-        console.log(finalRows);
-        console.log(finalColumns);
-
-        setRows(finalRows);
-        console.log(newColumns);
-        const buffer = [{
-            field: "test",
-            headerName: "test",
-            width: 100,
-            editable: true,
-            align: "left",
-            headerAlign: "left"
-        }];
-        console.log(buffer);
-        apiRef.current.updateColumns(finalColumns);
-        console.log("--------------");
-
-        // setColumns(finalColumns);
-    }
-
-    function findRowToJoin(rowsToMerge, oneColumnName, joinId) {
-        for (const row of rowsToMerge) {
-            for (const item of row) {
-                if (item.columnName === oneColumnName && item.dataValue === joinId) {
-                    return row
-                        .filter(item => item.columnName !== oneColumnName)
-                        .map(item => ({ [item.columnName]: item.dataValue }));
-                }
-            }
-        }
-        return null;
-    }
-
-    function findColumnsToJoin(rowsToMerge, oneColumnName) {
-        const node = rowsToMerge[0];
-        let ret = [];
-        node.forEach(col => {
-            if (col.columnName !== oneColumnName) {
-                ret.push(col.columnName);
-            }
-        })
-
-        return ret;
-    }
 
     let columns = prepareColumns(selectedColumns, primaryKey);
     columns.push(
@@ -298,20 +141,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         processData(data, setRows);
     }, [data, selectedColumns]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetchJoinInfo(databaseName, tableName);
-            setJoinInfo(response);
-            let tables = [];
-            response.forEach(r => {
-                tables.push(r.oneTableName);
-            })
-            setJoinAbleTables(tables);
-        };
-
-        fetchData();
-    }, []);
-
     const handleEditClick = (id) => () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
@@ -327,7 +156,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const handleDeleteClick = (id) => () => {
-        console.log(id);
         setRows(rows.filter((row) => row.id !== id));
         commitDeleteSingleRow(id);
     };
@@ -345,22 +173,25 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     const processRowUpdate = (newRow, originalRow) => {
+        const updatedRow = { ...newRow, isNew: false };
+        const contains = newRows.some(row => row.id === newRow.id);
+
+        setNewRows(prevRows => {
+            if (contains) {
+                return prevRows.map(row => (row.id === newRow.id ? updatedRow : row));
+            } else {
+                return [...prevRows, updatedRow];
+            }
+        });
+
+        setRows(rows.map(row => (row.id === newRow.id ? updatedRow : row)));
+
         if (newRow.id < 0 || originalRow.id < 0) {
-            setNewRows(prevRows => [...prevRows, newRow]);
-            const updatedRow = { ...newRow, isNew: false };
-            setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-
             return updatedRow;
-        }
-        else {
-            const updatedRow = { ...newRow, isNew: false };
-            setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-
+        } else {
             let request = findDifference(originalRow, updatedRow);
             request["rowIndex"] = originalRow.id;
-
-            setFieldsToUpdate((prevFields) => [...prevFields, request]);
-
+            setFieldsToUpdate(prevFields => [...prevFields, request]);
             return updatedRow;
         }
     };
@@ -433,7 +264,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     function Debug() {
-        console.log(selectedRowsIndex);
+        console.log(rows);
+        console.log(newRows);
+        console.log(fieldsToUpdate);
+
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
@@ -447,7 +281,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     };
 
     function handleRowSelectionChange(e) {
-        console.log(e);
         setSelectedRowsIndex(e);
     }
 
@@ -462,7 +295,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             <DataGrid
                 rows={rows}
                 columns={columns}
-                apiRef={apiRef}
                 editMode="row"
                 checkboxSelection
                 rowModesModel={rowModesModel}
@@ -577,7 +409,6 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                     }
                 };
 
-                // Read the file as text
                 reader.readAsText(file);
             }
         };
@@ -602,14 +433,12 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
 
         const handleClick = () => {
             const id = newId;
-            console.log(id);
             newId--;
 
             const newRow = {id};
 
             selectedColumns.forEach(
                 (column) => {
-                    console.log(column);
                     if (column === primaryKey) {
                         newRow[column] = 'will be generated';
                     }

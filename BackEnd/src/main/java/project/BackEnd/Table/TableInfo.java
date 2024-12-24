@@ -28,9 +28,10 @@ public class TableInfo {
                 '}';
     }
 
-    public TableInfo(DatabaseInfo databaseInfo, String tableName) {
+    public TableInfo(DatabaseInfo databaseInfo, String tableName, String primary_key) {
         this.databaseInfo = databaseInfo;
         this.tableName = tableName;
+        this.primary_key = primary_key;
     }
 
     @Id

@@ -34,8 +34,6 @@ public class UserInfoController {
             boolean isAdmin = !userPayload.getHash().isEmpty();
 
             if (isAdmin) {
-                System.out.println("IsAdmin");
-
                 if (!Arrays.asList(availableHashes).contains(userPayload.getHash())) {
                     System.out.println(userPayload.getHash());
                     System.out.println("BadHash");
@@ -44,7 +42,6 @@ public class UserInfoController {
 
                 userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), true, null);
             } else {
-                System.out.println("user");
                 UserInfo admin = userInfoRepository.findByUsername(userPayload.getAdminName());
                 if (admin == null) {
                     System.out.println("Incorrect admin");
@@ -83,9 +80,11 @@ public class UserInfoController {
     }
 
     @GetMapping("/getByUsername")
-    public UserInfo getByUsername(@RequestParam("userName") String userInfoName) {
-        System.out.println(userInfoName);
-        return usersService.getUsersByUsername(userInfoName);
+    public boolean getByUsername(@RequestParam("userName") String userName, @RequestParam("password") String password) {
+        System.out.println(userName);
+        System.out.println(password);
+        Optional<Long> userId = userInfoRepository.checkLoginData(userName, password);
+        return userId.isPresent();
     }
 
     @GetMapping("/getIdByUsername/{username}")

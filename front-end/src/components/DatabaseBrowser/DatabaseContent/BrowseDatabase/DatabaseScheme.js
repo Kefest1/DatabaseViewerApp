@@ -29,7 +29,6 @@ async function fetchAvailableDatabases() {
 
 async function fetchAvailableConnections(databaseName) {
     const userName = getCookie("userName");
-    console.log("http://localhost:8080/api/tableconnection/getDatabaseConnection/" + databaseName + "/" + userName);
     const tables = await fetch(
         "http://localhost:8080/api/tableconnection/getDatabaseConnection/" + databaseName + "/" + userName
     );
@@ -208,11 +207,11 @@ function DatabaseScheme() {
         const loadDatabaseStructure = async () => {
             const dbStructure = await fetchDatabaseStructure(selectedDatabase);
             setDatabaseStructure(dbStructure);
-
         };
 
         if (selectedDatabase !== "") {
             loadDatabaseStructure();
+            console.log(databaseStructure);
         }
     }, [selectedDatabase]);
 
@@ -226,11 +225,8 @@ function DatabaseScheme() {
 
     useEffect(() => {
         if (connections.length > 0) {
-            console.log(connections);
             const initialConnections = prepareEdges(connections);
-            console.log(initialConnections);
             setEdges(initialConnections);
-
         }
     }, [connections]);
 

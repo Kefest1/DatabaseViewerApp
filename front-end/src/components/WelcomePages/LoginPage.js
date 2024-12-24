@@ -5,6 +5,9 @@ import BackGroundStyle from './BackGroundStyle'
 import InvalidDataLabel from "./InvalidDataLabel";
 import { FaUser , FaLock } from 'react-icons/fa';
 
+const MAX_USERNAME_LENGTH = 20;
+const MAX_PASSWORD_LENGTH = 20;
+
 function LoginPage() {
     const [IsVisible, setIsVisible] = useState(false)
     const [username, setUsername] = useState('');
@@ -24,14 +27,14 @@ function LoginPage() {
             return;
         }
         if (password.length === 0) {
-            setErrCode("Enter password")
+            setErrCode("Enter password");
             setIsVisible(true);
             return;
         }
 
         let data;
         try {
-            const response = await fetch('http://localhost:8080/api/userinfo/getByUsername?userName=' + username);
+            const response = await fetch(`http://localhost:8080/api/userinfo/getByUsername?userName=${username}&password=${password}`);
 
             if (!response.ok) {
                 console.error('Fetch error:', response.status, response.statusText);
@@ -40,31 +43,30 @@ function LoginPage() {
 
             data = await response.json();
             console.log(data);
+
+            if (data) {
+                console.log("Login successful");
+                const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`);
+                const isAdmin = await adminResponse.json();
+
+                setErrCode("Login successful");
+                setIsVisible(true);
+                const expirationTime = new Date();
+                expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
+                document.cookie = `userName=${username}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
+                document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
+
+                window.location.href = 'http://localhost:3000';
+            } else {
+                console.log("Invalid user or password");
+                setErrCode("Invalid user or password");
+                setIsVisible(true);
+                setPassword("");
+            }
         } catch (error) {
-            console.error('There was a problem with the fetch operation:', error);
             setPassword("");
             setErrCode("There was a problem with the fetch operation. Please try again later");
-            return;
-        }
-
-        if (data.password_hash === password) {
-            console.log("Login");
-            const response = await fetch('http://localhost:8080/api/userinfo/checkifadmin/' + username);
-            const isAdmin = await response.json();
-
-            setErrCode("Login successful");
             setIsVisible(true);
-            const expirationTime = new Date();
-            expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
-            document.cookie = 'userName=' + username + '; expires=' + expirationTime.toUTCString() + '; secure; samesite=strict ';
-            document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
-
-            window.location.href = 'http://localhost:3000';
-        } else {
-            console.log("Invalid password try again");
-            setErrCode("Invalid user or password");
-            setIsVisible(true);
-            setPassword("");
         }
     }
 
@@ -87,6 +89,7 @@ function LoginPage() {
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 style={{ height: '50px', fontSize: '16px', padding: '10px' }}
+                                maxLength={MAX_USERNAME_LENGTH}
                             />
                         </div>
                     </div>
@@ -101,6 +104,7 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 style={{ height: '50px', fontSize: '16px', padding: '10px' }}
+                                maxLength={MAX_PASSWORD_LENGTH}
                             />
                         </div>
                     </div>

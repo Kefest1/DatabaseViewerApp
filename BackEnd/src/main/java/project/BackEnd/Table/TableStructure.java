@@ -25,6 +25,12 @@ public class TableStructure {
 
     @JsonIgnore
     private TableInfo tableInfo;
+
+    public TableStructure(String columnName, String columnType, TableInfo tableInfo) {
+        this.columnName = columnName;
+        this.columnType = columnType;
+        this.tableInfo = tableInfo;
+    }
 }
 
 enum DataType {

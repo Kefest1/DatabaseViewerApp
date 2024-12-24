@@ -3,11 +3,19 @@ package project.BackEnd.DatabaseInfo;
 
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
+import project.BackEnd.OwnershipDetails.OwnershipDetailsPayload;
+import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
+import project.BackEnd.Table.TableInfo;
 import project.BackEnd.Table.TableInfoRepository;
+import project.BackEnd.Table.TableStructure;
+import project.BackEnd.Table.TableStructureRepository;
 import project.BackEnd.User.UserInfo;
+import project.BackEnd.User.UserInfoRepository;
 
 import javax.xml.crypto.Data;
 import java.util.*;
@@ -28,6 +36,15 @@ public class DatabaseInfoController {
 
     @Autowired
     FieldInfoRepository fieldInfoRepository;
+
+    @Autowired
+    TableStructureRepository tableStructureRepository;
+
+    @Autowired
+    UserInfoRepository userInfoRepository;
+
+    @Autowired
+    OwnershipDetailsService ownershipDetailsService;
 
     @GetMapping("/getall")
     public List<DatabaseInfo> getDatabase() {
@@ -63,12 +80,34 @@ public class DatabaseInfoController {
         return getStats();
     }
 
-    @PostMapping("/add/{databaseName}/{databaseDescription}")
-    public Long add(@PathVariable("databaseName") String databaseName, @PathVariable("databaseDescription") String databaseDescription) {
+    @PostMapping("/add/{databaseName}/{tableName}/{columnName}/{databaseDescription}/{userName}")
+    public ResponseEntity<String> add(
+            @PathVariable("databaseName") String databaseName,
+            @PathVariable("databaseDescription") String databaseDescription,
+            @PathVariable("columnName") String columnName,
+            @PathVariable("tableName") String tableName,
+            @PathVariable("userName") String userName
+    ) {
+        var existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(userName);
+        System.out.println(databaseName);
+        System.out.println(existingDatabaseName);
+        if (existingDatabaseName != null) {
+            return new ResponseEntity<>("Database with that name already exists", HttpStatus.OK);
+        }
+
         DatabaseInfo databaseInfo = new DatabaseInfo(databaseName, databaseDescription);
-        System.out.println(databaseInfo);
         DatabaseInfo savedDatabaseInfo = databaseInfoRepository.save(databaseInfo);
-        return savedDatabaseInfo.getId();
+        TableInfo tableInfo = new TableInfo(savedDatabaseInfo, tableName, columnName);
+
+        TableInfo savedTableInfo = tableInfoRepository.save(tableInfo);
+        TableStructure tableStructure = new TableStructure(columnName, "Long", savedTableInfo);
+
+        tableStructureRepository.save(tableStructure);
+
+        Long userID = userInfoRepository.findUserIDByUsername(userName);
+        ownershipDetailsService.addOwnershipDetails(new OwnershipDetailsPayload(userID, savedTableInfo.getId()));
+
+        return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
     private DatabaseStatistics getStats() {

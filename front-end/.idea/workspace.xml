@@ -5,24 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="More">
-      <change afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/OwnershipDetails/OwnershipDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/OwnershipDetails/OwnershipDetailsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructure.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructure.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructureRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructureRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DataGridTable.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DataGridTable.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseModifier.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseModifier.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/QueryTool.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/QueryTool.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/StructureModifier.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/StructureModifier.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseScheme.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseScheme.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableCreator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableCreator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/MainTest.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/MainTest.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/WelcomePages/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WelcomePages/LoginPage.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" afterDir="false" />
     </list>
@@ -184,7 +178,10 @@
       <workItem from="1734603819645" duration="5859000" />
       <workItem from="1734639823564" duration="3192000" />
       <workItem from="1734716747191" duration="4497000" />
-      <workItem from="1734797959919" duration="3020000" />
+      <workItem from="1734797959919" duration="4133000" />
+      <workItem from="1734865837404" duration="2555000" />
+      <workItem from="1734883443195" duration="2821000" />
+      <workItem from="1734950165427" duration="1519000" />
     </task>
     <task id="LOCAL-00001" summary="More">
       <option name="closed" value="true" />

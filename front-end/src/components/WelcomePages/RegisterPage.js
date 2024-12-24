@@ -16,42 +16,63 @@ function RegisterPage() {
     const [isVisible, setIsVisible] = useState('');
     const [caption, setCaption] = useState('');
 
-    const [users, setUsers] = useState('');
 
     useEffect(() => {
         document.title = "Register Page";
     }, []);
 
+    const MAX_USERNAME_LENGTH = 20;
+    const MAX_ADMIN_USERNAME_LENGTH = MAX_USERNAME_LENGTH;
+    const MAX_EMAIL_LENGTH = 50;
+    const MAX_PASSWORD_LENGTH = 20;
+    const MAX_HASH_LENGTH = 50;
+
     const ValidatePassword = () => {
-        console.log(users);
         setIsVisible(true);
 
-        if (password === "" || confirmPassword === "") {
-            console.log("No data");
-            return "No data"
+        if (password === "" || confirmPassword === "" || username === "" || email === "") {
+            return "Please fill in all required fields";
         }
-        else if (password.length <= 8 || confirmPassword.length <= 8) {
-            console.log('Password is to short');
-            return "Passwords is to short"
+        else if (username.length < 8) {
+            return "Username is too short";
+        }
+        else if (username.length > MAX_USERNAME_LENGTH) {
+            return `Username must be less than ${MAX_USERNAME_LENGTH + 1} characters`;
+        }
+        else if (password.length < 8 || confirmPassword.length < 8) {
+            return "Password is too short";
+        }
+        else if (password.length > MAX_PASSWORD_LENGTH) {
+            return `Password must be less than ${MAX_PASSWORD_LENGTH + 1} characters`;
         }
         else if (password !== confirmPassword) {
-            console.log('Passwords do not match');
-            return "Passwords do not match"
+            return "Passwords do not match";
         } else {
-            console.log('Passwords match');
-            return "OK"
+            return "OK";
         }
-
     }
 
     const validateData = () => {
-      if (adminUsername === '' && hash === '') {
-          return "Give hash or admin username";
-      }
-      if (adminUsername !== '' && hash !== '') {
-          return "Give either hash or admin username";
-      }
-      return "OK";
+        if (adminUsername === '' && hash === '') {
+            return "Give hash or admin username";
+        }
+        if (adminUsername !== '' && hash !== '') {
+            return "Give either hash or admin username";
+        }
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+            return "Email is not valid";
+        }
+        if (email.length > MAX_EMAIL_LENGTH) {
+            return `Email must be less than ${MAX_EMAIL_LENGTH + 1} characters`;
+        }
+        if (adminUsername.length > MAX_ADMIN_USERNAME_LENGTH) {
+            return `Admin username must be less than ${MAX_ADMIN_USERNAME_LENGTH + 1} characters`;
+        }
+        if (hash.length > MAX_HASH_LENGTH) {
+            return `Hash must be less than ${MAX_HASH_LENGTH + 1} characters`;
+        }
+        return "OK";
     }
 
     const Register = async () => {
@@ -136,7 +157,6 @@ function RegisterPage() {
 
                         </Link>
                         {isVisible && <label>{caption}</label>}
-                    {}
                 </div>
             </div>
         </div>

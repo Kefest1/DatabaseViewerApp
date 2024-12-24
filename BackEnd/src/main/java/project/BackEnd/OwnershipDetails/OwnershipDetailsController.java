@@ -42,11 +42,8 @@ public class OwnershipDetailsController {
         return "OK";
     }
 
-    @PostMapping("/addbyusername/{tableid}")
-    public String addUserByName(@PathVariable("tableid") Long tableid, @RequestBody String username) {
-        System.out.println("\n\n\n");
-        System.out.println(tableid);
-        System.out.println(username);
+    @PostMapping("/addbyusername/{tableid}/{username}")
+    public String addUserByName(@PathVariable("tableid") Long tableid, @PathVariable("username") String username) {
         Long userID = userInfoRepository.findUserIDByUsername(username);
         System.out.println(userID);
 
