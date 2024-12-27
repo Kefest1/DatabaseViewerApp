@@ -278,6 +278,11 @@ function ConnectionsCreator() {
 
 }
 
+function saveConnection(selectedDatabase, selectedTableOne, selectedTableMany, selectedColumnOne, selectedColumnMany) {
+    console.log("Save connection");
+
+}
+
 const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -293,19 +298,17 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
             const sourceColumnDataType = sourceNode.data.schema.find(column => column.title === sourceColumn).type;
             const targetColumnDataType = targetNode.data.schema.find(column => column.title === targetColumn).type;
 
-            const existingEdge = edges.find(edge =>
-                (edge.source === params.source && edge.target === params.target) ||
-                (edge.source === params.target && edge.target === params.source)
-            );
+            if ((sourceColumnDataType === 'long' || sourceColumnDataType === 'integer') &&
+                (targetColumnDataType === 'long' || targetColumnDataType === 'integer')) {
 
-            if (sourceColumnDataType === 'long' || targetColumnDataType === 'long' ||
-                sourceColumnDataType === 'integer' || targetColumnDataType === 'integer') {
+                setEdges([]);
+
                 setEdges((eds) => addEdge(params, eds));
                 console.log(`Connection made from ${sourceNode.data.label}.${sourceColumn} to ${targetNode.data.label}.${targetColumn}`);
             }
         }
-    };
 
+    };
     const handleEdgesChange = (changes) => {
         console.log(changes);
         setEdges([]);
