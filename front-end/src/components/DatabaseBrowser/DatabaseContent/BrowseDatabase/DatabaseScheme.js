@@ -70,7 +70,6 @@ const getLayoutedElements = (nodes, edges, options) => {
     };
 };
 
-
 const nodeTypes = {
     databaseSchema: DatabaseSchemaNode,
 };
@@ -78,17 +77,17 @@ const nodeTypes = {
 const mapColumnType = (type) => {
     switch (type) {
         case "Long":
-            return "bigint"; // Example mapping
+            return "bigint";
         case "Integer":
-            return "int4"; // Example mapping
+            return "int4";
         case "String":
-            return "varchar"; // Example mapping
+            return "varchar";
         case "Number":
-            return "numeric"; // Example mapping
+            return "numeric";
         case "Timestamp":
-            return "timestamp"; // Example mapping
+            return "timestamp";
         default:
-            return "unknown"; // Fallback for unknown types
+            return "unknown";
     }
 };
 
@@ -250,7 +249,7 @@ function DatabaseScheme() {
                 </Select>
             )}
 
-            {selectedDatabase !== "" && nodes.length > 0 && edges.length > 0 && (
+            {selectedDatabase !== "" && nodes.length > 0 && (
                 <ReactFlowProvider>
                     <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges}/>
                 </ReactFlowProvider>

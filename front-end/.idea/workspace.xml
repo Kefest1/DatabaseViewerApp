@@ -5,20 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="More">
+      <change afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/ConnectionsCreator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/OwnershipDetails/OwnershipDetailsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/OwnershipDetails/OwnershipDetailsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructure.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructure.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructureRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableStructureRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/TableConnections/TableConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/TableConnections/TableConnectionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseScheme.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseScheme.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/WelcomePages/LoginPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WelcomePages/LoginPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseContent.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/Header.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +76,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.222" />
       </set>
     </attachedChunks>
   </component>
@@ -182,6 +176,10 @@
       <workItem from="1734865837404" duration="2555000" />
       <workItem from="1734883443195" duration="2821000" />
       <workItem from="1734950165427" duration="1519000" />
+      <workItem from="1735031591275" duration="1870000" />
+      <workItem from="1735034387787" duration="17000" />
+      <workItem from="1735289472560" duration="4250000" />
+      <workItem from="1735318790268" duration="2180000" />
     </task>
     <task id="LOCAL-00001" summary="More">
       <option name="closed" value="true" />
@@ -205,5 +203,16 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="More" />
     <option name="LAST_COMMIT_MESSAGE" value="More" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/ConnectionsCreator.js</url>
+          <line>210</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

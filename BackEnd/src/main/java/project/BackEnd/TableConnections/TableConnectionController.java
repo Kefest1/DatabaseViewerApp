@@ -91,18 +91,17 @@ public class TableConnectionController {
         String manyTableName;
     }
 
-    // Method to convert TableConnection to TableConnectionDTO
     private TableConnectionDTO convertToDTO(TableConnection tableConnection) {
         TableConnectionDTO dto = new TableConnectionDTO();
         dto.oneColumnName = tableConnection.getOneColumnName();
         dto.manyColumnName = tableConnection.getManyColumnName();
 
-        // Assuming you have a method to get the table name from TableInfo
         dto.oneTableName = tableConnection.getOne().getTableName();
         dto.manyTableName = tableConnection.getMany().getTableName();
 
         return dto;
     }
+    
     @GetMapping("/checkifhasconnectedtables/{databasename}/{tablename}/{username}")
     public boolean checkIfHasConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
         Long id = tableInfoRepository.getTableIdByTableName(tablename);

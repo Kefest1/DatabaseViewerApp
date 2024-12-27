@@ -56,6 +56,11 @@ public class DatabaseInfoController {
         return databaseInfoRepository.findAllUsersTable(username);
     }
 
+    @GetMapping("/getAvailableDatabaseNames/{userName}")
+    public List<String> getAvailableDatabases(@PathVariable("userName") String userName) {
+        return databaseInfoRepository.findDatabaseNamesByUsername(userName);
+    }
+
     @GetMapping("/getDatabaseStructure/{username}/{databaseName}")
     public List<String> getDatabaseStructure(@PathVariable String databaseName, @PathVariable String username) {
         List<String> databaseStructure = databaseInfoRepository.findTablesForDatabase(username, databaseName);

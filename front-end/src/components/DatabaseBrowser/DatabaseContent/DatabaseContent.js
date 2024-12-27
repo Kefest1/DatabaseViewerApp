@@ -9,6 +9,7 @@ import AdminPanel from "../admin/AdminPanel";
 import StructureModifier from "./BrowseDatabase/StructureModifier";
 import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
 import BrowseMultipleTables from "./BrowseDatabase/BrowseMultipleTables";
+import ConnectionsCreator from "./BrowseDatabase/ConnectionsCreator";
 
 const Component = ( {name} ) => {
     return <div style={{ marginLeft: '20px' }}>{name}</div>;
@@ -55,6 +56,8 @@ const DatabaseContent = ({selectedTable}) => {
                 return <StructureModifier/>;
             case 7:
                 return <DatabaseScheme/>;
+            case 8:
+                return <ConnectionsCreator/>;
             default:
                 return null;
         }
@@ -107,6 +110,12 @@ const DatabaseContent = ({selectedTable}) => {
                         onClick={() => handleButtonClick(7)}
                     >
                         Browse database scheme
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 8 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(8)}
+                    >
+                        Connections Creator
                     </div>
 
                 </div>

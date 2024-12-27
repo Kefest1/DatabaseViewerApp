@@ -1,4 +1,3 @@
-// Header.js
 import React, { useEffect, useState } from "react";
 import { getCookie } from "../getCookie";
 import "./Header.css";
@@ -33,7 +32,7 @@ function Header() {
 
     return (
         <header>
-            <h3 align={"center"}>Available databases for {userName} :</h3>
+            <h3 align={"center"}>Available databases for {userName}:</h3>
             {loading ? (
                 <p align={"center"}>Loading...</p>
             ) : (
