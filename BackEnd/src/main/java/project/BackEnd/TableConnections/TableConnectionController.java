@@ -8,10 +8,7 @@ import project.BackEnd.Table.TableInfoRepository;
 import project.BackEnd.Table.TableInfo;
 import project.BackEnd.User.UserInfoRepository;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,6 +35,26 @@ public class TableConnectionController {
         TableConnection tableConnection = new TableConnection(tableInfoOne, tableInfoMany, tableInfoPayload.oneColumnName, tableInfoPayload.manyColumnName);
         tableConnectionRepository.save(tableConnection);
         return "OK";
+    }
+
+    @GetMapping("/getConnectionDetails/{databaseName}/{tableNameOne}/{tableNameMany}/{username}")
+    public TableConnection getConnectionDetails(
+                                          @PathVariable("databaseName") String databaseName,
+                                          @PathVariable("tableNameOne") String tableNameOne,
+                                          @PathVariable("tableNameMany") String tableNameMany,
+                                          @PathVariable("username") String username) {
+        Optional<Long> oneID = tableInfoRepository.findWithUsersAndTables(username, tableNameOne, databaseName);
+        Optional<Long> manyID = tableInfoRepository.findWithUsersAndTables(username, tableNameMany, databaseName);
+        if (manyID.isEmpty() || oneID.isEmpty()) {
+            System.out.println("Empty");
+            return null;
+        }
+        TableConnection tableConnectionOne = tableConnectionRepository.getTableConnectionByParams(databaseName, username, oneID.get(), manyID.get());
+
+        if (tableConnectionOne != null)
+            return tableConnectionOne;
+
+        return tableConnectionRepository.getTableConnectionByParams(databaseName, username, oneID.get(), manyID.get());
     }
 
     @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")

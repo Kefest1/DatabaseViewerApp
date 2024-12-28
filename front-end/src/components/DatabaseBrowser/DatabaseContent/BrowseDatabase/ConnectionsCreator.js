@@ -280,7 +280,6 @@ function ConnectionsCreator() {
 
 function saveConnection(selectedDatabase, selectedTableOne, selectedTableMany, selectedColumnOne, selectedColumnMany) {
     console.log("Save connection");
-
 }
 
 const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {

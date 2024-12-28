@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "dagre": "^0.8.5",
+    "framer-motion": "^11.15.0",
     "lucide-react": "^0.468.0",
     "pg-promise": "^11.5.4",
     "querystring": "^0.2.1",

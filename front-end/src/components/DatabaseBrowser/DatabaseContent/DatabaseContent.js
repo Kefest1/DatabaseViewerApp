@@ -5,6 +5,7 @@ import QueryTool from "./BrowseDatabase/QueryTool";
 import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 import Statistics from "./DatabaseStatistics/Statistics";
 import {getCookie} from "../../getCookie";
+import WelcomePage from "../../WelcomePages/WelcomePage";
 import AdminPanel from "../admin/AdminPanel";
 import StructureModifier from "./BrowseDatabase/StructureModifier";
 import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
@@ -40,23 +41,25 @@ const DatabaseContent = ({selectedTable}) => {
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
-                return <QueryTool selectedDbTable={locSelectedTable} />;
+                return <WelcomePage/>;
             case 2:
-                return <BrowseMultipleTables />;
+                return <QueryTool selectedDbTable={locSelectedTable} />;
             case 3:
-                return <Statistics/>;
+                return <BrowseMultipleTables />;
             case 4:
+                return <Statistics/>;
+            case 5:
                 if (isAdmin)
                     return <AdminPanel name={"Admin panel"}/>;
                 else
                     return <Component name={"TODO"}/>;
-            case 5:
-                return <QueryLoggerComponent/>;
             case 6:
-                return <StructureModifier/>;
+                return <QueryLoggerComponent/>;
             case 7:
-                return <DatabaseScheme/>;
+                return <StructureModifier/>;
             case 8:
+                return <DatabaseScheme/>;
+            case 9:
                 return <ConnectionsCreator/>;
             default:
                 return null;
@@ -71,49 +74,56 @@ const DatabaseContent = ({selectedTable}) => {
                         className={`wcPanelTab ${activeButton === 1 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(1)}
                     >
-                        Single table CRUD
+                        Welcome!
 
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 2 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(2)}
                     >
-                        Browse multiple tables
+                        Single table CRUD
+
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(3)}
                     >
-                        Statistics
+                        Browse multiple tables
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 4 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(4)}
                     >
-                        Admin Panel
-
+                        Statistics
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 5 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(5)}
                     >
-                        Logger
+                        Admin Panel
+
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 6 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(6)}
                     >
-                        Structure modifier
+                        Logger
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 7 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(7)}
                     >
-                        Browse database scheme
+                        Structure modifier
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 8 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(8)}
+                    >
+                        Browse database scheme
+                    </div>
+                    <div
+                        className={`wcPanelTab ${activeButton === 9 ? 'active' : ''}`}
+                        onClick={() => handleButtonClick(9)}
                     >
                         Connections Creator
                     </div>

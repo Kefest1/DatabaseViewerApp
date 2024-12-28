@@ -50,6 +50,11 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
             "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
     List<String> findAvailableTableNames(@Param("databasename") String databasename, @Param("username") String username);
 
+    @Query("SELECT DISTINCT ti.id " +
+            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo " +
+            "WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tableName")
+    List<String> findTableIDByUsername(@Param("databasename") String databasename, @Param("username") String username, @Param("tableName") String tableName);
+
     @Query("SELECT ti.tableName FROM TableInfo ti")
     List<String> findDistinctTableNames();
 
@@ -61,9 +66,6 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :database")
     List<String> findTableInfoAndByUserName(@Param("username") String username, @Param("database") String database);
-
-//    @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
-//    String findDatabaseNamesByUserName(@Param("username") String username, @Param("databaseName") String databaseName);
 
     @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username")
     List<String> findDatabaseNamesByUserName(@Param("username") String username);
