@@ -196,7 +196,7 @@ const QueryTool = ({selectedDbTable}) => {
                 <Grid2 container spacing={2} alignItems="center" direction="row">
                     <Grid2 item>
                         <FormControl variant="outlined">
-                            <InputLabel id="demo-simple-select-label">Select Option</InputLabel>
+                            <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"

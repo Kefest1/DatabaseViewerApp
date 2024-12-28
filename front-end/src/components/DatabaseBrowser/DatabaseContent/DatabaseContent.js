@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './DatabaseContent.css';
 import './BrowseDatabase/QueryTool';
 import QueryTool from "./BrowseDatabase/QueryTool";
 import QueryLoggerComponent from "./BrowseDatabase/QueryLoggerComponent";
 import Statistics from "./DatabaseStatistics/Statistics";
-import {getCookie} from "../../getCookie";
+import { getCookie } from "../../getCookie";
 import WelcomePage from "../../WelcomePages/WelcomePage";
 import AdminPanel from "../admin/AdminPanel";
 import StructureModifier from "./BrowseDatabase/StructureModifier";
@@ -12,11 +13,7 @@ import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
 import BrowseMultipleTables from "./BrowseDatabase/BrowseMultipleTables";
 import ConnectionsCreator from "./BrowseDatabase/ConnectionsCreator";
 
-const Component = ( {name} ) => {
-    return <div style={{ marginLeft: '20px' }}>{name}</div>;
-}
-
-const DatabaseContent = ({selectedTable}) => {
+const DatabaseContent = ({ selectedTable }) => {
     const isAdmin = getCookie("isAdmin");
 
     const [activeButton, setActiveButton] = useState(null);
@@ -41,30 +38,27 @@ const DatabaseContent = ({selectedTable}) => {
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
-                return <WelcomePage/>;
+                return <WelcomePage />;
             case 2:
                 return <QueryTool selectedDbTable={locSelectedTable} />;
             case 3:
                 return <BrowseMultipleTables />;
             case 4:
-                return <Statistics/>;
+                return <Statistics />;
             case 5:
-                if (isAdmin)
-                    return <AdminPanel name={"Admin panel"}/>;
-                else
-                    return <Component name={"TODO"}/>;
+                return isAdmin ? <AdminPanel name={"Admin panel"} /> : <div>TODO</div>;
             case 6:
-                return <QueryLoggerComponent/>;
+                return <QueryLoggerComponent />;
             case 7:
-                return <StructureModifier/>;
+                return <StructureModifier />;
             case 8:
-                return <DatabaseScheme/>;
+                return <DatabaseScheme />;
             case 9:
-                return <ConnectionsCreator/>;
+                return <ConnectionsCreator />;
             default:
                 return null;
         }
-    }
+    };
 
     return (
         <div>
@@ -75,14 +69,12 @@ const DatabaseContent = ({selectedTable}) => {
                         onClick={() => handleButtonClick(1)}
                     >
                         Welcome!
-
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 2 ? 'active' : ''}`}
                         onClick={() => handleButtonClick(2)}
                     >
                         Single table CRUD
-
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 3 ? 'active' : ''}`}
@@ -101,7 +93,6 @@ const DatabaseContent = ({selectedTable}) => {
                         onClick={() => handleButtonClick(5)}
                     >
                         Admin Panel
-
                     </div>
                     <div
                         className={`wcPanelTab ${activeButton === 6 ? 'active' : ''}`}
@@ -127,10 +118,19 @@ const DatabaseContent = ({selectedTable}) => {
                     >
                         Connections Creator
                     </div>
-
                 </div>
             </div>
-            {renderButtonContent()}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeButton}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.4 }}
+                >
+                    {renderButtonContent()}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 };

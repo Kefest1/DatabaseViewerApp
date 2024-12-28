@@ -19,3 +19,23 @@
     bottom: 0;
     border-bottom: 4px solid #2b00fa;
 }
+
+.wcPanelTab {
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    margin: 5px;
+    text-align: center;
+}
+
+.wcPanelTab:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+.wcPanelTab.active {
+    background-color: #007BFF;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
