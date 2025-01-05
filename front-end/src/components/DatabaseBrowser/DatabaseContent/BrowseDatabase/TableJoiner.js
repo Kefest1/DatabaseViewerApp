@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import {
     DataGrid,
-    GridRowEditStopReasons,
     GridToolbar,
     GridToolbarContainer,
     useGridApiRef,
@@ -35,26 +34,6 @@ function prepareColumns(selectedColumns, primaryKey) {
     return columns;
 }
 
-const logUpdatable = async (fieldsToUpdate) => {
-    try {
-        const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(fieldsToUpdate),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
 const fetchJoinInfo = async (databaseName, tableName) => {
     const userName = getCookie("userName");
     const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`)
@@ -63,6 +42,9 @@ const fetchJoinInfo = async (databaseName, tableName) => {
 
 const fetchJoinTable = async (databaseName, tableName) => {
     const userName = getCookie("userName");
+
+    console.log(databaseName);
+    console.log(tableName);
 
     const requestBody = {
         table: tableName
@@ -135,32 +117,52 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         setSelectedJoinTable(e.target.value);
     }
 
-    function performJoin() {
+    async function performJoin() {
         let informationJoin = [];
+        console.log(joinInfo);
+        console.log(selectedJoinTable)
         joinInfo.forEach(info => {
             if (info.oneTableName === selectedJoinTable) {
                 informationJoin = info;
             }
         });
 
-        console.log(informationJoin);
         fetchJoinTable(databaseName, informationJoin.oneTableName)
             .then(async fetchedJoinTable => {
+                console.log(fetchedJoinTable);
                 mergeTwoTables(fetchedJoinTable, (fetchedJoinTable[0].map(column => column.columnName))
                     .filter(item => item !== informationJoin.oneColumnName), informationJoin);
 
                 const res = await fetchJoinInfo(databaseName, informationJoin.oneTableName);
-                console.log(res);
+                console.log(joinAbleTables);
+                if (res.length === 0) {
+                    return;
+                }
+                res.forEach(tableData => {
+                    setJoinAbleTables(prevJoinAbleTables => [
+                        ...prevJoinAbleTables,
+                        tableData.oneTableName
+                    ]);
+                });
 
             })
             .catch(error => {
                 console.error('Error fetching join table:', error);
             });
 
+
+        const response = await fetchJoinInfo(databaseName, selectedJoinTable);
+        console.log(joinInfo);
+        console.log(response);
+        const mergedJoinInfo = joinInfo.concat(response);
+        setJoinInfo(mergedJoinInfo);
     }
 
     function mergeTwoTables(rowsToMerge, columnsToMerge, informationJoin) {
         let finalRows = [];
+
+        console.log(rowsToMerge);
+        console.log(columnsToMerge);
 
         const deepCopyRows = JSON.parse(JSON.stringify(rows));
         deepCopyRows.forEach(row => {
@@ -197,9 +199,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
             if (b.field === "actions") return -1;
             return 0;
         });
-
-        console.log(finalRows);
-        console.log(finalColumns);
 
         setRows(finalRows);
 
@@ -271,32 +270,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     }, []);
 
 
-    const handleRowEditStop = (params, event) => {
-        if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-            event.defaultMuiPrevented = true;
-        }
-    };
-
-    const processRowUpdate = (newRow, originalRow) => {
-        if (newRow.id < 0 || originalRow.id < 0) {
-            setNewRows(prevRows => [...prevRows, newRow]);
-            const updatedRow = {...newRow, isNew: false};
-            setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-
-            return updatedRow;
-        } else {
-            const updatedRow = {...newRow, isNew: false};
-            setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-
-            let request = findDifference(originalRow, updatedRow);
-            request["rowIndex"] = originalRow.id;
-
-            setFieldsToUpdate((prevFields) => [...prevFields, request]);
-
-            return updatedRow;
-        }
-    };
-
     const handleRowModesModelChange = (newRowModesModel) => {
         setRowModesModel(newRowModesModel);
     };
@@ -310,7 +283,7 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         console.log(columns);
     }
 
-    const CustomToolbar = ({setRows, setRowModesModel}) => {
+    const CustomToolbar = () => {
         return (
             <GridToolbarContainer>
                 <GridToolbar/>
@@ -331,8 +304,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                 editMode="row"
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
-                onRowEditStop={handleRowEditStop}
-                processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={processError}
                 slots={{
                     toolbar: CustomToolbar,
@@ -344,24 +315,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         </Box>
     );
 
-
-    function findDifference(obj1, obj2) {
-        let differences = {};
-
-        for (const key in obj1) {
-            if (obj1.hasOwnProperty(key)) {
-                if (obj2.hasOwnProperty(key) && obj1[key] !== obj2[key]) {
-                    differences = {
-                        columnName: key,
-                        newDataValue: obj2[key]
-                    };
-                    break;
-                }
-            }
-        }
-
-        return differences;
-    }
 }
 
 export default TableJoiner;
