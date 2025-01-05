@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getCookie } from "../getCookie";
 import "./Header.css";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 function getUserName() {
     return getCookie("userName");
@@ -30,13 +32,21 @@ function Header() {
             });
     }, [userName]);
 
+
     return (
         <header>
-            <h3 align={"center"}>Available databases for {userName}:</h3>
+            <h6 align={"center"}>Available databases for {userName}:</h6>
             {loading ? (
                 <p align={"center"}>Loading...</p>
             ) : (
-                <h4 align={"center"}>{tablesData}</h4>
+                <Autocomplete
+                    options={tablesData}
+                    renderInput={(params) => <TextField {...params} label="Display Database" variant="outlined" style={{height: '10px', margin: 'auto'}} />}
+                    onChange={(event, newValue) => {
+                        console.log(newValue);
+                    }}
+                    style={{ width: '125px', height: '35px', margin: 'auto' }}
+                />
             )}
         </header>
     );

@@ -92,6 +92,30 @@ async function fetchStructure(databaseName, selectedTable) {
     return await response.json();
 }
 
+async function fetchConnection(databaseName, selectedTableOne, selectedTableMany) {
+    const userName = getCookie("userName");
+    try {
+        console.log(`http://localhost:8080/api/tableconnection/getConnectionDetails/${databaseName}/${selectedTableOne}/${selectedTableMany}/${userName}`);
+        const response = await fetch(
+            `http://localhost:8080/api/tableconnection/getConnectionDetails/${databaseName}/${selectedTableOne}/${selectedTableMany}/${userName}`
+        );
+
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data === null) {
+            throw new Error('The response data is null.');
+        }
+
+        return data;
+    } catch (error) {
+        console.log('Empty message:');
+        return null; // Return null or a default value to handle this case gracefully
+    }
+}
 
 function prepareNodes(tableOne, tableMany, tableNameOne, tableNameMany) {
     const nodes = [];
@@ -144,6 +168,11 @@ function ConnectionsCreator() {
     const [tableOneContent, setTableOneContent] = useState([]);
     const [tableManyContent, setTableManyContent] = useState([]);
 
+    const [initialConnection, setInitialConnection] = useState([]);
+    const [isEdgesSet, setIsEdgesSet] = useState(false);
+
+    const [connectionID, setConnectionID] = useState(-1);
+
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
 
@@ -195,7 +224,6 @@ function ConnectionsCreator() {
             fetchStructure(selectedDatabase, selectedTableMany)
                 .then(data => {
                     console.log(data);
-
                     setTableManyContent(data);
                 });
         }
@@ -214,6 +242,40 @@ function ConnectionsCreator() {
 
     }, [selectedDatabase]);
 
+    useEffect(() => {
+        if (selectedDatabase !== "" && selectedTableOne !== "" && selectedTableMany !== "") {
+            fetchConnection(selectedDatabase, selectedTableOne, selectedTableMany)
+                .then(data => {
+                    if (data === null) {
+                        setConnectionID(-1);
+                        setIsEdgesSet(true);
+                    }
+                    else {
+                        setInitialConnection(data);
+                        console.log(data);
+                        setConnectionID(data.id);
+                        const edge = [
+                            {
+                                id: "e1-2",
+                                source: "1",
+                                target: "2",
+                                sourceHandle: data.manyColumnName,
+                                targetHandle: data.oneColumnName,
+                            }
+                        ];
+                        setEdges(edge);
+                    }
+                });
+        }
+    }, [selectedDatabase, selectedTableOne, selectedTableMany]);
+
+
+    useEffect(() => {
+        if (edges.length > 0) {
+            setIsEdgesSet(true);
+            console.log("Edges have been updated:", edges);
+        }
+    }, [edges]);
 
     return (
         <div className="h-full w-full" style={{ width: '1000px', height: '600px' }}>
@@ -267,9 +329,9 @@ function ConnectionsCreator() {
             )}
 
             {
-                selectedDatabase !== "" && selectedTableOne !== "" && setSelectedTableMany !== "" && nodes.length > 0 && (
+                selectedDatabase !== "" && selectedTableOne !== "" && setSelectedTableMany !== "" && isEdgesSet === true && (
                     <ReactFlowProvider>
-                        <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges}/>
+                        <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} selectedTableOne={selectedTableOne} selectedTableMany={selectedTableMany} id={connectionID}/>
                     </ReactFlowProvider>
                 )
             }
@@ -278,13 +340,12 @@ function ConnectionsCreator() {
 
 }
 
-function saveConnection(selectedDatabase, selectedTableOne, selectedTableMany, selectedColumnOne, selectedColumnMany) {
-    console.log("Save connection");
-}
-
-const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
+const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTableOne, selectedTableMany, id }) => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    console.log(id);
+    console.log(selectedTableMany);
+    console.log(selectedTableOne);
 
     const onConnect = (params) => {
         const sourceNode = nodes.find(node => node.id === params.source);
@@ -309,9 +370,93 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
 
     };
     const handleEdgesChange = (changes) => {
-        console.log(changes);
         setEdges([]);
     };
+
+    async function addEdges() {
+        console.log(edges);
+        console.log(nodes);
+        console.log(id);
+        if (id < 0) {
+            const payload = {
+                oneTableName: selectedTableOne,
+                manyTableName: selectedTableMany,
+                oneColumnName: edges[0].sourceHandle,
+                manyColumnName: edges[0].targetHandle,
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/tableconnection/addconnection`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const message = await response.text();
+                    console.log("Success:", message);
+                } else {
+                    const errorMessage = await response.text();
+                    console.error("Error:", errorMessage);
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+            }
+        }
+        else {
+            if (edges.length === 0) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/tableconnection/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (response.ok) {
+                        const message = await response.text();
+                        console.log("Success:", message);
+                    } else {
+                        const errorMessage = await response.text();
+                        console.error("Error:", errorMessage);
+                    }
+                } catch (error) {
+                    console.error("Network error:", error);
+                }
+            }
+            else {
+                const userName = getCookie("userName");
+                const updatedTableConnection = {
+                    oneTableName: selectedTableOne,
+                    manyTableName: selectedTableMany,
+                    oneColumnName: edges[0].sourceHandle,
+                    manyColumnName: edges[0].targetHandle,
+                };
+
+                try {
+                    const response = await fetch(`http://localhost:8080/api/tableconnection/update/${id}/${userName}/${selectedDatabase}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(updatedTableConnection),
+                    });
+
+                    if (response.ok) {
+                        const message = await response.text();
+                        console.log("Success:", message);
+                    } else {
+                        const errorMessage = await response.text();
+                        console.error("Error:", errorMessage);
+                    }
+                } catch (error) {
+                    console.error("Network error:", error);
+                }
+            }
+        }
+    }
 
     return (
         <ReactFlow
@@ -325,7 +470,7 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
         >
             <Panel position="top-left">
                 <h4 style={{ marginBottom: '10px' }}>Selected database: {selectedDatabase}</h4>
-                <Button onClick={() => console.log(nodes)}>
+                <Button onClick={addEdges}>
                     Log nodes
                 </Button>
             </Panel>

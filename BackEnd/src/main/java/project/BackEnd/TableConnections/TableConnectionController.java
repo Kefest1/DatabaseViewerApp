@@ -1,12 +1,11 @@
 package project.BackEnd.TableConnections;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
 import project.BackEnd.Table.TableInfo;
-import project.BackEnd.User.UserInfoRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,10 +50,19 @@ public class TableConnectionController {
         }
         TableConnection tableConnectionOne = tableConnectionRepository.getTableConnectionByParams(databaseName, username, oneID.get(), manyID.get());
 
+        System.out.println("tableConnectionOne");
+        System.out.println(tableConnectionOne);
         if (tableConnectionOne != null)
             return tableConnectionOne;
 
-        return tableConnectionRepository.getTableConnectionByParams(databaseName, username, oneID.get(), manyID.get());
+
+        TableConnection tableConnectionMany = tableConnectionRepository.getTableConnectionByParams(databaseName, username, manyID.get(), oneID.get());
+        System.out.println("tableConnectionMany");
+        System.out.println(tableConnectionMany);
+        System.out.println("");
+        System.out.println("");
+
+        return tableConnectionMany;
     }
 
     @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")
@@ -141,6 +149,39 @@ public class TableConnectionController {
         }
 
         return retlist.isEmpty();
+    }
+
+    @PutMapping("/update/{id}/{username}/{databaseName}")
+    public ResponseEntity<String> updateTableConnection(
+            @PathVariable("id") Long id,
+            @PathVariable("username") String userName,
+            @PathVariable("databaseName") String databaseName,
+            @RequestBody TableInfoPayload updatedTableConnection) {
+
+        TableInfo tableInfoOne =  tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(updatedTableConnection.getOneTableName(),  databaseName);
+        TableInfo tableInfoMany = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(updatedTableConnection.getManyTableName(), databaseName);
+        TableConnection tableConnection = new TableConnection(
+                tableInfoOne,
+                tableInfoMany,
+                updatedTableConnection.getOneColumnName(),
+                updatedTableConnection.getManyColumnName()
+        );
+        System.out.println(tableConnection);
+
+        int rowsAffected = tableConnectionRepository.updateTableConnection(id, tableConnection);
+
+        if (rowsAffected == 0) {
+            return ResponseEntity.status(404)
+                    .body("TableConnection with ID " + id + " not found.");
+        }
+
+        return ResponseEntity.ok("TableConnection with ID " + id + " updated successfully.");
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteTableConnection(@PathVariable("id") Long id) {
+        tableConnectionRepository.deleteTableConnectionById(id);
+        return ResponseEntity.ok("TableConnection with ID " + id + " deleted successfully.");
     }
 
     @ToString

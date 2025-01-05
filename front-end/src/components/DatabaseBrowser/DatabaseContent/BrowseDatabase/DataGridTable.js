@@ -36,6 +36,13 @@ async function fetchStructure(databaseName, selectedTable) {
     return await response.json();
 }
 
+async function checkIfTableIsEmpty(selectedTable, selectedDatabase) {
+    const userName = getCookie("userName");
+    const url = "http://localhost:8080/api/tableinfo/checkIfTableEmpty/" + selectedDatabase + "/" + selectedTable;
+    const tables = await fetch(url);
+    return await tables.json();
+}
+
 let idBuf = -1;
 
 function DataGridTable({ databaseName, selectedTable }) {
@@ -43,6 +50,7 @@ function DataGridTable({ databaseName, selectedTable }) {
     const [rows, setRows] = useState([])
     const [rowModesModel, setRowModesModel] = useState({});
     const [tablesToDelete, setTablesToDelete] = useState([]);
+    const [isEmpty, setIsEmpty] = useState(false);
 
     function EditToolbar(props) {
         const { setRows, setRowModesModel } = props;
@@ -74,10 +82,15 @@ function DataGridTable({ databaseName, selectedTable }) {
         );
     }
 
-
     useEffect(() => {
         const loadTableStructure = async () => {
             try {
+                const ret = await checkIfTableIsEmpty(selectedTable, databaseName);
+                if (ret === false) {
+                    setIsEmpty(false);
+                    return;
+                }
+
                 const structure = await fetchStructure(databaseName, selectedTable);
                 console.log(structure);
                 const rowsWithUniqueIds = structure.map(item => ({
@@ -86,6 +99,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                 }));
                 idBuf--;
                 setRows(rowsWithUniqueIds);
+                setIsEmpty(true);
             } catch (error) {
                 console.error("Error loading table structure:", error);
             }
@@ -95,6 +109,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             loadTableStructure();
         }
     }, [databaseName, selectedTable]);
+
 
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -187,6 +202,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             setRows(rows.filter((row) => row.id !== id));
         }
     };
+
     const handleTypeChange = (id, newType) => {
         const updatedRows = rows.map((row) => {
             if (row.id === id) {
@@ -209,10 +225,16 @@ function DataGridTable({ databaseName, selectedTable }) {
             // editable: true,
             renderCell: (params) => (
                 <FormControl fullWidth>
-                    <InputLabel id={`select-label-${params.id}`}>Type</InputLabel>
+                    <InputLabel
+                        id={`select-label-${params.id}`}
+                        style={{ marginTop: '10px' }}
+                    >
+                        Type
+                    </InputLabel>
                     <Select
                         labelId={`select-label-${params.id}`}
                         value={params.value}
+                        style={{ height: '30px', marginTop: '15px' }}
                         onChange={(event) => handleTypeChange(params.id, event.target.value)}
                         variant={"outlined"}
                     >
@@ -291,32 +313,43 @@ function DataGridTable({ databaseName, selectedTable }) {
 
     return (
         <div>
-            <Box
-                sx={{
-                    height: 500,
-                    width: '100%',
-                    '& .actions': {
-                        color: 'text.secondary',
-                    },
-                    '& .textPrimary': {
-                        color: 'text.primary',
-                    },
-                }}
-            >
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    editMode="row"
-                    rowModesModel={rowModesModel}
-                    onRowModesModelChange={handleRowModesModelChange}
-                    onRowEditStop={handleRowEditStop}
-                    processRowUpdate={processRowUpdate}
-                    slots={{ toolbar: EditToolbar }}
-                    slotProps={{
-                        toolbar: { setRows, setRowModesModel },
+            {
+                isEmpty === true && (
+                    <Box
+                    sx={{
+                        height: 500,
+                        width: '100%',
+                        '& .actions': {
+                            color: 'text.secondary',
+                        },
+                        '& .textPrimary': {
+                            color: 'text.primary',
+                        },
                     }}
-                />
-            </Box>
+                >
+                    <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        editMode="row"
+                        rowModesModel={rowModesModel}
+                        onRowModesModelChange={handleRowModesModelChange}
+                        onRowEditStop={handleRowEditStop}
+                        processRowUpdate={processRowUpdate}
+                        slots={{ toolbar: EditToolbar }}
+                        slotProps={{
+                            toolbar: { setRows, setRowModesModel },
+                        }}
+                    />
+                </Box>
+                )
+            }
+
+            {
+                isEmpty === false && (
+                    <h1>Table has to be empty to modify its structure</h1>
+                )
+            }
+
         </div>
     );
 }

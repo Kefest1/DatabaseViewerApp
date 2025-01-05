@@ -66,6 +66,13 @@ async function fetchPrimaryKeyName(database, table) {
     return await response.text();
 }
 
+async function fetchTableStructure(database, table) {
+    const userName = getCookie("userName");
+    const url = `http://localhost:8080/api/tableinfo/getColumnsWithTypes/${userName}/${database}/${table}`
+    const response = await fetch(url);
+    return await response.json();
+}
+
 async function runQuery(database, table, columns) {
     try {
         const requestBody = { database, table, columns: [...columns] };
@@ -110,6 +117,7 @@ const QueryTool = ({selectedDbTable}) => {
     const [queryResult, setQueryResult] = useState([]);
 
     const [primaryKeyName, setPrimaryKeyName] = useState("");
+    const [tableStructure, setTableStructure] = useState([]);
 
     const [tableBrowserKey, setTableBrowserKey] = useState(0);
 
@@ -126,7 +134,6 @@ const QueryTool = ({selectedDbTable}) => {
     }
 
     function handleSelectThree(event) {
-        // logger.addLog(`Selected from ${selectedDatabase} database and ${selectedDbTable} fields ${selectedColumns}`);
         setSelectedColumns(event.target.value);
     }
 
@@ -168,6 +175,18 @@ const QueryTool = ({selectedDbTable}) => {
             fetchPrimaryKeyName(selectedDatabase, selectedTable)
                 .then((response) => {
                     setPrimaryKeyName(response);
+                })
+                .catch((error) =>
+                    console.error("Error fetching columns for the selected table:", error)
+                );
+        }
+    }, [selectedDatabase, selectedTable]);
+
+    useEffect(() => {
+        if (selectedDatabase && selectedTable) {
+            fetchTableStructure(selectedDatabase, selectedTable)
+                .then((response) => {
+                    setTableStructure(response);
                 })
                 .catch((error) =>
                     console.error("Error fetching columns for the selected table:", error)
@@ -271,7 +290,7 @@ const QueryTool = ({selectedDbTable}) => {
                         </Grid2>
                     )}
 
-                    {selectedTable && (
+                    {selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && (
                         <Grid2 item>
                             <Button
                                 size={"large"}
@@ -306,6 +325,7 @@ const QueryTool = ({selectedDbTable}) => {
                         databaseName={selectedDatabase}
                         selectedColumns={selectedColumns}
                         primaryKey={primaryKeyName}
+                        tableStructure={tableStructure}
                     />
                 </Grid2>
             )}

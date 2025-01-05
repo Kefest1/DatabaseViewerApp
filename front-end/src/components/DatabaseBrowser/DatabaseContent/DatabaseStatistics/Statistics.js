@@ -1,6 +1,17 @@
 import { getCookie } from "../../../getCookie";
 import React, { useEffect, useState } from "react";
 import "./Statictics.css";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {Container, ListItemButton, Typography} from '@mui/material';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import { FixedSizeList } from 'react-window';
+
+
 
 const Statistics = () => {
     const [databases, setDatabases] = useState([]);
@@ -81,7 +92,7 @@ const Statistics = () => {
     async function getDatabaseStatistics(databaseName) {
         const userName = getCookie("userName");
         const response = await fetch(
-            `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}`
+            `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`
         );
         const data = await response.json();
         console.log(data);
@@ -91,7 +102,6 @@ const Statistics = () => {
     const handleTableChange = (event) => {
         setSelectedTable(event.target.value);
     };
-
 
     const handleColumn1Change = (event) => {
         setSelectedColumn1(event.target.value);
@@ -104,28 +114,44 @@ const Statistics = () => {
     return (
         <div>
             <h2>Available Databases:</h2>
-            <select value={selectedDatabase} onChange={handleDatabaseChange} className="database-select">
-                <option value="">Select a database</option>
+            <Select
+                labelId="demo-simple-select-database"
+                id="demo-simple-database"
+                value={selectedDatabase}
+                onChange={handleDatabaseChange}
+                className="database-select"
+                style={{width: '200px'}}
+                variant={"outlined"}
+            >
+                <MenuItem value="">Select a database</MenuItem >
                 {databases.map((database, index) => (
-                    <option key={index} value={database}>{database}</option>
+                    <MenuItem key={index} value={database}>{database}</MenuItem >
                 ))}
-            </select>
-            <p>Selected Database: {selectedDatabase}</p>
-            {databaseStatistics && (
+            </Select>
+            {selectedDatabase && (
                 <div>
-                    <h2>
-                        Select from {databaseStatistics.tableCount} tables:
-                    </h2>
+                    <div>
+                        <h2>
+                            Select from {databaseStatistics.tableCount} tables:
+                        </h2>
+                    </div>
+                    <p>Available Tables:</p>
+                    <Select
+                        labelId="demo-simple-select-database"
+                        id="demo-simple-database"
+                        value={selectedTable}
+                        onChange={handleTableChange}
+                        className="database-select"
+                        style={{width: '200px'}}
+                        variant={"outlined"}
+                    >
+                        <MenuItem value="">Select a table</MenuItem>
+                        {tables.map((table, index) => (
+                            <MenuItem key={index} value={table}>{table}</MenuItem>
+                        ))}
+                    </Select>
                 </div>
             )}
-            <p>Available Tables:</p>
-            <select value={selectedTable} onChange={handleTableChange} className="table-select">
-                <option value="">Select a table</option>
-                {tables.map((table, index) => (
-                    <option key={index} value={table}>{table}</option>
-                ))}
-            </select>
-            <p>Selected Table: {selectedTable}</p>
             {selectedTable && (
                 <div>
                     {databaseStatistics.tableStatistics
@@ -133,33 +159,65 @@ const Statistics = () => {
                         .map((stats) => (
                             <div key={stats.tableName}>
                                 <h2>Statistics for {stats.tableName}:</h2>
-                                <h2>Row Count: {stats.rowCount}</h2>
-                                <h2>Column Count: {stats.columnCounts}</h2>
+                                <h2>Row Count: {stats.columnCounts}</h2>
+                                <h2>Column Count: {stats.rowCount}</h2>
 
-                                <ul>
-                                    {stats.rowNames.map((rowName, index) => (
-                                        <li key={index}>{rowName}</li>
-                                    ))}
-                                </ul>
+                                <FixedSizeList
+                                    height={125}
+                                    width={360}
+                                    itemSize={30}
+                                    itemCount={stats.rowNames.length}
+                                    overscanCount={5}
+                                >
+                                    {({ index, style }) => {
+                                        const rowName = stats.rowNames[index];
+                                        return (
+                                            <ListItem key={index} style={style} component="div" disablePadding>
+                                                <ListItemText primary={rowName.columnName} />
+                                            </ListItem>
+                                        );
+                                    }}
+                                </FixedSizeList>
 
-                                <h3>Select columns to plot:</h3>
-                                <select value={selectedColumn1} onChange={handleColumn1Change} className="column-select">
-                                    <option value="">Select column 1</option>
+                                <Select
+                                    value={selectedColumn1}
+                                    onChange={handleColumn1Change}
+                                    className="column-select"
+                                    variant="outlined"
+                                    style={{ height: '40px' }}
+                                >
+                                    <MenuItem value="">
+                                        <em>Select column 1</em>
+                                    </MenuItem>
                                     {stats.rowNames.map((rowName, index) => (
-                                        <option key={index} value={rowName}>{rowName}</option>
+                                        <MenuItem key={index} value={rowName.columnName}>
+                                            {rowName.columnName}
+                                        </MenuItem>
                                     ))}
-                                </select>
+                                </Select>
 
-                                <select value={selectedColumn2} onChange={handleColumn2Change} className="column-select">
-                                    <option value="">Select column 2</option>
-                                    {stats.rowNames.map((rowName, index) => (
-                                        <option key={index} value={rowName}>{rowName}</option>
-                                    ))}
-                                </select>
+                                <Select
+                                    value={selectedColumn2}
+                                    onChange={handleColumn2Change}
+                                    className="column-select"
+                                    style={{ height: '40px' }}
+                                    variant="outlined"
+                                >
+                                    <MenuItem value="">
+                                        <em>Select column 2</em>
+                                    </MenuItem>
+                                    {stats.rowNames
+                                        .filter(rowName => rowName.columnType === "Long" || rowName.columnType === "Numeric" || rowName.columnType === "Integer")
+                                        .map((rowName, index) => (
+                                            <MenuItem key={index} value={rowName.columnName}>
+                                                {rowName.columnName}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
 
                                 {selectedColumn1 && selectedColumn2 && (
                                     <div>
-                                        {MyPlot(xPlot, yPlot, selectedColumn1, selectedColumn2, selectedTable, selectedDatabase) }
+                                        {MyPlot(xPlot, yPlot, selectedColumn1, selectedColumn2, selectedTable, selectedDatabase)}
                                     </div>
                                 )}
 
@@ -167,7 +225,6 @@ const Statistics = () => {
                         ))}
                 </div>
             )}
-
         </div>
     );
 };
@@ -180,10 +237,32 @@ const MyPlot = (xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatab
         console.log(yPlot);
     }
 
+    let finalData = [];
+    if (xPlot.length > 0 && yPlot.length > 0) {
+        for (let i = 0; i < xPlot.length; i++) {
+            finalData.push({name: xPlot[i], value1: yPlot[i]});
+        }
+    }
+    const text = `Plotting ${xPlotName} with ${yPlotName} for ${selectedTable} in ${selectedDatabase}`;
+
     return (
         <div>
-            <h2>{selectedDatabase}</h2>
-            <h2>{selectedTable}</h2>
+            <Container>
+                <Typography variant="h4" gutterBottom>
+                    Plotting {xPlotName} with {yPlotName} for {selectedTable} in {selectedDatabase}
+                </Typography>
+                <LineChart width={1100} height={300} data={finalData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey={text} stroke="#8884d8" />
+                </LineChart>
+                <Typography variant="h4" gutterBottom>
+                    
+                </Typography>
+            </Container>
         </div>
     )
 };

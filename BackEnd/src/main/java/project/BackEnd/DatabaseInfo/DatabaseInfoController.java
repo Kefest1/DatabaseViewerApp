@@ -19,6 +19,7 @@ import project.BackEnd.User.UserInfoRepository;
 
 import javax.xml.crypto.Data;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/databaseinfo")
@@ -79,10 +80,9 @@ public class DatabaseInfoController {
         return modifiedDatabaseStructure;
     }
 
-    @GetMapping("/getStatistics/{database}")  // TODO check database's name
-    public DatabaseStatistics getDatabaseStatistics(@PathVariable String database) {
-//        return new DatabaseStatistics();
-        return getStats();
+    @GetMapping("/getStatistics/{databaseName}/{userName}")
+    public DatabaseStatistics getDatabaseStatistics(@PathVariable String databaseName, @PathVariable String userName) {
+        return getStats(userName, databaseName);
     }
 
     @PostMapping("/add/{databaseName}/{tableName}/{columnName}/{databaseDescription}/{userName}")
@@ -115,27 +115,32 @@ public class DatabaseInfoController {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    private DatabaseStatistics getStats() {
+    private DatabaseStatistics getStats(String userName, String databaseName) {
         DatabaseStatistics databaseStatistics = new DatabaseStatistics();
-        databaseStatistics.tableCount = (int)tableInfoRepository.count();
+        databaseStatistics.tableCount = tableInfoRepository.findCountWithUsersAndTables(userName, databaseName);
         databaseStatistics.tableStatistics = new LinkedList<>();
 
-        var tableNames = tableInfoRepository.findDistinctTableNames();
+        var tableNames = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
         for (String tableName : tableNames) {
-            databaseStatistics.tableStatistics.add(getTableStatistic(tableName));
+            databaseStatistics.tableStatistics.add(getTableStatistic(tableName, databaseName));
         }
 
         return databaseStatistics;
     }
 
-    private TableStatistics getTableStatistic(String tableName) {
+    private TableStatistics getTableStatistic(String tableName, String databaseName) {
         TableStatistics tableStatistics = new TableStatistics();
 
         tableStatistics.tableName = tableName;
         tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnNamesByTableName(tableName);
         tableStatistics.columnCounts = fieldInfoRepository.countDistinctColumnIDByColumnId(tableName);
-        tableStatistics.rowNames = fieldInfoRepository.findDistinctColumnNamesByTableName(tableName);
-
+        List<TableStructure> tableStructures = tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, "user1", tableName);
+        System.out.println(tableStructures);
+        System.out.println(databaseName);
+        System.out.println(tableName);
+        tableStatistics.rowNames = tableStructures.stream()
+                .map(ts -> new Columns(ts.getColumnName(), ts.getColumnType()))
+                .toList();
         return tableStatistics;
     }
 
@@ -146,7 +151,7 @@ public class DatabaseInfoController {
 @Setter
 @NoArgsConstructor
 class DatabaseStatistics {
-    Integer tableCount;
+    Long tableCount;
     List<TableStatistics> tableStatistics;
 }
 
@@ -156,7 +161,17 @@ class DatabaseStatistics {
 @NoArgsConstructor
 class TableStatistics {
     String tableName;
-    List<String> rowNames;
+    List<Columns> rowNames;
     Long rowCount;
     Long columnCounts;
+}
+
+@ToString
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+class Columns {
+    String columnName;
+    String columnType;
 }

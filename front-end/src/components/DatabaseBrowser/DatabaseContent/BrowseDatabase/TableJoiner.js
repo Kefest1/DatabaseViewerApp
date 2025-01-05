@@ -2,18 +2,9 @@ import * as React from 'react';
 import {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
-import UploadFile from '@mui/icons-material/UploadFile';
-
 import {
     DataGrid,
-    GridActionsCellItem,
     GridRowEditStopReasons,
-    GridRowModes,
     GridToolbar,
     GridToolbarContainer,
     useGridApiRef,
@@ -99,14 +90,11 @@ const fetchJoinTable = async (databaseName, tableName) => {
     }
 }
 
-let newId = -1;
-
 function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
     const apiRef = useGridApiRef();
 
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
-    const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
 
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
@@ -153,12 +141,17 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
             if (info.oneTableName === selectedJoinTable) {
                 informationJoin = info;
             }
-        })
+        });
+
         console.log(informationJoin);
         fetchJoinTable(databaseName, informationJoin.oneTableName)
-            .then(fetchedJoinTable => {
+            .then(async fetchedJoinTable => {
                 mergeTwoTables(fetchedJoinTable, (fetchedJoinTable[0].map(column => column.columnName))
                     .filter(item => item !== informationJoin.oneColumnName), informationJoin);
+
+                const res = await fetchJoinInfo(databaseName, informationJoin.oneTableName);
+                console.log(res);
+
             })
             .catch(error => {
                 console.error('Error fetching join table:', error);
@@ -173,9 +166,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         deepCopyRows.forEach(row => {
             const joinId = row[informationJoin.manyColumnName];
             const nodes = findRowToJoin(rowsToMerge, informationJoin.oneColumnName, joinId);
-            console.log(rowsToMerge);
-            console.log(informationJoin.oneColumnName);
-            console.log(joinId);
             nodes.forEach(item => {
                 const key = Object.keys(item)[0];
                 row[key] = item[key];
@@ -311,65 +301,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         setRowModesModel(newRowModesModel);
     };
 
-    const commitDeleteSingleRow = (params) => {
-        console.log(params);
-        if (params < 0) {
-            return;
-        }
-        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify([params])
-        })
-            .then(response => response.json())
-            .catch(error => console.error('Error:', error));
-    };
-
-    const commitDeleteManyRows = () => {
-        console.log(selectedRowsIndex);
-
-        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(selectedRowsIndex)
-        })
-            .then(response => response.json())
-            .catch(error => console.error('Error:', error));
-    };
-
-    const commitInsertNewRows = () => {
-        console.log(newRows);
-        let dtoArray = [];
-        newRows.forEach(item => {
-            for (const key in item) {
-                if (key !== 'id' && key !== 'isNew') {
-                    dtoArray.push(
-                        {
-                            tableName: tableName,
-                            dataValue: item[key],
-                            columnName: key,
-                        }
-                    );
-                }
-            }
-        });
-
-        console.log(dtoArray);
-        // fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(dtoArray)
-        // })
-        //     .then(response => response.json())
-        //     .catch(error => console.error('Error:', error));
-    }
-
     function processError(params) {
         console.log(params);
     }
@@ -390,9 +321,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     return (
         <Box sx={{height: 600, width: 1200}}>
             <Box sx={{display: 'flex', gap: 1, mb: 2}}>
-                <Button onClick={() => logUpdatable(fieldsToUpdate)}>Update altered fields</Button>
-                <Button onClick={commitDeleteManyRows}>Delete selected rows</Button>
-                <Button onClick={commitInsertNewRows}>Commit Insertion</Button>
                 <Button onClick={Debug}>Debug</Button>
             </Box>
             <JoinPanel/>
@@ -401,11 +329,9 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                 columns={columns}
                 apiRef={apiRef}
                 editMode="row"
-                checkboxSelection
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
-                // onRowSelectionModelChange={handleRowSelectionChange}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={processError}
                 slots={{

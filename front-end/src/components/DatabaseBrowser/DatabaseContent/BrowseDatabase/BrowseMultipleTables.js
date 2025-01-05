@@ -115,7 +115,6 @@ const QueryTool = ({selectedDbTable}) => {
     }
 
     function handleSelectThree(event) {
-        // logger.addLog(`Selected from ${selectedDatabase} database and ${selectedDbTable} fields ${selectedColumns}`);
         setSelectedColumns(event.target.value);
     }
 
@@ -256,7 +255,7 @@ const QueryTool = ({selectedDbTable}) => {
                         </Grid2>
                     )}
 
-                    {selectedTable && (
+                    {selectedTable && selectedColumns.length > 0 && (
                         <Grid2 item>
                             <Button
                                 size={"large"}

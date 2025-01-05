@@ -351,6 +351,11 @@ public class TableInfoController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/getColumnsWithTypes/{user}/{databaseName}/{tableName}")
+    public List<TableStructure> getColumnsWithTypes(@PathVariable("user") String userName, @PathVariable("databaseName") String databaseName, @PathVariable("tableName") String tableName) {
+        return tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, userName, tableName);
+    }
+
     @GetMapping("/getFields/{user}/{databasename}/{tableName}")
     public List<FieldInfo> getFields(@PathVariable("user") String userName, @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
         return tableInfoRepository.getFields(databaseName, userName, tableName);
@@ -375,6 +380,14 @@ public class TableInfoController {
     @GetMapping("/getFields/{databasename}/{tableName}")
     public List<String> getTableInfo( @PathVariable("databasename") String databaseName, @PathVariable("tableName") String tableName) {
         return tableInfoRepository.getTableInformation(databaseName, tableName);
+    }
+
+    @GetMapping("/checkIfTableEmpty/{databaseName}/{tableName}")
+    public ResponseEntity<Boolean> checkIfTableEmpty(@PathVariable("databaseName") String databaseName, @PathVariable("tableName") String tableName) {
+        Long fieldCount = tableInfoRepository.getFieldCount(databaseName, tableName);
+        System.out.println(fieldCount);
+        boolean isEmpty = (fieldCount == null || fieldCount == 0);
+        return ResponseEntity.ok(isEmpty);
     }
 
     @GetMapping("/getDatabaseStructure/{databaseName}")

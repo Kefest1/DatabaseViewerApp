@@ -1,13 +1,13 @@
 package project.BackEnd.TableConnections;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import project.BackEnd.Table.TableInfo;
 
 import java.util.List;
-import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface TableConnectionRepository extends JpaRepository<TableConnection, Long> {
@@ -30,4 +30,18 @@ public interface TableConnectionRepository extends JpaRepository<TableConnection
             @Param("tableInfoOne") Long tableInfoOne,
             @Param("tableInfoMany") Long tableInfoMany
     );
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE TableConnection tc SET " +
+            "tc.oneColumnName = :#{#tableConnection.oneColumnName}, " +
+            "tc.manyColumnName = :#{#tableConnection.manyColumnName}, " +
+            "tc.one = :#{#tableConnection.one}, " +
+            "tc.many = :#{#tableConnection.many} " +
+            "WHERE tc.id = :id")
+    int updateTableConnection(@Param("id") Long id, @Param("tableConnection") TableConnection tableConnection);
+
+    @Transactional
+    @Modifying
+    void deleteTableConnectionById(Long id);
 }

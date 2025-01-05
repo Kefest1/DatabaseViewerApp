@@ -19,9 +19,25 @@ import {
 } from '@mui/x-data-grid';
 import {getCookie} from "../../../getCookie";
 
+function getColumnTypeByName(cols, columnName) {
+    console.log(cols);
+    console.log(cols[0]);
+    let type = null;
+    cols.forEach(
+        column => {
+            console.log(column.columnName);
+            if (column.columnName === columnName) {
+                type = column.columnType;
+            }
+        }
+    )
 
-function prepareColumns(selectedColumns, primaryKey) {
+    return type;
+}
+
+function prepareColumns(selectedColumns, primaryKey, tableStructure) {
     let columns = []
+    getColumnTypeByName(tableStructure, "unit");
 
     selectedColumns.forEach(
         columnName => {
@@ -33,6 +49,8 @@ function prepareColumns(selectedColumns, primaryKey) {
                 align: 'left',
                 headerAlign: 'left'
             }
+            getColumnTypeByName(tableStructure, columnName
+            ) === 'Number' && 'Long' && 'Integer' ? col.type = 'number' : col.type = 'string';
 
             columns.push(col);
         }
@@ -42,7 +60,6 @@ function prepareColumns(selectedColumns, primaryKey) {
 }
 
 const logUpdatable = async (fieldsToUpdate) => {
-    console.log(fieldsToUpdate);
     try {
         const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
             method: 'PUT',
@@ -64,8 +81,7 @@ const logUpdatable = async (fieldsToUpdate) => {
 
 let newId = -1;
 
-function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey }) {
-
+function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure }) {
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
@@ -73,7 +89,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
 
-    let columns = prepareColumns(selectedColumns, primaryKey);
+    let columns = prepareColumns(selectedColumns, primaryKey, tableStructure);
     columns.push(
         {
             field: 'actions',
