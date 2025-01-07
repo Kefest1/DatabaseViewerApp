@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 import "./Statictics.css";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import {Container} from '@mui/material';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
-import { Typography, Box } from '@mui/material';
-
+import { Typography, Box, Grid2} from '@mui/material';
+import Button from "@mui/material/Button";
+import { BarChart } from '@mui/x-charts/BarChart';
+import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import {motion} from "framer-motion";
 
 const Statistics = () => {
     const [databases, setDatabases] = useState([]);
@@ -23,6 +26,9 @@ const Statistics = () => {
 
     const [selectedColumn1, setSelectedColumn1] = useState('');
     const [selectedColumn2, setSelectedColumn2] = useState('');
+
+    const [generateGraphClicked, setGenerateGraphClicked] = useState(false);
+    const [generateHistogramClicked, setGenerateHistogramClicked] = useState(false);
 
     async function GetDatabases() {
         const userName = getCookie("userName");
@@ -109,85 +115,134 @@ const Statistics = () => {
         setSelectedColumn2(event.target.value);
     };
 
+    function flipGraph() {
+        setGenerateGraphClicked(true);
+        setGenerateHistogramClicked(false);
+    }
+
+    function flipHistogram() {
+        setGenerateHistogramClicked(true);
+        setGenerateGraphClicked(false);
+    }
 
     return (
         <Box sx={{ padding: 2 }}>
-            <Typography variant="h4" gutterBottom>
-                Available Databases:
-            </Typography>
-            <Select
-                labelId="database-select-label"
-                id="database-select"
-                value={selectedDatabase}
-                onChange={handleDatabaseChange}
-                className="database-select"
-                sx={{ width: '200px', marginBottom: 1 }}
-                variant="outlined"
-            >
-                <MenuItem value="">
-                    <em>Select a database</em>
-                </MenuItem>
-                {databases.map((database, index) => (
-                    <MenuItem key={index} value={database}>
-                        {database}
-                    </MenuItem>
-                ))}
-            </Select>
-
-            {selectedDatabase && (
-                <Box sx={{ marginBottom: 1 }}>
-                    <Typography variant="h5">
-                        Select from {databaseStatistics.tableCount} tables:
-                    </Typography>
-                    <Typography variant="body1">Available Tables:</Typography>
-                    <Select
-                        labelId="table-select-label"
-                        id="table-select"
-                        value={selectedTable}
-                        onChange={handleTableChange}
-                        className="database-select"
-                        sx={{ width: '200px', marginBottom: 1 }}
-                        variant="outlined"
-                    >
-                        <MenuItem value="">
-                            <em>Select a table</em>
-                        </MenuItem>
-                        {tables.map((table, index) => (
-                            <MenuItem key={index} value={table}>
-                                {table}
+            <Box sx={{ padding: 2 }}>
+                <Grid2 container spacing={2} alignItems="center">
+                    <Grid2 item>
+                        <Typography variant="h4" gutterBottom>
+                            Available Databases:
+                        </Typography>
+                    </Grid2>
+                    <Grid2 item>
+                        <Select
+                            labelId="database-select-label"
+                            id="database-select"
+                            value={selectedDatabase}
+                            onChange={handleDatabaseChange}
+                            className="database-select"
+                            sx={{ width: '200px' }}
+                            variant="outlined"
+                        >
+                            <MenuItem value="">
+                                <em>Select a database</em>
                             </MenuItem>
-                        ))}
-                    </Select>
-                </Box>
+                            {databases.map((database, index) => (
+                                <MenuItem key={index} value={database}>
+                                    {database}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </Grid2>
+                </Grid2>
+
+                {selectedDatabase && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                    <Grid2 container spacing={2} alignItems="center" sx={{ marginTop: 1 }}>
+                        <Grid2 item>
+                            <Typography variant="h5">
+                                Select from {databaseStatistics.tableCount} tables:
+                            </Typography>
+                        </Grid2>
+                        <Grid2 item>
+                            <Select
+                                labelId="table-select-label"
+                                id="table-select"
+                                value={selectedTable}
+                                onChange={handleTableChange}
+                                className="database-select"
+                                sx={{ width: '200px' }}
+                                variant="outlined"
+                            >
+                                <MenuItem value="">
+                                    <em>Select a table</em>
+                                </MenuItem>
+                                {tables.map((table, index) => (
+                                    <MenuItem key={index} value={table}>
+                                        {table}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Grid2>
+                    </Grid2>
+                    </motion.div>
+
+                )}
+            </Box>
+
+            {selectedTable && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <Box>
+                        {databaseStatistics.tableStatistics
+                            .filter((stats) => stats.tableName === selectedTable)
+                            .map((stats) => (
+                                <Box key={stats.tableName}>
+                                    <TableStatistics stats={stats} />
+                                </Box>
+                            ))}
+                    </Box>
+                </motion.div>
+
             )}
 
             {selectedTable && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
+                        <Button onClick={flipGraph}>
+                            Generate Graph
+                        </Button>
+                    </Box>
+                </motion.div>
+
+            )}
+
+            {selectedTable && generateGraphClicked && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                >
                 <Box>
                     {databaseStatistics.tableStatistics
                         .filter((stats) => stats.tableName === selectedTable)
                         .map((stats) => (
-                            <Box key={stats.tableName} sx={{ marginBottom: 3 }}>
-                                <Typography variant="h5">Statistics for {stats.tableName}:</Typography>
-                                <Typography variant="body1">Row Count: {stats.rowCount}</Typography>
-                                <Typography variant="body1">Column Count: {stats.columnCounts}</Typography>
-
-                                <FixedSizeList
-                                    height={125}
-                                    width={360}
-                                    itemSize={30}
-                                    itemCount={stats.rowNames.length}
-                                    overscanCount={5}
-                                >
-                                    {({ index, style }) => {
-                                        const rowName = stats.rowNames[index];
-                                        return (
-                                            <ListItem key={index} style={style} component="div" disablePadding>
-                                                <ListItemText primary={rowName.columnName} />
-                                            </ListItem>
-                                        );
-                                    }}
-                                </FixedSizeList>
-
+                            <Box key={stats.tableName} sx={{ marginBottom: 1 }}>
                                 <Box sx={{ display: 'flex', gap: 2, marginTop: 2 }}>
                                     <Select
                                         value={selectedColumn1}
@@ -227,25 +282,115 @@ const Statistics = () => {
                                 </Box>
 
                                 {selectedColumn1 && selectedColumn2 && (
-                                    <Box sx={{ marginTop: 2 }}>
+                                    <Box sx={{ marginTop: 1 }}>
                                         {MyPlot(xPlot, yPlot, selectedColumn1, selectedColumn2, selectedTable, selectedDatabase)}
                                     </Box>
                                 )}
                             </Box>
                         ))}
                 </Box>
+                </motion.div>
             )}
+
+            {selectedTable && generateHistogramClicked && (
+
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    <Box>
+                        <h1>Histogram</h1>
+                        {databaseStatistics.tableStatistics
+                            .filter((stats) => stats.tableName === selectedTable)
+                            .map((stats) => (
+                                <Box key={stats.tableName} sx={{ marginBottom: 1 }}>
+                                        <Select
+                                            value={selectedColumn1}
+                                            onChange={handleColumn1Change}
+                                            className="column-select"
+                                            variant="outlined"
+                                            sx={{ height: '40px', flex: 1 }}
+                                        >
+                                            <MenuItem value="">
+                                                <em>Select column 1</em>
+                                            </MenuItem>
+                                            {stats.rowNames.map((rowName, index) => (
+                                                <MenuItem key={index} value={rowName.columnName}>
+                                                    {rowName.columnName}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+
+                                        {selectedColumn1 && (
+                                            <Box sx={{ marginTop: 1 }}>
+                                                {MyHistogram(xPlot, selectedColumn1, selectedTable, selectedDatabase)}
+                                            </Box>
+                                        )}
+                                </Box>
+                            ))}
+                    </Box>
+
+                </motion.div>
+            )}
+        </Box>
+    );
+};
+
+
+function PrepareTree(stats) {
+    let tree = [{
+        id: 'tree',
+        label: 'Browser column statistics for ' + stats.stats.tableName,
+        children: []
+    }];
+
+    stats.stats.rowNames.forEach((rowName, index) => {
+        const treeNode = {
+            id: rowName.columnName,
+            label: rowName.columnName,
+        }
+        tree[0].children.push(treeNode);
+    });
+
+    return (
+        <RichTreeView items={tree} />
+    );
+}
+
+const TableStatistics = ({ stats }) => {
+    return (
+        <Box key={stats.tableName} sx={{ marginBottom: 1 }}>
+            <Typography variant="h5">Statistics for {stats.tableName}:</Typography>
+            <Typography variant="body1">Row Count: {stats.rowCount}</Typography>
+            <Typography variant="body1">Column Count: {stats.columnCounts}</Typography>
+            <PrepareTree stats={stats} />
         </Box>
     );
 };
 
 export default Statistics;
 
+const MyHistogram = (xPlot, xPlotName, selectedTable, selectedDatabase) => {
+    console.log(xPlot);
+
+    const categories = xPlot.map(item => item.category);
+    const dataSeries = xPlot.map(item => item.value);
+
+    return (
+        <div>
+            <h1>{xPlotName}</h1>
+            <BarChart
+                xAxis={[{ scaleType: 'band', data: categories }]}
+                series={[{ data: dataSeries }]}
+                width={500}
+                height={300}
+            />
+        </div>
+    );
+}
 const MyPlot = (xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatabase) => {
-    if (xPlot.length > 0 && yPlot.length > 0) {
-        console.log(xPlot);
-        console.log(yPlot);
-    }
 
     let finalData = [];
     if (xPlot.length > 0 && yPlot.length > 0) {
@@ -259,9 +404,6 @@ const MyPlot = (xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatab
     return (
         <div>
             <Container>
-                {/*<Typography variant="h4" gutterBottom>*/}
-                {/*    Plotting {xPlotName} with {yPlotName} for {selectedTable} in {selectedDatabase}*/}
-                {/*</Typography>*/}
                 <LineChart width={1100} height={300} data={finalData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
@@ -270,9 +412,6 @@ const MyPlot = (xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatab
                     <Legend />
                     <Line type="monotone" dataKey="value1" stroke="#8884d8" name={text}/>
                 </LineChart>
-                <Typography variant="h4" gutterBottom>
-                    
-                </Typography>
             </Container>
         </div>
     )

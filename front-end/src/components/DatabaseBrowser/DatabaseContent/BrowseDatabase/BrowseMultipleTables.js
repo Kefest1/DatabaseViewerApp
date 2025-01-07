@@ -89,7 +89,6 @@ const QueryTool = ({selectedDbTable}) => {
     }
 
     const [availableDatabases, setAvailableDatabases] = useState([]);
-    const [columnsByDatabase, setColumnsByDatabase] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState(info[0]);
     const [selectedTable, setSelectedTable] = useState(info[1]);
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
@@ -167,7 +166,6 @@ const QueryTool = ({selectedDbTable}) => {
         fetchAvailableDatabases(userName)
             .then(({ databases, columnsByDatabase }) => {
                 setAvailableDatabases(databases);
-                setColumnsByDatabase(columnsByDatabase);
             })
             .catch((error) => console.error("Error fetching databases:", error));
     }, [userName, selectedDbTable]);

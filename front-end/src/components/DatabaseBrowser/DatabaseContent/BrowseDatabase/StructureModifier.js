@@ -54,7 +54,7 @@ function StructureModifier() {
 
     return (
         <div>
-            <h1>Database create</h1>
+            <h1>Structure modifier</h1>
             <DatabaseCreator/>
             <h1>Table create</h1>
             <TableCreator/>

@@ -35,89 +35,6 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
         });
 }
 
-function addTable(tableName, databaseID, primaryColumnName) {
-    const url = `http://localhost:8080/api/tableinfo/add`;
-
-    const data = new URLSearchParams();
-    data.append('tableInfo', tableName);
-    data.append('databaseID', databaseID);
-    data.append('primaryKey', primaryColumnName);
-
-    console.log(data);
-
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            return data;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-}
-
-function addStructure(columnName, tableID) {
-    const userName = getCookie("userName");
-
-    const url = `http://localhost:8080/api/tableinfo/addFieldInfo/Long/${columnName}/${tableID}/${userName}`;
-    console.log(columnName);
-    console.log(tableID);
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
-
-function addConnection(tableID) {
-    const url = `http://localhost:8080/api/ownershipdetails/addbyusername/${tableID}`;
-
-    const userName = getCookie("userName");
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: userName
-    })
-        .then(response => {
-            if (response.ok) {
-                console.log('User added successfully');
-            } else {
-                console.log('Error adding user');
-            }
-        })
-        .catch(error => {
-            console.error('Request failed', error);
-        });
-}
-
 
 function DatabaseCreator() {
     const [databaseName, setDatabaseName] = useState('');
@@ -178,8 +95,6 @@ function DatabaseCreator() {
             return;
         }
 
-        let databaseId;
-        let tableID;
 
         addDatabase(databaseName, databaseDescription, primaryColumnName, tableName)
 
@@ -222,7 +137,7 @@ function DatabaseCreator() {
                 onChange={handleInputDescriptionChange}
             />
             <br/>
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button variant="contained" onClick={handleSubmit} style={{marginTop: 5}}>
                 Add database
             </Button>
             <Snackbar

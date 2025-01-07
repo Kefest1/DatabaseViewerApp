@@ -7,6 +7,7 @@ import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import TableBrowserNew from "./TableBrowserNew";
 import { useTransition, animated } from 'react-spring';
+import {motion} from "framer-motion";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -196,7 +197,7 @@ const QueryTool = ({selectedDbTable}) => {
 
     useEffect(() => {
         fetchAvailableDatabases(userName)
-            .then(({ databases, columnsByDatabase }) => {
+            .then(({databases, columnsByDatabase}) => {
                 setAvailableDatabases(databases);
                 setColumnsByDatabase(columnsByDatabase);
             })
@@ -222,7 +223,7 @@ const QueryTool = ({selectedDbTable}) => {
                                 value={selectedDatabase}
                                 onChange={handleSelectOne}
                                 variant={"outlined"}
-                                style={{ width: '125px' }}
+                                style={{width: '125px'}}
                             >
                                 {availableDatabases.map((option, index) => (
                                     <MenuItem key={index} value={option}>
@@ -246,7 +247,7 @@ const QueryTool = ({selectedDbTable}) => {
                                                 value={selectedTable}
                                                 onChange={handleSelectTwo}
                                                 variant={"outlined"}
-                                                style={{ width: '125px' }}
+                                                style={{width: '125px'}}
                                             >
                                                 {tablesForSelectedDatabase.map((option, index) => (
                                                     <MenuItem key={index} value={option}>
@@ -265,7 +266,7 @@ const QueryTool = ({selectedDbTable}) => {
                             <FormControl variant="outlined">
                                 <InputLabel id="demo-multiple-checkbox-label">Select Columns</InputLabel>
                                 {availableColumns.length === 0 ? (
-                                    <div style={{ padding: '10px', color: 'gray' }}>No columns available to select</div>
+                                    <div style={{padding: '10px', color: 'gray'}}>No columns available to select</div>
                                 ) : (
                                     <Select
                                         labelId="demo-multiple-checkbox-label"
@@ -276,7 +277,7 @@ const QueryTool = ({selectedDbTable}) => {
                                         input={<OutlinedInput label="Select Columns"/>}
                                         renderValue={(selected) => selected.join(', ')}
                                         variant={"outlined"}
-                                        style={{ width: '175px' }}
+                                        style={{width: '175px'}}
                                     >
                                         {availableColumns.map((name) => (
                                             <MenuItem key={name} value={name}>
@@ -315,23 +316,32 @@ const QueryTool = ({selectedDbTable}) => {
                 </Grid2>
             </Grid2>
 
-            {isButtonPressed && (
-                <Grid2 item style={{marginTop: '16px'}}>
-                    <TableBrowserNew
-                        key={tableBrowserKey}
-                        data={queryResult.result}
-                        fetchTime={-1}
-                        tableName={selectedTable}
-                        databaseName={selectedDatabase}
-                        selectedColumns={selectedColumns}
-                        primaryKey={primaryKeyName}
-                        tableStructure={tableStructure}
-                    />
-                </Grid2>
+            {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && (
+                //
+                // <motion.div
+                //     initial={{opacity: 0, y: 10}}
+                //     animate={{opacity: 1, y: 0}}
+                //     exit={{opacity: 0, y: -10}}
+                //     transition={{duration: 0.4}}
+                // >
+                    <Grid2 item style={{marginTop: '16px'}}>
+                        <TableBrowserNew
+                            key={tableBrowserKey}
+                            data={queryResult.result}
+                            fetchTime={-1}
+                            tableName={selectedTable}
+                            databaseName={selectedDatabase}
+                            selectedColumns={selectedColumns}
+                            primaryKey={primaryKeyName}
+                            tableStructure={tableStructure}
+                        />
+                    </Grid2>
+                // </motion.div>
             )}
+
         </Grid2>
     );
 
 };
 
-export default QueryTool;
+            export default QueryTool;

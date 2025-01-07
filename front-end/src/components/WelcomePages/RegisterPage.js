@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import {Link} from "react-router-dom";
 
-
 function RegisterPage() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -116,47 +115,56 @@ function RegisterPage() {
 
     return (
         <div>
-            <div align="center">Database Viewer app</div>
+            <div align="center" className="mb-2">
+                <h3>Database Viewer App</h3>
+            </div>
             <div style={BackGroundStyle}
                  className="d-flex justify-content-center align-items-center vh-100">
                 <div className='bg-white p-3 rounded w-35'>
-                        <h1>Sign-Up</h1>
-                        <div className='mb-3'>
-                            <label htmlFor="username"><strong>Username</strong></label>
-                            <input className='form-control rounded-0' type="username" placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="email"><strong>Email</strong></label>
-                            <input className='form-control rounded-0' type="text" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="password"><strong>Password</strong></label>
-                            <input className='form-control rounded-0' type="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="retype_password"><strong>Confirm Password</strong></label>
-                            <input className='form-control rounded-0' type="password" placeholder="Enter Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="username"><strong>Admin username (not required when registering as an admin)</strong></label>
-                            <input className='form-control rounded-0' type="text" placeholder="Master username" value={adminUsername}  onChange={(e) => setAdminUsername(e.target.value)}/>
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="username"><strong>Hash (use only when registering as an admin)</strong></label>
-                            <input className='form-control rounded-0' type="text" placeholder="Master username" value={hash} onChange={(e) => setHash(e.target.value)} />
-                        </div>
+                    <h1>Sign-Up</h1>
+                    <div className='mb-3'>
+                        <label htmlFor="username"><strong>Username</strong></label>
+                        <input className='form-control rounded-0' type="username" placeholder="Enter Username"
+                               value={username} onChange={(e) => setUsername(e.target.value)}/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="email"><strong>Email</strong></label>
+                        <input className='form-control rounded-0' type="text" placeholder="Enter Email" value={email}
+                               onChange={(e) => setEmail(e.target.value)}/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="password"><strong>Password</strong></label>
+                        <input className='form-control rounded-0' type="password" placeholder="Enter Password"
+                               value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="retype_password"><strong>Confirm Password</strong></label>
+                        <input className='form-control rounded-0' type="password" placeholder="Enter Password"
+                               value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="username"><strong>Admin username (not required when registering as an
+                            admin)</strong></label>
+                        <input className='form-control rounded-0' type="text" placeholder="Master username"
+                               value={adminUsername} onChange={(e) => setAdminUsername(e.target.value)}/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor="username"><strong>Hash (use only when registering as an admin)</strong></label>
+                        <input className='form-control rounded-0' type="text" placeholder="Master username" value={hash}
+                               onChange={(e) => setHash(e.target.value)}/>
+                    </div>
 
-                        <button className='btn btn-success border w-100' onClick={Register}>Register</button>
-                        <p></p>
-                        <Link to="/login">
-                            <button
-                                className='btn btn-light border-dark w-100'
-                                style={{ marginTop: '10px' }}
-                            >
-                                Log in</button>
+                    <button className='btn btn-success border w-100' onClick={Register}>Register</button>
+                    <Link to="/login">
+                        <button
+                            className='btn btn-light border-dark w-100'
+                            style={{marginTop: '10px'}}
+                        >
+                            Log in
+                        </button>
 
-                        </Link>
-                        {isVisible && <label>{caption}</label>}
+                    </Link>
+                    {isVisible && <label>{caption}</label>}
                 </div>
             </div>
         </div>

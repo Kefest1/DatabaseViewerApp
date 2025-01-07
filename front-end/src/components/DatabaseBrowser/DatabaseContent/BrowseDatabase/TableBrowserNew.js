@@ -301,12 +301,13 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     return (
+
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button onClick={() => logUpdatable(fieldsToUpdate)}>Update altered fields</Button>
-                <Button onClick={commitDeleteManyRows}>Delete selected rows</Button>
-                <Button onClick={commitInsertNewRows}>Commit Insertion</Button>
-                <Button onClick={Debug}>Debug</Button>
+                <Button variant="contained" onClick={() => logUpdatable(fieldsToUpdate)}>Update altered fields</Button>
+                <Button variant="contained" onClick={commitDeleteManyRows}>Delete selected rows</Button>
+                <Button variant="contained" onClick={commitInsertNewRows}>Commit Insertion</Button>
+                <Button variant="contained" onClick={Debug}>Debug</Button>
             </Box>
             <DataGrid
                 rows={rows}
