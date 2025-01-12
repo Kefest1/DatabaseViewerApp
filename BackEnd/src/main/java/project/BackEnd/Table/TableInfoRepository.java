@@ -29,9 +29,6 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     List<TableInfo> getTableStructure(@Param("databaseName") String databaseName);
 
     @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
-    TableInfo findInstanceByTableNameAndDatabaseName(@Param("tableName") String tableName, @Param("databaseName") String databaseName);
-
-    @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
     TableInfo findTableInstanceByTableNameAndDatabaseName(@Param("tableName") String tableName, @Param("databaseName") String databaseName);
 
     @Query("SELECT t.primary_key FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
@@ -42,24 +39,16 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT ti FROM TableInfo ti JOIN FETCH ti.ownershipDetails od JOIN FETCH od.userInfo")
     List<TableInfo> findWithUsersAndTables();
 
-    @Query("SELECT ti FROM TableInfo ti JOIN FETCH ti.ownershipDetails od JOIN od.userInfo ui WHERE ui.username = :userName")
-    List<TableInfo> findWithUsersAndTablesByUserName(@Param("userName") String userName);
-
     @Query("SELECT COUNT(ti) FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo ui JOIN ti.databaseInfo db WHERE ui.username = :userName AND db.databaseName = :databaseName")
     Long findCountWithUsersAndTables(@Param("userName") String userName, @Param("databaseName") String databaseName);
 
     @Query("SELECT DISTINCT ti.id " +
-            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
-    List<Long> findAvailableTables(@Param("databasename") String databasename, @Param("username") String username);
+            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
+    List<Long> findAvailableTables(@Param("databaseName") String databaseName, @Param("username") String username);
 
     @Query("SELECT DISTINCT ti.tableName " +
-            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
-    List<String> findAvailableTableNames(@Param("databasename") String databasename, @Param("username") String username);
-
-    @Query("SELECT DISTINCT ti.id " +
-            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo " +
-            "WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tableName")
-    List<String> findTableIDByUsername(@Param("databasename") String databasename, @Param("username") String username, @Param("tableName") String tableName);
+            "FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
+    List<String> findAvailableTableNames(@Param("databaseName") String databaseName, @Param("username") String username);
 
     @Query("SELECT ti.tableName FROM TableInfo ti")
     List<String> findDistinctTableNames();
@@ -70,29 +59,29 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Query("SELECT DISTINCT db FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username")
     List<DatabaseInfo> findDatabasesObjectsByUserName(@Param("username") String username);
 
-    @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :database")
-    List<String> findTableInfoAndByUserName(@Param("username") String username, @Param("database") String database);
+    @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
+    List<String> findTableInfoAndByUserName(@Param("username") String username, @Param("databaseName") String databaseName);
 
-    @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username")
-    List<String> findDatabaseNamesByUserName(@Param("username") String username);
+    @Query("SELECT DISTINCT db.databaseName FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
+    List<String> findDatabaseNamesByUserName(@Param("username") String username, @Param("databaseName") String databaseName);
 
     @Query("SELECT DISTINCT ti.tableName, db.databaseName, od.accessLevel FROM TableInfo ti JOIN ti.databaseInfo JOIN ti.ownershipDetails od JOIN od.userInfo JOIN ti.databaseInfo db WHERE od.userInfo.username = :username")
     List<String> findTableInfoAndDatabasesByUserName(@Param("username") String username);
 
-    @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename")
-    List<String> findDatabasesByUserNameAndUsername(@Param("databasename") String databasename, @Param("username") String username);
+    @Query("SELECT DISTINCT ti.tableName FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databaseName")
+    List<String> findDatabasesByUserNameAndUsername(@Param("databaseName") String databaseName, @Param("username") String username);
 
-    @Query("SELECT DISTINCT ti.tableStructure FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
-    List<TableStructure> findColumnNamesByUserAndDatabaseAndTablenameFromStructure(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+    @Query("SELECT DISTINCT ti.tableStructure FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo WHERE od.userInfo.username = :username AND db.databaseName = :databaseName AND ti.tableName = :tablename")
+    List<TableStructure> findColumnNamesByUserAndDatabaseAndTablenameFromStructure(@Param("databaseName") String databaseName, @Param("username") String username, @Param("tablename") String tablename);
 
-    @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
-    List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+    @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databaseName AND ti.tableName = :tablename")
+    List<FieldInfo> getFields(@Param("databaseName") String databaseName, @Param("username") String username, @Param("tablename") String tablename);
 
-    @Query("SELECT DISTINCT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE od.userInfo.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
-    Long getTableInfoID(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
+    @Query("SELECT DISTINCT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE od.userInfo.username = :username AND db.databaseName = :databaseName AND ti.tableName = :tablename")
+    Long getTableInfoID(@Param("databaseName") String databaseName, @Param("username") String username, @Param("tablename") String tablename);
 
-    @Query("SELECT DISTINCT fi.columnName, fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE db.databaseName = :databasename AND ti.tableName = :tablename")
-    List<String> getTableInformation(@Param("databasename") String databasename, @Param("tablename") String tablename);
+    @Query("SELECT DISTINCT fi.columnName, fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE db.databaseName = :databaseName AND ti.tableName = :tablename")
+    List<String> getTableInformation(@Param("databaseName") String databaseName, @Param("tablename") String tablename);
 
     @Query("SELECT COUNT(fi.id) FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.fields fi WHERE db.databaseName = :databaseName AND ti.tableName = :tableName")
     Long getFieldCount(@Param("databaseName") String databaseName, @Param("tableName") String tableName);

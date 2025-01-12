@@ -43,9 +43,6 @@ const fetchJoinInfo = async (databaseName, tableName) => {
 const fetchJoinTable = async (databaseName, tableName) => {
     const userName = getCookie("userName");
 
-    console.log(databaseName);
-    console.log(tableName);
-
     const requestBody = {
         table: tableName
     };
@@ -126,6 +123,7 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                 informationJoin = info;
             }
         });
+        console.log(informationJoin)
 
         fetchJoinTable(databaseName, informationJoin.oneTableName)
             .then(async fetchedJoinTable => {
@@ -144,11 +142,12 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                         tableData.oneTableName
                     ]);
                 });
-
-            })
-            .catch(error => {
-                console.error('Error fetching join table:', error);
             });
+
+            // })
+            // .catch(error => {
+            //     console.error('Error fetching join table:', error);
+            // });
 
 
         const response = await fetchJoinInfo(databaseName, selectedJoinTable);

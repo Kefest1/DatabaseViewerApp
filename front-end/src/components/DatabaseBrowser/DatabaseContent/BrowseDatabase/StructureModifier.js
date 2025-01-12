@@ -54,13 +54,13 @@ function StructureModifier() {
 
     return (
         <div>
-            <h1>Structure modifier</h1>
+            <h6>Structure modifier</h6>
             <DatabaseCreator/>
-            <h1>Table create</h1>
+            <h6>Table create</h6>
             <TableCreator/>
-            <h1>Modify database structure</h1>
+            <h6>Modify database structure</h6>
             <DatabaseModifier/>
-            <h1>Modify table structure</h1>
+            <h6>Modify table structure</h6>
 
             <Select
                 labelId="demo-simple-select-table"

@@ -1,4 +1,13 @@
 package project.BackEnd.DatabaseInfo;
 
-public class ColumnsDto {
+import lombok.*;
+
+@ToString
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+class ColumnsDTO {
+    String columnName;
+    String columnType;
 }

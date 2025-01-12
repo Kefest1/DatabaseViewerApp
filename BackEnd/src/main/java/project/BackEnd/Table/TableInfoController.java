@@ -366,7 +366,7 @@ public class TableInfoController {
             @PathVariable("user") String userName,
             @PathVariable("databasename") String databaseName,
             @PathVariable("tableName") String tableName) {
-        return tableInfoRepository.findInstanceByTableNameAndDatabaseName(tableName, databaseName).getTableStructure();
+        return tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databaseName).getTableStructure();
     }
 
     @GetMapping("/checkIfTaken/{user}/{databasename}/{tableName}")

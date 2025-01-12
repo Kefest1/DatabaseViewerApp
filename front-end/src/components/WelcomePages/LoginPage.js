@@ -21,12 +21,15 @@ function LoginPage() {
     }, []);
 
     const Login = async () => {
+        console.log("Login button clicked");
         if (username.length === 0) {
+            console.log("2222");
             setErrCode("Enter username")
             setIsVisible(true);
             return;
         }
         if (password.length === 0) {
+            console.log("2222");
             setErrCode("Enter password");
             setIsVisible(true);
             return;

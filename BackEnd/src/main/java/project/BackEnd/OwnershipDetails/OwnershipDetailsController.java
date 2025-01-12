@@ -64,7 +64,7 @@ public class OwnershipDetailsController {
         System.out.println(tableNames);
 
         UserInfo userInfo = userInfoRepository.findByUsername(userName);
-        var userID = userInfo.getId();
+        Long userID = userInfo.getId();
         System.out.println(userID);
         for (String tableName : tableNames) {
             System.out.println(databaseName + " " + userName + " " + tableName);

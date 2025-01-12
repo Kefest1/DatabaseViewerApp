@@ -11,6 +11,7 @@ import {
     useReactFlow
 } from "@xyflow/react";
 import {DatabaseSchemaNode} from "../components/database-schema-node";
+
 import React, {useCallback, useEffect, useState} from "react";
 import '@xyflow/react/dist/style.css';
 import Dagre from '@dagrejs/dagre';
@@ -218,7 +219,6 @@ function DatabaseScheme() {
         if (databaseStructure.length > 0) {
             const initialNodes = prepareNodes(databaseStructure);
             setNodes(initialNodes);
-
         }
     }, [databaseStructure]);
 

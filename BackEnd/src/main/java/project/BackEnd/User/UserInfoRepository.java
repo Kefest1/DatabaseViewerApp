@@ -22,9 +22,4 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
 
     UserInfo findByUsernameAndIsAdmin(String username, boolean isAdmin);
     UserInfo findByEmail(String email);
-    UserInfo getUserInfoById(Long id);
-
-    @Query("SELECT DISTINCT db.databaseName, ti.fields, fd.columnName FROM UserInfo ui JOIN ui.ownershipDetails od JOIN od.tableInfo ti JOIN ti.fields fd JOIN ti.databaseInfo db WHERE ui.username = :name")
-    List<String> findAllUsersTable(@Param("name") String name);
-
 }

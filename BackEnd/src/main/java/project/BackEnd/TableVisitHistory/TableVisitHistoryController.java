@@ -36,7 +36,7 @@ public class TableVisitHistoryController {
     @PostMapping("/addHistory")
     public String addConnection(@RequestBody AddPayload addPayload) {
         UserInfo userInfo = userInfoRepository.findByUsername(addPayload.userName);
-        TableInfo tableInfo = tableInfoRepository.findInstanceByTableNameAndDatabaseName(addPayload.tableName, addPayload.databaseName);
+        TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(addPayload.tableName, addPayload.databaseName);
         TableVisitHistory tableVisitHistory = new TableVisitHistory(tableInfo, userInfo, new Date());
 
         tableVisitHistoryRepository.save(tableVisitHistory);

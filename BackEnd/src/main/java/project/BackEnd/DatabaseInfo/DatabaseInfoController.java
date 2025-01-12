@@ -1,25 +1,18 @@
 package project.BackEnd.DatabaseInfo;
 
-
-import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.FieldInfo.FieldInfoRepository;
-import project.BackEnd.OwnershipDetails.OwnershipDetails;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsPayload;
 import project.BackEnd.OwnershipDetails.OwnershipDetailsService;
 import project.BackEnd.Table.TableInfo;
 import project.BackEnd.Table.TableInfoRepository;
 import project.BackEnd.Table.TableStructure;
 import project.BackEnd.Table.TableStructureRepository;
-import project.BackEnd.User.UserInfo;
 import project.BackEnd.User.UserInfoRepository;
-
-import javax.xml.crypto.Data;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/databaseinfo")
@@ -81,7 +74,7 @@ public class DatabaseInfoController {
     }
 
     @GetMapping("/getStatistics/{databaseName}/{userName}")
-    public DatabaseStatistics getDatabaseStatistics(@PathVariable String databaseName, @PathVariable String userName) {
+    public DatabaseStatisticsDTO getDatabaseStatistics(@PathVariable String databaseName, @PathVariable String userName) {
         return getStats(userName, databaseName);
     }
 
@@ -93,10 +86,12 @@ public class DatabaseInfoController {
             @PathVariable("tableName") String tableName,
             @PathVariable("userName") String userName
     ) {
-        var existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(userName);
+
+        List<String> existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(userName, databaseName);
         System.out.println(databaseName);
         System.out.println(existingDatabaseName);
-        if (existingDatabaseName != null) {
+        if (!existingDatabaseName.isEmpty()) {
+            System.out.println("Database already exists");
             return new ResponseEntity<>("Database with that name already exists", HttpStatus.OK);
         }
 
@@ -115,12 +110,12 @@ public class DatabaseInfoController {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    private DatabaseStatistics getStats(String userName, String databaseName) {
-        DatabaseStatistics databaseStatistics = new DatabaseStatistics();
+    private DatabaseStatisticsDTO getStats(String userName, String databaseName) {
+        DatabaseStatisticsDTO databaseStatistics = new DatabaseStatisticsDTO();
         databaseStatistics.tableCount = tableInfoRepository.findCountWithUsersAndTables(userName, databaseName);
         databaseStatistics.tableStatistics = new LinkedList<>();
 
-        var tableNames = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
+        List<String> tableNames = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
         for (String tableName : tableNames) {
             databaseStatistics.tableStatistics.add(getTableStatistic(tableName, databaseName));
         }
@@ -128,8 +123,8 @@ public class DatabaseInfoController {
         return databaseStatistics;
     }
 
-    private TableStatistics getTableStatistic(String tableName, String databaseName) {
-        TableStatistics tableStatistics = new TableStatistics();
+    private TableStatisticsDTO getTableStatistic(String tableName, String databaseName) {
+        TableStatisticsDTO tableStatistics = new TableStatisticsDTO();
 
         tableStatistics.tableName = tableName;
         tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnNamesByTableName(tableName);
@@ -139,39 +134,9 @@ public class DatabaseInfoController {
         System.out.println(databaseName);
         System.out.println(tableName);
         tableStatistics.rowNames = tableStructures.stream()
-                .map(ts -> new Columns(ts.getColumnName(), ts.getColumnType()))
+                .map(ts -> new ColumnsDTO(ts.getColumnName(), ts.getColumnType()))
                 .toList();
         return tableStatistics;
     }
 
-}
-
-@ToString
-@Getter
-@Setter
-@NoArgsConstructor
-class DatabaseStatistics {
-    Long tableCount;
-    List<TableStatistics> tableStatistics;
-}
-
-@ToString
-@Getter
-@Setter
-@NoArgsConstructor
-class TableStatistics {
-    String tableName;
-    List<Columns> rowNames;
-    Long rowCount;
-    Long columnCounts;
-}
-
-@ToString
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class Columns {
-    String columnName;
-    String columnType;
 }

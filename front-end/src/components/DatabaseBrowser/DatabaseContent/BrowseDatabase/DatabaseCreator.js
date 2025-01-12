@@ -10,9 +10,10 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
     if (databaseDescription === "") {
         databaseDescription = "No description";
     }
+
     const userName = getCookie("userName");
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`;
-
+    console.log(`http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`);
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -23,7 +24,7 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
             console.log('Success:', data);
@@ -42,7 +43,10 @@ function DatabaseCreator() {
     const [tableName, setTableName] = useState('');
     const [primaryColumnName, setPrimaryColumnName] = useState('');
     const [errorMessage, setErrorMessage] = useState("");
+
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [openSnackbarSuccess, setOpenSnackbarSuccess] = useState(false);
+    const [successMessage, setSucessMessage] = useState("");
 
     const handleColumnName = (event) => {
         setPrimaryColumnName(event.target.value);
@@ -62,6 +66,10 @@ function DatabaseCreator() {
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+    };
+
+    const handleCloseSnackbarSuccess = () => {
+        setOpenSnackbarSuccess(false);
     };
 
     const isValidName = (name) => {
@@ -95,9 +103,12 @@ function DatabaseCreator() {
             return;
         }
 
-
         addDatabase(databaseName, databaseDescription, primaryColumnName, tableName)
-
+            .then(() => {
+                console.log('Database added successfully.');
+                setSucessMessage(`Database ${databaseName} added successfully!`);
+                setOpenSnackbarSuccess(true);
+            })
             .catch(error => {
                 console.error('Failed to add database:', error);
                 setErrorMessage('Failed to add database. Please try again.');
@@ -159,6 +170,31 @@ function DatabaseCreator() {
                             aria-label="close"
                             color="inherit"
                             onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
+            <Snackbar
+                open={openSnackbarSuccess}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbarSuccess}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#117311' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {successMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbarSuccess}
                         >
                             <CloseIcon />
                         </IconButton>,

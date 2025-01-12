@@ -20,12 +20,9 @@ import {
 import {getCookie} from "../../../getCookie";
 
 function getColumnTypeByName(cols, columnName) {
-    console.log(cols);
-    console.log(cols[0]);
     let type = null;
     cols.forEach(
         column => {
-            console.log(column.columnName);
             if (column.columnName === columnName) {
                 type = column.columnType;
             }
@@ -36,8 +33,7 @@ function getColumnTypeByName(cols, columnName) {
 }
 
 function prepareColumns(selectedColumns, primaryKey, tableStructure) {
-    let columns = []
-    getColumnTypeByName(tableStructure, "unit");
+    let columns = [];
 
     selectedColumns.forEach(
         columnName => {
@@ -49,8 +45,11 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
                 align: 'left',
                 headerAlign: 'left'
             }
-            getColumnTypeByName(tableStructure, columnName
-            ) === 'Number' && 'Long' && 'Integer' ? col.type = 'number' : col.type = 'string';
+            const x = getColumnTypeByName(tableStructure, columnName);
+            if (x.toLowerCase() === 'number' || x.toLowerCase() === 'long' || x.toLowerCase() === 'integer') {
+                col.type = 'number';
+            }
+
 
             columns.push(col);
         }
@@ -280,10 +279,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     function Debug() {
-        console.log(rows);
-        console.log(newRows);
-        console.log(fieldsToUpdate);
-
+        console.log(columns);
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
