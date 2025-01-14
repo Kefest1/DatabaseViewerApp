@@ -107,7 +107,7 @@ public class DatabaseInfoController {
         Long userID = userInfoRepository.findUserIDByUsername(userName);
         ownershipDetailsService.addOwnershipDetails(new OwnershipDetailsPayload(userID, savedTableInfo.getId()));
 
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
 
     private DatabaseStatisticsDTO getStats(String userName, String databaseName) {

@@ -78,6 +78,8 @@ const logUpdatable = async (fieldsToUpdate) => {
     }
 };
 
+
+
 let newId = -1;
 
 function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure }) {
@@ -220,28 +222,37 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         if (params < 0) {
             return;
         }
-        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
+        fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify([params])
         })
-            .then(response => response.json())
+            .then(response => {
+                const res = response.text();
+                console.log(res);
+            })
             .catch(error => console.error('Error:', error));
     };
 
     const commitDeleteManyRows = () => {
         console.log(selectedRowsIndex);
 
-        fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
+        fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(selectedRowsIndex)
         })
-            .then(response => response.json())
+            .then(async response => {
+                const res = await response.json();
+                console.log(res);
+                res.forEach((num) => {
+                    setRows(rows.filter((row) => row.id !== num));
+                });
+            })
             .catch(error => console.error('Error:', error));
     };
 
@@ -279,7 +290,7 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     function Debug() {
-        console.log(columns);
+        console.log(rows);
     }
 
     const CustomToolbar = ({ setRows, setRowModesModel }) => {

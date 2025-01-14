@@ -13,7 +13,7 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
 
     const userName = getCookie("userName");
     const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`;
-    console.log(`http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`);
+
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -21,20 +21,24 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
         },
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            if (response.status === 200) {
+                return response.text().then(message => ({
+                    status: 200,
+                    message,
+                }));
+            } else if (response.status === 201) {
+                return response.text().then(message => ({
+                    status: 201,
+                    message,
+                }));
+            } else {
+                return response.text().then(message => {
+                    throw new Error(message);
+                });
             }
-            return response.text();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            return data;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
         });
 }
+
 
 
 function DatabaseCreator() {
@@ -77,7 +81,6 @@ function DatabaseCreator() {
         return regex.test(name) && name.length <= 63;
     };
 
-
     const handleSubmit = () => {
         if (databaseName === "" || tableName === "" || primaryColumnName === "") {
             setErrorMessage('Fill all necessary text fields');
@@ -104,14 +107,18 @@ function DatabaseCreator() {
         }
 
         addDatabase(databaseName, databaseDescription, primaryColumnName, tableName)
-            .then(() => {
-                console.log('Database added successfully.');
-                setSucessMessage(`Database ${databaseName} added successfully!`);
-                setOpenSnackbarSuccess(true);
+            .then(({ status, message }) => {
+                if (status === 201) {
+                    setSucessMessage('Database added successfully');
+                    setOpenSnackbarSuccess(true);
+                } else if (status === 200) {
+                    setErrorMessage(`Database with that name already exists:`);
+                    setOpenSnackbar(true);
+                }
             })
             .catch(error => {
-                console.error('Failed to add database:', error);
-                setErrorMessage('Failed to add database. Please try again.');
+                console.error('Failed to add database:', error.message);
+                setErrorMessage(`Error: ${error.message}`);
                 setOpenSnackbar(true);
             });
     };

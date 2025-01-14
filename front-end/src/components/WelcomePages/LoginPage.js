@@ -4,34 +4,48 @@ import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import InvalidDataLabel from "./InvalidDataLabel";
 import { FaUser , FaLock } from 'react-icons/fa';
+import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
+import {InfoIcon} from "lucide-react";
 
 const MAX_USERNAME_LENGTH = 20;
 const MAX_PASSWORD_LENGTH = 20;
 
 function LoginPage() {
-    const [IsVisible, setIsVisible] = useState(false)
     const [username, setUsername] = useState('');
 
     const [password, setPassword] = useState('');
 
-    const [errCode, setErrCode] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const [openSnackbarOk, setOpenSnackbarOk] = useState(false);
 
     useEffect(() => {
         document.title = "Login Page";
     }, []);
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
+    const handleCloseSnackbarOk = () => {
+        setOpenSnackbarOk(false);
+    };
+
     const Login = async () => {
         console.log("Login button clicked");
         if (username.length === 0) {
             console.log("2222");
-            setErrCode("Enter username")
-            setIsVisible(true);
+            setMessage("Enter username")
+            setOpenSnackbar(true);
             return;
         }
         if (password.length === 0) {
             console.log("2222");
-            setErrCode("Enter password");
-            setIsVisible(true);
+            setMessage("Enter password");
+            setOpenSnackbar(true);
             return;
         }
 
@@ -48,12 +62,11 @@ function LoginPage() {
             console.log(data);
 
             if (data) {
-                console.log("Login successful");
+                setOpenSnackbarOk(true);
+
                 const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`);
                 const isAdmin = await adminResponse.json();
 
-                setErrCode("Login successful");
-                setIsVisible(true);
                 const expirationTime = new Date();
                 expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
                 document.cookie = `userName=${username}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
@@ -62,14 +75,14 @@ function LoginPage() {
                 window.location.href = 'http://localhost:3000';
             } else {
                 console.log("Invalid user or password");
-                setErrCode("Invalid user or password");
-                setIsVisible(true);
+                setMessage("User not found");
+                setOpenSnackbar(true);
                 setPassword("");
             }
         } catch (error) {
             setPassword("");
-            setErrCode("There was a problem with the fetch operation. Please try again later");
-            setIsVisible(true);
+            setMessage("There was a problem with the fetch operation. Please try again later");
+            setOpenSnackbar(true);
         }
     }
 
@@ -115,7 +128,56 @@ function LoginPage() {
                     <Link to="/register">
                         <button className='btn btn-light border-dark w-100'>Register</button>
                     </Link>
-                    {IsVisible && <InvalidDataLabel errCode={errCode} />}
+                    <Snackbar
+                        open={openSnackbar}
+                        autoHideDuration={6000}
+                        onClose={handleCloseSnackbar}
+                    >
+                        <SnackbarContent
+                            style={{ backgroundColor: '#f44336' }}
+                            message={
+                                <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                                    {message}
+                        </span>
+                            }
+                            action={[
+                                <IconButton
+                                    key="close"
+                                    aria-label="close"
+                                    color="inherit"
+                                    onClick={handleCloseSnackbar}
+                                >
+                                    <CloseIcon />
+                                </IconButton>,
+                            ]}
+                        />
+                    </Snackbar>
+                    <Snackbar
+                        open={openSnackbarOk}
+                        autoHideDuration={6000}
+                        onClose={handleCloseSnackbarOk}
+                    >
+                        <SnackbarContent
+                            style={{ backgroundColor: '#117311' }}
+                            message={
+                                <span style={{ display: 'flex', alignItems: 'center' }}>
+                                    <InfoIcon style={{ marginRight: 8 }} />
+                                    {"Login successful"}
+                                </span>
+                            }
+                            action={[
+                                <IconButton
+                                    key="close"
+                                    aria-label="close"
+                                    color="inherit"
+                                    onClick={handleCloseSnackbar}
+                                >
+                                    <CloseIcon />
+                                </IconButton>,
+                            ]}
+                        />
+                    </Snackbar>
                 </div>
             </div>
         </div>

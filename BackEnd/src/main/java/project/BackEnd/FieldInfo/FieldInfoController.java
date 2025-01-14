@@ -1,8 +1,14 @@
 package project.BackEnd.FieldInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
+import project.BackEnd.Table.TableStructure;
+import project.BackEnd.Table.TableStructureRepository;
+import project.BackEnd.TableConnections.TableConnection;
+import project.BackEnd.TableConnections.TableConnectionRepository;
 
 import java.util.*;
 
@@ -19,6 +25,10 @@ public class FieldInfoController {
 
     @Autowired
     TableInfoRepository tableInfoRepository;
+    @Autowired
+    private TableStructureRepository tableStructureRepository;
+    @Autowired
+    private TableConnectionRepository tableConnectionRepository;
 
     @GetMapping
     public List<FieldInfo> getAll() {
@@ -142,25 +152,89 @@ public class FieldInfoController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public String deleteFieldInfo(@RequestBody Long columnID) {
-        try {
-            System.out.println(columnID);
+    @DeleteMapping("/delete/{databaseName}/{tableName}/{primaryKey}")
+    public ResponseEntity<String> deleteFieldInfo(@RequestBody Long columnID,
+                                  @PathVariable("databaseName") String databaseName,
+                                  @PathVariable("primaryKey") String primaryKey,
+                                  @PathVariable("tableName") String tableName) {
+        Boolean isRemovable = checkIfRemoveAble(columnID, databaseName, tableName, primaryKey);
+
+        if (isRemovable) {
             fieldInfoRepository.deleteByColumnId(columnID);
-            return "OK";
-        } catch (Exception e) {
-            return e.toString();
+            return ResponseEntity.status(HttpStatus.OK).body("Ok");
         }
+        return ResponseEntity.status(HttpStatus.OK).body("Failed to remove");
+
     }
 
-    @DeleteMapping("/deleteArray")
-    public String deleteFieldInfo(@RequestBody Long[] columnIds) {
-        try {
-             fieldInfoRepository.deleteByColumnIds(Arrays.asList(columnIds));
-            return "OK";
-        } catch (Exception e) {
-            return e.toString();
+    @DeleteMapping("/deleteArray/{databaseName}/{tableName}/{primaryKey}")
+    public ResponseEntity<List<Long>> deleteFieldInfos(@RequestBody Long[] columnIds,
+                                                   @PathVariable("databaseName") String databaseName,
+                                                   @PathVariable("primaryKey") String primaryKey,
+                                                   @PathVariable("tableName") String tableName
+//                                  @PathVariable("userName") String userName
+    ) {
+        boolean isAllRemoved = true;
+        boolean isSomethingRemoved = false;
+
+        List<Long> removed = new ArrayList<>();
+
+        for (Long columnId : columnIds) {
+            Boolean isRemovable = checkIfRemoveAble(columnId, databaseName, tableName, primaryKey);
+            System.out.println(isRemovable);
+            if (isRemovable) {
+                isSomethingRemoved = true;
+                removed.add(columnId);
+                fieldInfoRepository.deleteByColumnId(columnId);
+            }
+            else {
+                isAllRemoved = false;
+            }
         }
+
+        if (isAllRemoved && isSomethingRemoved) {
+            return ResponseEntity.status(HttpStatus.OK).body(removed);
+        }
+        else if (!isSomethingRemoved && !isAllRemoved) {
+            return ResponseEntity.status(HttpStatus.OK).body(removed);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.OK).body(removed);
+        }
+
     }
+
+    private Boolean checkIfRemoveAble(Long columnID, String databaseName, String tableName, String primaryKey) {
+        FieldInfo fieldInfo = fieldInfoRepository.findDistinctFieldInfoByTableInfo_TableNameAndColumnNameAndTableInfo_DatabaseInfo_DatabaseNameAndColumnId(
+               tableName,
+               primaryKey,
+               databaseName,
+               columnID);
+        List<TableConnection> tableConnection = tableConnectionRepository.getTableConnectionByParamsStrings(
+                databaseName, "user1", tableName, primaryKey);
+
+        for (TableConnection tc : tableConnection) {
+            String connectedTableName = tc.getMany().getTableName();
+            String connectedColumnName = tc.getManyColumnName();
+
+            List<FieldInfo> finfo = fieldInfoRepository.getFieldsByColumnName(databaseName, "user1", connectedTableName, connectedColumnName, fieldInfo.getDataValue());
+            System.out.println("fieldInfo");
+            System.out.println(fieldInfo);
+
+            System.out.println("tc");
+            System.out.println(tc);
+
+            System.out.println("finfo");
+            System.out.println(finfo);
+
+            if (!finfo.isEmpty()) {
+                return Boolean.FALSE;
+            }
+
+        }
+
+        return Boolean.TRUE;
+    }
+
 }
 

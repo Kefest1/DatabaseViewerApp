@@ -66,15 +66,19 @@ public class TableInfoController {
     }
 
     @PostMapping("/addenhanced")
-    public String saveInfoEnhanced(@RequestParam("tableName") String tableName,
+    public ResponseEntity<String> saveInfoEnhanced(@RequestParam("tableName") String tableName,
                                    @RequestParam("databaseName") String databaseName,
                                    @RequestParam("primaryKey") String primaryKey,
                                    @RequestParam("username") String username
 
     ) {
-
-
+        List<String> tables = tableInfoRepository.findTableInfoAndByUserName(username, databaseName);
+        if (!tables.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("Failed to add table");
+        }
         TableInfo tableInfo = new TableInfo();
+
         tableInfo.setDatabaseInfo(databaseInfoRepository.getDatabaseInfoByDatabaseName(databaseName));
         tableInfo.setTableName(tableName);
         tableInfo.setPrimary_key(primaryKey);
@@ -84,7 +88,8 @@ public class TableInfoController {
 
         OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
-        return "Ok";
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Table created successfully");
     }
 
     @DeleteMapping("/deletetable")
@@ -110,7 +115,7 @@ public class TableInfoController {
         try {
             tableInfoRepository.deleteTableInfoByIds(Arrays.asList(id));
         }
-        catch (DataIntegrityViolationException dataIntegrityViolationException) {
+        catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Cannot delete table that is not empty");
         }
