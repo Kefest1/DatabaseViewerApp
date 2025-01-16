@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Select from '@mui/material/Select';
-import {MenuItem} from "@mui/material";
+import {FormControl, InputLabel, MenuItem} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import DataGridTable from "./DataGridTable";
 import DatabaseCreator from "./DatabaseCreator";
@@ -61,21 +61,25 @@ function StructureModifier() {
             <h6>Modify database structure</h6>
             <DatabaseModifier/>
             <h6>Modify table structure</h6>
+            <FormControl variant="outlined">
+                <InputLabel id="demo-simple-select-table">Select a Database</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-table"
+                        id="demo-simple-table"
+                        value={selectedDatabase}
+                        label="Select Table"
+                        onChange={(event) => setSelectedDatabase(event.target.value)}
+                        variant={"outlined"}
+                        style={{width: "200px"}}
+                    >
+                        {availableDatabases.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+            </FormControl>
 
-            <Select
-                labelId="demo-simple-select-table"
-                id="demo-simple-table"
-                value={selectedDatabase}
-                label="Select Table"
-                onChange={(event) => setSelectedDatabase(event.target.value)}
-                variant={"outlined"}
-            >
-                {availableDatabases.map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
             {
                 selectedDatabase !== "" &&
                 (

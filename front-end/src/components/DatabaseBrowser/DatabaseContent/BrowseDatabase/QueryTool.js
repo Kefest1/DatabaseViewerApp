@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
 import QueryLogger from './QueryLogger';
 import Select from '@mui/material/Select';
-import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput} from "@mui/material";
+import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput, Paper} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import TableBrowserNew from "./TableBrowserNew";
@@ -100,17 +100,11 @@ async function runQuery(database, table, columns) {
     }
 }
 
-const QueryTool = ({selectedDbTable}) => {
-    let info;
-    info = ["", ""];
-    if (selectedDbTable) {
-        info = selectedDbTable.split(",");
-    }
-
+const QueryTool = ({setData}) => {
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [columnsByDatabase, setColumnsByDatabase] = useState([]);
-    const [selectedDatabase, setSelectedDatabase] = useState(info[0]);
-    const [selectedTable, setSelectedTable] = useState(info[1]);
+    const [selectedDatabase, setSelectedDatabase] = useState("");
+    const [selectedTable, setSelectedTable] = useState("");
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
     const [availableColumns, setAvailableColumns] = useState([]);
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -121,6 +115,8 @@ const QueryTool = ({selectedDbTable}) => {
     const [tableStructure, setTableStructure] = useState([]);
 
     const [tableBrowserKey, setTableBrowserKey] = useState(0);
+
+    // setData("Query Tool");
 
     const logger = QueryLogger.getInstance();
 
@@ -202,7 +198,7 @@ const QueryTool = ({selectedDbTable}) => {
                 setColumnsByDatabase(columnsByDatabase);
             })
             .catch((error) => console.error("Error fetching databases:", error));
-    }, [userName, selectedDbTable]);
+    }, [userName]);
 
     const transitions = useTransition(selectedDatabase, {
         from: {opacity: 0, transform: 'translateY(-20px)'},
@@ -211,10 +207,11 @@ const QueryTool = ({selectedDbTable}) => {
     });
 
     return (
+        <Paper sx={{ width: 1250, height: 778, overflow: 'auto' }} elevation={3} style={{ padding: '20px', margin: '20px', borderRadius: '8px' }}>
         <Grid2 container direction="column" alignItems="flex-start" spacing={2} style={{marginTop: '12px'}}>
-            <Grid2 item>
+            <Grid2>
                 <Grid2 container spacing={2} alignItems="center" direction="row">
-                    <Grid2 item>
+                    <Grid2>
                         <FormControl variant="outlined">
                             <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
                             <Select
@@ -238,7 +235,7 @@ const QueryTool = ({selectedDbTable}) => {
                         (style, item) =>
                             item && (
                                 <animated.div style={style}>
-                                    <Grid2 item>
+                                    <Grid2>
                                         <FormControl variant="outlined">
                                             <InputLabel id="demo-simple-select-table">Select Table</InputLabel>
                                             <Select
@@ -324,7 +321,7 @@ const QueryTool = ({selectedDbTable}) => {
                 //     exit={{opacity: 0, y: -10}}
                 //     transition={{duration: 0.4}}
                 // >
-                    <Grid2 item style={{marginTop: '16px'}}>
+                    <Grid2 style={{marginTop: '16px'}}>
                         <TableBrowserNew
                             key={tableBrowserKey}
                             data={queryResult.result}
@@ -340,6 +337,8 @@ const QueryTool = ({selectedDbTable}) => {
             )}
 
         </Grid2>
+        </Paper>
+
     );
 
 };

@@ -73,7 +73,7 @@ const AdminPanel = () => {
         getDatabase();
     }, []);
 
-    const customList = (tablesInfo) => ( // TODO Customize
+    const customList = (tablesInfo) => (
         <Paper sx={{ width: 300, height: 360, overflow: 'auto' }}>
             <List dense component="div" role="list">
                 {tablesInfo.map((val) => {

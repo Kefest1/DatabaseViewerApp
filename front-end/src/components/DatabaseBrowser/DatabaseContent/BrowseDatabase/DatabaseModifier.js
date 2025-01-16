@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
-import {MenuItem} from "@mui/material";
+import {FormControl, InputLabel, MenuItem} from "@mui/material";
 import Select from "@mui/material/Select";
 import {
     DataGrid, GridActionsCellItem,
@@ -371,20 +371,24 @@ function DatabaseModifier() {
 
     return (
         <div style={{width: '90%'}}>
-            <Select
-                labelId="demo-simple-select-table"
-                id="demo-simple-table"
-                value={selectedDatabase}
-                label="Select Table"
-                onChange={(event) => setSelectedDatabase(event.target.value)}
-                variant={"outlined"}
-            >
-                {availableDatabases.map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
+            <FormControl variant="outlined">
+                <InputLabel id="demo-simple-select-table">Select a Database</InputLabel>
+                <Select
+                    labelId="demo-simple-select-table"
+                    id="demo-simple-table"
+                    value={selectedDatabase}
+                    label="Select Table"
+                    onChange={(event) => setSelectedDatabase(event.target.value)}
+                    variant={"outlined"}
+                    style={{width: "200px"}}
+                >
+                    {availableDatabases.map((option, index) => (
+                        <MenuItem key={index} value={option}>
+                            {option}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
 
             {
                 selectedDatabase !== "" &&

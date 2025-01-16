@@ -1,30 +1,29 @@
 import './App.css';
 import LoginPage from './components/WelcomePages/LoginPage';
 import RegisterPage from "./components/WelcomePages/RegisterPage";
-import MainTest from "./components/DatabaseBrowser/MainTest";
+import Main from "./components/DatabaseBrowser/Main";
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import './index.css';
 
-// Component to handle animations
 function AnimatedRoutes() {
     const location = useLocation();
 
     const pageVariants = {
         initial: {
             opacity: 0,
-            x: "-100vw",
+            scale: 0.9,
         },
         animate: {
             opacity: 1,
-            x: 0,
-            transition: { duration: 0.2 },
+            scale: 1,
+            transition: { duration: 0.3, ease: "easeInOut" },
         },
         exit: {
             opacity: 0,
-            x: "100vw",
-            transition: { duration: 0.2 },
+            scale: 0.9,
+            transition: { duration: 0.3, ease: "easeInOut" },
         },
     };
 
@@ -40,12 +39,13 @@ function AnimatedRoutes() {
                 <Routes location={location} key={location.pathname}>
                     <Route path='/login' element={<LoginPage />} />
                     <Route path='/register' element={<RegisterPage />} />
-                    <Route path='/' element={<MainTest />} />
+                    <Route path='/' element={<Main />} />
                 </Routes>
             </motion.div>
         </AnimatePresence>
     );
 }
+
 
 function App() {
     return (

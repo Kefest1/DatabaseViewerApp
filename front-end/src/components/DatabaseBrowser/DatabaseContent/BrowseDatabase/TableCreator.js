@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import Select from '@mui/material/Select';
-import {MenuItem, TextField} from "@mui/material";
+import {InputLabel, MenuItem, TextField, FormControl, Grid2} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import DataGridTable from "./DataGridTable";
 import DatabaseCreator from "./DatabaseCreator";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
@@ -81,23 +82,27 @@ function TableCreator() {
 
     return (
         <div>
-            <Select
-                labelId="demo-simple-select-table"
-                id="demo-simple-table"
-                value={selectedDatabase}
-                label="Select Table"
-                onChange={(event) => setSelectedDatabase(event.target.value)}
-                variant={"outlined"}
-            >
-                {availableDatabases.map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
+                <FormControl variant="outlined">
+                    <InputLabel id="demo-simple-select-table">Select a Database</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-table"
+                        id="demo-simple-table"
+                        value={selectedDatabase}
+                        label="Select Table"
+                        onChange={(event) => setSelectedDatabase(event.target.value)}
+                        variant={"outlined"}
+                        style={{width: "200px"}}
+                    >
+                        {availableDatabases.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
             {selectedDatabase !== "" && (
-                <div>
+                <Box mt={1} display="flex" alignItems="center" gap={1}>
                     <TextField
                         id="outlined-basic"
                         label="Table Name"
@@ -117,8 +122,7 @@ function TableCreator() {
                     <Button variant="contained" onClick={handleSubmit}>
                         Add table
                     </Button>
-
-                </div>
+                </Box>
             )}
         </div>
     );

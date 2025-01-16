@@ -4,7 +4,7 @@ import DatabaseContent from './DatabaseContent/DatabaseContent';
 import Header from "./Header";
 import {getCookie} from "../getCookie";
 
-const MainTest = () => {
+const Main = () => {
     const [selectedTable, setSelectedTable] = useState("");
 
     useEffect(() => {
@@ -37,4 +37,4 @@ const MainTest = () => {
     );
 }
 
-export default MainTest;
+export default Main;

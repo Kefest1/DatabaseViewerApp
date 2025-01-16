@@ -22,7 +22,6 @@ public class TableStructure {
 
     @ManyToOne
     @JoinColumn(name = "table_info_id")
-
     @JsonIgnore
     private TableInfo tableInfo;
 

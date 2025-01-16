@@ -12,35 +12,43 @@ import StructureModifier from "./BrowseDatabase/StructureModifier";
 import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
 import BrowseMultipleTables from "./BrowseDatabase/BrowseMultipleTables";
 import ConnectionsCreator from "./BrowseDatabase/ConnectionsCreator";
+import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
+import {InfoIcon} from "lucide-react";
+import CloseIcon from "@mui/icons-material/Close";
 
-const DatabaseContent = ({ selectedTable }) => {
+const DatabaseContent = () => {
     const isAdmin = getCookie("isAdmin");
 
     const [activeButton, setActiveButton] = useState(null);
-    const [locSelectedTable, setLocSelectedTable] = useState("");
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
 
-    const handleButtonClick = (buttonIndex) => {
-        if (buttonIndex === 1) {
-            setLocSelectedTable("");
+        const [dataQueryTool, setDataQueryTool] = useState({"update" : [], "insert" : []});
+
+        const handleButtonClick = (buttonIndex) => {
+            if (activeButton === 2) {
+                console.log(dataQueryTool);
+                console.log(dataQueryTool.update);
+                console.log(dataQueryTool.update.length);
+                if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
+                    if (window.confirm("You have unsaved changes. Are you sure you want to leave this page?")) {
+                        setMessage("Changes were not saved!");
+                        setOpenSnackbar(true);
+                    } else {
+                        return;
+                    }
+                }
+            console.log(dataQueryTool);
         }
         setActiveButton(buttonIndex);
     };
-
-    const handleChangeInSelectedTable = (buttonIndex) => {
-        setLocSelectedTable(selectedTable);
-        setActiveButton(buttonIndex);
-    };
-
-    useEffect(() => {
-        handleChangeInSelectedTable(1);
-    }, [selectedTable]);
 
     const renderButtonContent = () => {
         switch (activeButton) {
             case 1:
                 return <WelcomePage />;
             case 2:
-                return <QueryTool selectedDbTable={locSelectedTable} />;
+                return <QueryTool setData={setDataQueryTool}/>;
             case 3:
                 return <BrowseMultipleTables />;
             case 4:
@@ -58,6 +66,10 @@ const DatabaseContent = ({ selectedTable }) => {
             default:
                 return null;
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     return (
@@ -131,6 +143,32 @@ const DatabaseContent = ({ selectedTable }) => {
                     {renderButtonContent()}
                 </motion.div>
             </AnimatePresence>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#766ff4' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </div>
     );
 };

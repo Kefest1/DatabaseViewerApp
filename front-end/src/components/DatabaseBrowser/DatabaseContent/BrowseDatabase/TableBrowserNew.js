@@ -18,6 +18,10 @@ import {
     GridToolbarContainer,
 } from '@mui/x-data-grid';
 import {getCookie} from "../../../getCookie";
+import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
+import {InfoIcon} from "lucide-react";
 
 function getColumnTypeByName(cols, columnName) {
     let type = null;
@@ -58,37 +62,43 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
     return columns;
 }
 
-const logUpdatable = async (fieldsToUpdate) => {
-    try {
-        const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(fieldsToUpdate),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const result = await response.json();
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
-
 
 let newId = -1;
 
-function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure }) {
+function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData }) {
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
 
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const logUpdatable = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(fieldsToUpdate),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            setData(prevData => ({
+                ...prevData,
+                update: []
+            }));
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     let columns = prepareColumns(selectedColumns, primaryKey, tableStructure);
     columns.push(
@@ -209,6 +219,12 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             let request = findDifference(originalRow, updatedRow);
             request["rowIndex"] = originalRow.id;
             setFieldsToUpdate(prevFields => [...prevFields, request]);
+            if ('columnName' in request) {
+                setData(prevData => ({
+                    ...prevData,
+                    update: [...prevData.update, request]
+                }));
+            }
             return updatedRow;
         }
     };
@@ -238,6 +254,12 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
 
     const commitDeleteManyRows = () => {
         console.log(selectedRowsIndex);
+        const selectedCount = selectedRowsIndex.length;
+        if (selectedCount === 0) {
+            setMessage("No rows selected!");
+            setOpenSnackbar(true);
+            return;
+        }
 
         fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
             method: 'DELETE',
@@ -252,6 +274,22 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                 res.forEach((num) => {
                     setRows(rows.filter((row) => row.id !== num));
                 });
+                setMessage("????");
+
+                if (res.length === 0) {
+                    console.log("No rows were deleted");
+                    setMessage("No rows were deleted");
+                }
+                else if (selectedCount === res.length) {
+                    console.log("All selected rows deleted successfully");
+                    setMessage("All selected rows deleted successfully");
+                }
+                else if (selectedCount > res.length) {
+                    console.log("Some rows were not deleted");
+                    setMessage("Some rows were not deleted");
+                }
+
+                setOpenSnackbar(true);
             })
             .catch(error => console.error('Error:', error));
     };
@@ -293,6 +331,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
         console.log(rows);
     }
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
         return (
             <GridToolbarContainer>
@@ -308,10 +350,9 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
     }
 
     return (
-
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button variant="contained" onClick={() => logUpdatable(fieldsToUpdate)}>Update altered fields</Button>
+                <Button variant="contained" onClick={() => logUpdatable()}>Update altered fields</Button>
                 <Button variant="contained" onClick={commitDeleteManyRows}>Delete selected rows</Button>
                 <Button variant="contained" onClick={commitInsertNewRows}>Commit Insertion</Button>
                 <Button variant="contained" onClick={Debug}>Debug</Button>
@@ -334,6 +375,31 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                     toolbar: { setRows, setRowModesModel },
                 }}
             />
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#766ff4' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Box>
     );
 

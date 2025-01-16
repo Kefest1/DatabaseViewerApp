@@ -90,7 +90,6 @@ public class UserInfo {
     @JsonIgnore
     private List<UserInfo> subordinates;
 
-
     @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<TableVisitHistory> visitHistory;
