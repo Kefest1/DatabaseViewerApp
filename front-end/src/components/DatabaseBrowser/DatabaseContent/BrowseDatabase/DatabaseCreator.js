@@ -112,7 +112,7 @@ function DatabaseCreator() {
                     setSucessMessage('Database added successfully');
                     setOpenSnackbarSuccess(true);
                 } else if (status === 200) {
-                    setErrorMessage(`Database with that name already exists:`);
+                    setErrorMessage(`Database with that name already exists`);
                     setOpenSnackbar(true);
                 }
             })

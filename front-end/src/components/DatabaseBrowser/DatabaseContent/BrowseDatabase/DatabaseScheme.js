@@ -150,25 +150,30 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     }, [applyLayout]);
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-            nodeTypes={nodeTypes}
-            nodesConnectable={false}
-            edgesFocusable={false}
-        >
-            <Panel position="top-left">
-                <h4 style={{marginBottom : '10px'}}>Selected database: {selectedDatabase}</h4>
-                <Button variant={"contained"} onClick={() => applyLayout('LR')}>
-                    Layout scheme
-                </Button>
-            </Panel>
-            <MiniMap />
-            <Background />
-        </ReactFlow>
+        <div>
+        {
+            isLayoutApplied === 4 && (
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                fitView
+                nodeTypes={nodeTypes}
+                nodesConnectable={false}
+                edgesFocusable={false}
+            >
+                <Panel position="top-left">
+                    <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
+                    <Button variant={"contained"} onClick={() => applyLayout('LR')}>
+                        Layout scheme
+                    </Button>
+                </Panel>
+                <MiniMap/>
+                <Background/>
+            </ReactFlow>
+        )}
+        </div>
     );
 };
 
@@ -229,7 +234,7 @@ function DatabaseScheme() {
     }, [connections]);
 
     return (
-        <div className="h-full w-full" style={{ height: 783, width: 1600 }}>
+        <div className="h-full w-full" style={{ height: 783, width: 1400 }}>
 
             {selectedDatabase === "" && (
                 <Select

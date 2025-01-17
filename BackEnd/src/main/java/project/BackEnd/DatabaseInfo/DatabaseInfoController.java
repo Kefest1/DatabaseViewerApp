@@ -55,6 +55,20 @@ public class DatabaseInfoController {
         return databaseInfoRepository.findDatabaseNamesByUsername(userName);
     }
 
+    @DeleteMapping("/delete/{databaseName}/{userName}")
+    public ResponseEntity<String> getAvailableDatabases(
+            @PathVariable("userName") String userName,
+            @PathVariable("databaseName") String databaseName
+    ) {
+        List<Long> tables = databaseInfoRepository.findTablesIdsForDatabase(userName, databaseName);
+
+        tableStructureRepository.deleteTableStructureByTableInfo_Ids(tables);
+        tableInfoRepository.deleteTableInfoByIds(tables);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Success");
+    }
+
     @GetMapping("/getDatabaseStructure/{username}/{databaseName}")
     public List<String> getDatabaseStructure(@PathVariable String databaseName, @PathVariable String username) {
         List<String> databaseStructure = databaseInfoRepository.findTablesForDatabase(username, databaseName);

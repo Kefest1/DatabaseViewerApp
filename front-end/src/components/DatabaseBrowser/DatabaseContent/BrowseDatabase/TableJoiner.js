@@ -75,9 +75,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
 
-    const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
-    const [newRows, setNewRows] = useState([]);
-
     const [joinInfo, setJoinInfo] = useState([]);
     const [joinAbleTables, setJoinAbleTables] = useState([]);
     const [selectedJoinTable, setSelectedJoinTable] = useState("");
@@ -85,7 +82,7 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     const [columns, setColumns] = useState([]);
 
     const JoinPanel = () => {
-        if (joinAbleTables !== []) {
+        if (joinAbleTables.length > 0) {
             return (
                 <div>
                     <Select
@@ -106,6 +103,11 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                         Perform join on selected table
                     </Button>
                 </div>
+            )
+        }
+        else {
+            return (
+                <h3>No tables to joined!</h3>
             )
         }
     }
@@ -143,12 +145,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
                     ]);
                 });
             });
-
-            // })
-            // .catch(error => {
-            //     console.error('Error fetching join table:', error);
-            // });
-
 
         const response = await fetchJoinInfo(databaseName, selectedJoinTable);
         console.log(joinInfo);

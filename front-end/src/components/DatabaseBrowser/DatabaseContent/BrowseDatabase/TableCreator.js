@@ -1,11 +1,20 @@
 import React, {useEffect, useState} from "react";
 import Select from '@mui/material/Select';
-import {InputLabel, MenuItem, TextField, FormControl, Grid2} from "@mui/material";
+import {
+    InputLabel,
+    MenuItem,
+    TextField,
+    FormControl,
+    Grid2,
+    SnackbarContent,
+    IconButton,
+    Snackbar
+} from "@mui/material";
 import {getCookie} from "../../../getCookie";
-import DataGridTable from "./DataGridTable";
-import DatabaseCreator from "./DatabaseCreator";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
+import CloseIcon from "@mui/icons-material/Close";
+import {InfoIcon} from "lucide-react";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
@@ -15,42 +24,7 @@ async function fetchAvailableDatabases() {
     return await tables.json();
 }
 
-function addTable(tableName, primaryColumnName, databaseName) {
-    const url = `http://localhost:8080/api/tableinfo/addenhanced`;
-    const userName = getCookie("userName");
 
-    console.log(tableName);
-    console.log(primaryColumnName);
-    console.log(databaseName);
-
-    const data = new URLSearchParams();
-    data.append('tableName', tableName);
-    data.append('username', userName);
-    data.append('databaseName', databaseName);
-    data.append('primaryKey', primaryColumnName);
-
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data.toString()
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.text();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            return data;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-}
 
 function TableCreator() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
@@ -58,6 +32,49 @@ function TableCreator() {
 
     const [tableName, setTableName] = useState('');
     const [primaryColumnName, setPrimaryColumnName] = useState('');
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    }
+
+    function addTable(tableName, primaryColumnName, databaseName) {
+        const url = `http://localhost:8080/api/tableinfo/addenhanced`;
+        const userName = getCookie("userName");
+
+
+        const data = new URLSearchParams();
+        data.append('tableName', tableName);
+        data.append('username', userName);
+        data.append('databaseName', databaseName);
+        data.append('primaryKey', primaryColumnName);
+
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data.toString()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setMessage(data);
+                setOpenSnackbar(true);
+                return data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 
     const handleColumnName = (event) => {
         setPrimaryColumnName(event.target.value);
@@ -124,6 +141,32 @@ function TableCreator() {
                     </Button>
                 </Box>
             )}
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#f44336' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </div>
     );
 }

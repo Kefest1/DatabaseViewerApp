@@ -1,15 +1,19 @@
 package project.BackEnd.DatabaseInfo;
 import jakarta.persistence.*;
-import lombok.ToString;
+import lombok.*;
 import project.BackEnd.Table.TableInfo;
 
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Entity(name = "database_info")
-@Table
+@Entity
+@Table(name = "database_info")
 @ToString
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class DatabaseInfo {
 
     @Id
@@ -32,42 +36,6 @@ public class DatabaseInfo {
     public DatabaseInfo(String databaseName, String description) {
         this.databaseName = databaseName;
         this.description = description;
-    }
-
-    public DatabaseInfo() {
-
-    }
-
-    public List<TableInfo> getTables() {
-        return tables;
-    }
-
-    public void setTables(List<TableInfo> tables) {
-        this.tables = tables;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
     }
 
     @PrePersist

@@ -75,7 +75,7 @@ public class TableInfoController {
         List<String> tables = tableInfoRepository.findTableInfoAndByUserName(username, databaseName);
         if (!tables.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body("Failed to add table");
+                    .body("Table with that name already exists");
         }
         TableInfo tableInfo = new TableInfo();
 

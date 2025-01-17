@@ -99,6 +99,7 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
     @Transactional
     void deleteTableInfoById(@Param("tableId") Long tableId);
 
+
     @Query("SELECT ti.id FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo ui JOIN ti.databaseInfo di" +
             " WHERE ui.username = :userName AND ti.tableName = :tableName AND di.databaseName = :databaseName")
     Optional<Long> findWithUsersAndTables(@Param("userName") String userName, @Param("tableName") String tableName, @Param("databaseName") String databaseName);

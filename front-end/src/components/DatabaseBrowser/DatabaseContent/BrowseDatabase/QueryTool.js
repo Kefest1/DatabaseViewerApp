@@ -7,18 +7,6 @@ import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import TableBrowserNew from "./TableBrowserNew";
 import { useTransition, animated } from 'react-spring';
-import {motion} from "framer-motion";
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
 
 async function fetchAvailableDatabases(userName) {
     const response = await fetch(
@@ -331,6 +319,7 @@ const QueryTool = ({setData}) => {
                             selectedColumns={selectedColumns}
                             primaryKey={primaryKeyName}
                             tableStructure={tableStructure}
+                            setData={setData}
                         />
                     </Grid2>
                 // </motion.div>

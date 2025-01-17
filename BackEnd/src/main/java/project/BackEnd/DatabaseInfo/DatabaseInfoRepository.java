@@ -1,10 +1,11 @@
 package project.BackEnd.DatabaseInfo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
@@ -25,6 +26,15 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
     @Query("SELECT ti.id, ti.tableName, ti.primary_key FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
             "WHERE ui.username = :userName AND db.databaseName = :databaseName")
     List<String> findTablesForDatabase(@Param("userName") String userName, @Param("databaseName") String databaseName);
+
+    @Query("SELECT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
+            "WHERE ui.username = :userName AND db.databaseName = :databaseName")
+    List<Long> findTablesIdsForDatabase(@Param("userName") String userName, @Param("databaseName") String databaseName);
+
+    @Modifying
+    @Query("DELETE FROM DatabaseInfo db WHERE db.id = :databaseID")
+    @Transactional
+    void deleteDatabaseInfoById(@Param("databaseID") Long databaseID);
 
     DatabaseInfo getDatabaseInfoByDatabaseName(String databaseName);
 }

@@ -26,4 +26,8 @@ public interface TableStructureRepository extends JpaRepository<TableStructure, 
     @Query("DELETE FROM TableStructure ts WHERE ts.tableInfo.id = :id")
     void deleteTableStructureByTableInfo(Long id);
 
+    @Modifying
+    @Query("DELETE FROM TableStructure ts WHERE ts.tableInfo.id in (:tableId)")
+    @Transactional
+    void deleteTableStructureByTableInfo_Ids(@Param("tableId") List<Long> tableId);
 }

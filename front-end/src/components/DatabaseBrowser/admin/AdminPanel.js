@@ -196,7 +196,7 @@ const AdminPanel = () => {
                     value={selectedSubordinate}
                     onChange={handleSelectSubordinate}
                     fullWidth
-                    style={{ marginBottom: '8px', width: '300px', height: '50px'}}
+                    style={{ marginBottom: '16px', width: '300px', height: '50px' }}
                 >
                     <MenuItem value=""><em>Select a subordinate</em></MenuItem>
                     {subordinates.map((subordinate) => (
@@ -205,7 +205,7 @@ const AdminPanel = () => {
                         </MenuItem>
                     ))}
                 </Select>
-                <br/>
+
                 <Select
                     labelId="select-database-label"
                     id="select-database"
@@ -214,7 +214,7 @@ const AdminPanel = () => {
                     value={selectedDatabase}
                     onChange={handleSelectDatabase}
                     fullWidth
-                    style={{ marginBottom: '8px', width: '300px', height: '50px'}}
+                    style={{ marginBottom: '16px', width: '300px', height: '50px' }}
                 >
                     <MenuItem value=""><em>Select a database</em></MenuItem>
                     {availableDatabases.map((database) => (
@@ -226,14 +226,20 @@ const AdminPanel = () => {
 
                 {selectedDatabase && selectedSubordinate && (
                     <div>
-                        <Typography variant="body1">Selected Subordinate: {selectedSubordinate}</Typography>
-                        <Typography variant="body1">Selected Database: {selectedDatabase}</Typography>
+                        <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                            Selected Subordinate: <span style={{ color: '#3f51b5' }}>{selectedSubordinate}</span>
+                        </Typography>
+                        <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '16px' }}>
+                            Selected Database: <span style={{ color: '#3f51b5' }}>{selectedDatabase}</span>
+                        </Typography>
                         <Button variant="contained" color="primary" onClick={DEBUG} style={{ margin: '10px 0' }}>
                             Commit Changes
                         </Button>
                         <Grid2 container spacing={2} justifyContent="center" alignItems="center">
                             <Grid2 item xs={5}>
-                                <Typography variant="subtitle2">Tables Unassigned to {selectedSubordinate}:</Typography>
+                                <Typography variant="subtitle1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                                    Tables Unassigned to {selectedSubordinate}:
+                                </Typography>
                                 {customList(availableTables)}
                             </Grid2>
                             <Grid2 item xs={2}>
@@ -281,7 +287,9 @@ const AdminPanel = () => {
                                 </Grid2>
                             </Grid2>
                             <Grid2 item xs={5}>
-                                <Typography variant="subtitle2">Tables Assigned to {selectedSubordinate}:</Typography>
+                                <Typography variant="subtitle1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+                                    Tables Assigned to {selectedSubordinate}:
+                                </Typography>
                                 {customList(allowedTables)}
                             </Grid2>
                         </Grid2>

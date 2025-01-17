@@ -90,11 +90,13 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
                 throw new Error('Network response was not ok');
             }
 
-            const result = await response.json();
+            const result = await response.text();
             setData(prevData => ({
                 ...prevData,
                 update: []
             }));
+            console.log(result);
+            console.log(result);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -319,7 +321,14 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(finalList)
         })
-            .then(response => response.json())
+            .then(response => {
+                setData(prevData => ({
+                    ...prevData,
+                    insert: []
+                }));
+
+                const res = response.text();
+            })
             .catch(error => console.error('Error:', error));
     }
 
@@ -546,6 +555,10 @@ function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName
             setRowModesModel((oldModel) => ({
                 ...oldModel,
                 [id]: { mode: GridRowModes.Edit, fieldToFocus: selectedColumns[0] },
+            }));
+            setData(prevData => ({
+                ...prevData,
+                insert: [...prevData.insert, newRow]
             }));
         };
 
