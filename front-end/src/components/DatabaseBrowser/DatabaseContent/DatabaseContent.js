@@ -16,6 +16,14 @@ import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
 import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
 
+function popOccupied(occupiedTableInfo) {
+    const tableName = occupiedTableInfo["tableName"];
+    const databaseName = occupiedTableInfo["databaseName"];
+    const userName = occupiedTableInfo["userName"];
+
+    const response = fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+}
+
 const DatabaseContent = () => {
     const isAdmin = getCookie("isAdmin");
 
@@ -23,21 +31,28 @@ const DatabaseContent = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
 
-        const [dataQueryTool, setDataQueryTool] = useState({"update" : [], "insert" : []});
+    const [dataQueryTool, setDataQueryTool] = useState({"update" : [], "insert" : []});
+    const [occupiedTableInfo, setOccupiedTableInfo] = useState({
+        "tableName": "",
+        "databaseName": "",
+        "userName": ""
+    });
 
-        const handleButtonClick = (buttonIndex) => {
-            if (activeButton === 2) {
-                console.log(dataQueryTool);
-                console.log(dataQueryTool.update);
-                console.log(dataQueryTool.update.length);
-                if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
-                    if (window.confirm("You have unsaved changes. Are you sure you want to leave this page?")) {
-                        setMessage("Changes were not saved!");
-                        setOpenSnackbar(true);
-                    } else {
-                        return;
-                    }
+    const handleButtonClick = (buttonIndex) => {
+        console.log("occupiedTableInfo");
+        if (activeButton === 2) {
+            if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
+                if (window.confirm("You have unsaved changes. Are you sure you want to leave this page?")) {
+                    setMessage("Changes were not saved!");
+                    setOpenSnackbar(true);
+                } else {
+                    popOccupied(occupiedTableInfo);
+                    return;
                 }
+            }
+            else {
+                popOccupied(occupiedTableInfo);
+            }
             console.log(dataQueryTool);
         }
         setActiveButton(buttonIndex);
@@ -48,7 +63,7 @@ const DatabaseContent = () => {
             case 1:
                 return <WelcomePage />;
             case 2:
-                return <QueryTool setData={setDataQueryTool}/>;
+                return <QueryTool setData={setDataQueryTool} setOccupiedTableInfo={setOccupiedTableInfo}/>;
             case 3:
                 return <BrowseMultipleTables />;
             case 4:

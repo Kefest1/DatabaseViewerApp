@@ -123,14 +123,14 @@ function prepareEdges(data) {
 }
 
 const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
-    const { fitView } = useReactFlow();
+    const {fitView} = useReactFlow();
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [isLayoutApplied, setIsLayoutApplied] = useState(0);
 
     const applyLayout = useCallback(
         (direction) => {
-            const layouted = getLayoutedElements(nodes, edges, { direction });
+            const layouted = getLayoutedElements(nodes, edges, {direction});
 
             setNodes([...layouted.nodes]);
             setEdges([...layouted.edges]);
@@ -150,30 +150,26 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     }, [applyLayout]);
 
     return (
-        <div>
-        {
-            isLayoutApplied === 4 && (
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                fitView
-                nodeTypes={nodeTypes}
-                nodesConnectable={false}
-                edgesFocusable={false}
-            >
-                <Panel position="top-left">
-                    <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
-                    <Button variant={"contained"} onClick={() => applyLayout('LR')}>
-                        Layout scheme
-                    </Button>
-                </Panel>
-                <MiniMap/>
-                <Background/>
-            </ReactFlow>
-        )}
-        </div>
+        <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            fitView
+            nodeTypes={nodeTypes}
+            nodesConnectable={false}
+            edgesFocusable={false}
+        >
+            <Panel position="top-left">
+                <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
+                <Button variant={"contained"} onClick={() => applyLayout('LR')}>
+                    Layout scheme
+                </Button>
+            </Panel>
+            <MiniMap/>
+            <Background/>
+        </ReactFlow>
+
     );
 };
 
