@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
 import QueryLogger from './QueryLogger';
 import Select from '@mui/material/Select';
-import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput} from "@mui/material";
+import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput, Paper} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import TableJoiner from "./TableJoiner";
@@ -177,6 +177,9 @@ const QueryTool = ({selectedDbTable}) => {
     });
 
     return (
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
+
+
         <Grid2 container direction="column" alignItems="flex-start" spacing={2} style={{marginTop: '12px'}}>
             <Grid2 item>
                 <Grid2 container spacing={2} alignItems="center" direction="row">
@@ -292,6 +295,7 @@ const QueryTool = ({selectedDbTable}) => {
                 </Grid2>
             )}
         </Grid2>
+        </Paper>
     );
 
 };

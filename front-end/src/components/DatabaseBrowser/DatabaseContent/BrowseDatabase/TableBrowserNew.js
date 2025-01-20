@@ -50,8 +50,12 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
                 headerAlign: 'left'
             }
             const x = getColumnTypeByName(tableStructure, columnName);
-            if (x.toLowerCase() === 'number' || x.toLowerCase() === 'long' || x.toLowerCase() === 'integer') {
-                col.type = 'number';
+            try {
+                if (x.toLowerCase() === 'number' || x.toLowerCase() === 'long' || x.toLowerCase() === 'integer') {
+                    col.type = 'number';
+                }
+            } catch (e) {
+                console.log(e)
             }
 
 
@@ -66,9 +70,6 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
 let newId = -1;
 
 function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData }) {
-    console.log(data);
-    console.log(selectedColumns);
-    console.log(tableStructure);
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);

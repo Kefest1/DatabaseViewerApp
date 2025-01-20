@@ -184,8 +184,9 @@ const AdminPanel = () => {
     }
 
     return (
-        <Paper elevation={3} style={{ padding: '20px', margin: '20px', borderRadius: '8px' }}>
-            <div style={{ marginLeft: '20px' }}>
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
+
+        <div style={{ marginLeft: '20px' }}>
                 <Typography variant="h6" gutterBottom>Select Options</Typography>
 
                 <Select

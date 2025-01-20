@@ -9,7 +9,7 @@ import {
     useGridApiRef,
 } from '@mui/x-data-grid';
 import {getCookie} from "../../../getCookie";
-import {MenuItem} from "@mui/material";
+import {MenuItem, Paper} from "@mui/material";
 import Select from "@mui/material/Select";
 
 
@@ -287,27 +287,27 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     };
 
     return (
-        <Box sx={{height: 600, width: 1200}}>
-            <Box sx={{display: 'flex', gap: 1, mb: 2}}>
-                <Button onClick={Debug}>Debug</Button>
+            <Box sx={{height: 600, width: 1200}}>
+                <Box sx={{display: 'flex', gap: 1, mb: 2}}>
+                    <Button onClick={Debug}>Debug</Button>
+                </Box>
+                <JoinPanel/>
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    apiRef={apiRef}
+                    editMode="row"
+                    rowModesModel={rowModesModel}
+                    onRowModesModelChange={handleRowModesModelChange}
+                    onProcessRowUpdateError={processError}
+                    slots={{
+                        toolbar: CustomToolbar,
+                    }}
+                    slotProps={{
+                        toolbar: {setRows, setRowModesModel},
+                    }}
+                />
             </Box>
-            <JoinPanel/>
-            <DataGrid
-                rows={rows}
-                columns={columns}
-                apiRef={apiRef}
-                editMode="row"
-                rowModesModel={rowModesModel}
-                onRowModesModelChange={handleRowModesModelChange}
-                onProcessRowUpdateError={processError}
-                slots={{
-                    toolbar: CustomToolbar,
-                }}
-                slotProps={{
-                    toolbar: {setRows, setRowModesModel},
-                }}
-            />
-        </Box>
     );
 
 }

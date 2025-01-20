@@ -220,6 +220,10 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }, [availableColumns]);
 
     useEffect(() => {
+        setSelectedColumns([]);
+    }, [selectedTable]);
+
+    useEffect(() => {
         if (selectedDatabase && selectedTable) {
             fetchPrimaryKeyName(selectedDatabase, selectedTable)
                 .then((response) => {
@@ -259,139 +263,127 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     });
 
     return (
-        <Paper sx={{ width: 1250, height: 778, overflow: 'auto' }} elevation={3} style={{ padding: '20px', margin: '20px', borderRadius: '8px' }}>
-            <Button onClick={() => {
-                runQuery(selectedDatabase, selectedTable, selectedColumns)
-                    .then(result => {
-                        setQueryResult(result);
-                        setIsButtonPressed(true);
-                        setTableBrowserKey(prevKey => prevKey + 1);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            }} style={{marginBottom: '20px'}}>
-                DEBUG
-            </Button>
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
             <Grid2 container direction="column" alignItems="flex-start" spacing={2} style={{marginTop: '12px'}}>
-                <Grid2>
-                    <Grid2 container spacing={2} alignItems="center" direction="row">
-                        <Grid2>
-                            <FormControl variant="outlined">
-                                <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={selectedDatabase}
-                                    onChange={handleSelectOne}
-                                    variant={"outlined"}
-                                    style={{width: '125px'}}
-                                >
-                                    {availableDatabases.map((option, index) => (
-                                        <MenuItem key={index} value={option}>
-                                            {option}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid2>
-
-                        {transitions(
-                            (style, item) =>
-                                item && (
-                                    <animated.div style={style}>
-                                        <Grid2>
-                                            <FormControl variant="outlined">
-                                                <InputLabel id="demo-simple-select-table">Select Table</InputLabel>
-                                                <Select
-                                                    labelId="demo-simple-select-table"
-                                                    id="demo-simple-table"
-                                                    value={selectedTable}
-                                                    onChange={handleSelectTwo}
-                                                    variant={"outlined"}
-                                                    style={{width: '125px'}}
-                                                >
-                                                    {tablesForSelectedDatabase.map((option, index) => (
-                                                        <MenuItem key={index} value={option}>
-                                                            {option}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
-                                        </Grid2>
-                                    </animated.div>
-                                )
-                        )}
-
-                        {selectedTable && (
-                            <Grid2 item>
+                {!("result" in queryResult) && (
+                    <Grid2>
+                        <Grid2 container spacing={2} alignItems="center" direction="row">
+                            {!("result" in queryResult) && (<Grid2>
                                 <FormControl variant="outlined">
-                                    <InputLabel id="demo-multiple-checkbox-label">Select Columns</InputLabel>
-                                    {availableColumns.length === 0 ? (
-                                        <div style={{padding: '10px', color: 'gray'}}>No columns available to select</div>
-                                    ) : (
-                                        <Select
-                                            labelId="demo-multiple-checkbox-label"
-                                            id="demo-multiple-checkbox"
-                                            multiple
-                                            value={selectedColumns}
-                                            onChange={handleSelectThree}
-                                            input={<OutlinedInput label="Select Columns"/>}
-                                            renderValue={(selected) => selected.join(', ')}
-                                            variant={"outlined"}
-                                            style={{width: '175px'}}
-                                        >
-                                            {availableColumns.map((name) => (
-                                                <MenuItem key={name} value={name}>
-                                                    <Checkbox checked={selectedColumns.includes(name)}/>
-                                                    <ListItemText primary={name}/>
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    )}
+                                    <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-label"
+                                        id="demo-simple-select"
+                                        value={selectedDatabase}
+                                        onChange={handleSelectOne}
+                                        variant={"outlined"}
+                                        style={{width: '125px'}}
+                                    >
+                                        {availableDatabases.map((option, index) => (
+                                            <MenuItem key={index} value={option}>
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
-                            </Grid2>
-                        )}
+                            </Grid2>)}
 
-                        {selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && (
-                            <Grid2 item>
-                                <Button
-                                    size={"large"}
-                                    variant="contained"
-                                    style={{marginLeft: 16}}
-                                    onClick={async () => {
-                                        const res = await getTableTakenStatus(selectedDatabase, selectedTable);
-                                        setOccupiedTableInfo({
-                                            databaseName: selectedDatabase,
-                                            tableName: selectedTable,
-                                            userName: getCookie("userName")
-                                        });
+                            {transitions(
+                                (style, item) =>
+                                    item && !("result" in queryResult) && (
+                                        <animated.div style={style}>
+                                            <Grid2>
+                                                <FormControl variant="outlined">
+                                                    <InputLabel id="demo-simple-select-table">Select Table</InputLabel>
+                                                    <Select
+                                                        labelId="demo-simple-select-table"
+                                                        id="demo-simple-table"
+                                                        value={selectedTable}
+                                                        onChange={handleSelectTwo}
+                                                        variant={"outlined"}
+                                                        style={{width: '125px'}}
+                                                    >
+                                                        {tablesForSelectedDatabase.map((option, index) => (
+                                                            <MenuItem key={index} value={option}>
+                                                                {option}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
+                                            </Grid2>
+                                        </animated.div>
+                                    )
+                            )}
 
-                                        if (res) {
-                                            runQuery(selectedDatabase, selectedTable, selectedColumns)
-                                                .then(result => {
-                                                    setQueryResult(result);
-                                                    console.log(result);
-                                                    console.log(tableStructure);
-                                                    setTableBrowserKey(prevKey => prevKey + 1);
-                                                    setIsButtonPressed(true);
-                                                })
-                                                .catch(error => {
-                                                    console.error(error);
-                                                });
-                                        }
-                                        else {
-                                            setIsButtonPressed(true);
-                                        }
-                                    }}
-                                >
-                                    Fetch Data
-                                </Button>
-                            </Grid2>
-                        )}
+                            {selectedTable && !("result" in queryResult) && (
+                                <Grid2 item>
+                                    <FormControl variant="outlined">
+                                        <InputLabel id="demo-multiple-checkbox-label">Select Columns</InputLabel>
+                                        {availableColumns.length === 0 ? (
+                                            <div style={{padding: '10px', color: 'gray'}}>No columns available to
+                                                select</div>
+                                        ) : (
+                                            <Select
+                                                labelId="demo-multiple-checkbox-label"
+                                                id="demo-multiple-checkbox"
+                                                multiple
+                                                value={selectedColumns}
+                                                onChange={handleSelectThree}
+                                                input={<OutlinedInput label="Select Columns"/>}
+                                                renderValue={(selected) => selected.join(', ')}
+                                                variant={"outlined"}
+                                                style={{width: '175px'}}
+                                            >
+                                                {availableColumns.map((name) => (
+                                                    <MenuItem key={name} value={name}>
+                                                        <Checkbox checked={selectedColumns.includes(name)}/>
+                                                        <ListItemText primary={name}/>
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    </FormControl>
+                                </Grid2>
+                            )}
+
+                            {selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && !("result" in queryResult) && (
+                                <Grid2 item>
+                                    <Button
+                                        size={"large"}
+                                        variant="contained"
+                                        style={{marginLeft: 16}}
+                                        onClick={async () => {
+                                            const res = await getTableTakenStatus(selectedDatabase, selectedTable);
+                                            setOccupiedTableInfo({
+                                                databaseName: selectedDatabase,
+                                                tableName: selectedTable,
+                                                userName: getCookie("userName")
+                                            });
+
+                                            if (res) {
+                                                runQuery(selectedDatabase, selectedTable, selectedColumns)
+                                                    .then(result => {
+                                                        setQueryResult(result);
+                                                        console.log(result);
+                                                        console.log(tableStructure);
+                                                        setTableBrowserKey(prevKey => prevKey + 1);
+                                                        setIsButtonPressed(true);
+                                                    })
+                                                    .catch(error => {
+                                                        console.error(error);
+                                                    });
+                                            } else {
+                                                setIsButtonPressed(true);
+                                            }
+                                        }}
+                                    >
+                                        Fetch Data
+                                    </Button>
+                                </Grid2>
+                            )}
+                        </Grid2>
                     </Grid2>
-                </Grid2>
-
+                )}
                 {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && "result" in queryResult && occ && (
 
                         <Grid2 style={{marginTop: '16px'}}>
@@ -416,4 +408,4 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
 
 };
 
-            export default QueryTool;
+export default QueryTool;

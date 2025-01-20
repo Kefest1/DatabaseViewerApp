@@ -16,6 +16,11 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
     @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName FROM UserInfo ui JOIN ui.ownershipDetails od JOIN od.tableInfo ti WHERE ui.username = :name ORDER BY 1, 2")
     List<String> findAllUsersTable(@Param("name") String name);
 
+    @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName, ts.columnName FROM UserInfo ui " +
+            "JOIN ui.ownershipDetails od JOIN od.tableInfo ti  JOIN ti.tableStructure ts WHERE ui.username = :name" +
+            " ORDER BY 1, 2")
+    List<String> findAllUsersTableAndColumnNames(@Param("name") String name);
+
     @Query("SELECT DISTINCT db.databaseName FROM UserInfo ui " +
             "JOIN ui.ownershipDetails od " +
             "JOIN od.tableInfo ti " +

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
@@ -11,34 +11,29 @@ async function fetchAvailableDatabases(userName) {
     return await tables.json();
 }
 
-function organizeData(data) {
-    let result = data.map(item => {
-        const [database, table] = item.split(',');
-        return `${database},${table}`;
-    });
-    result = [...new Set(result)];
+const organizeData = (data) => {
+    const result = [];
+    let idCounter = 1;
 
-    const res = {};
+    data.forEach(item => {
+        const [database, table, column] = item.split(',');
 
-    result.forEach(item => {
-        const [db, table] = item.split(',');
-
-        if (!res[db]) {
-            res[db] = {
-                id: db,
-                label: db,
-                children: []
-            };
+        let dbEntry = result.find(db => db.label === database);
+        if (!dbEntry) {
+            dbEntry = { id: String(idCounter++), label: database, children: [] };
+            result.push(dbEntry);
+        }
+        let tableEntry = dbEntry.children.find(tbl => tbl.label === table);
+        if (!tableEntry) {
+            tableEntry = { id: String(idCounter++), label: table, children: [] };
+            dbEntry.children.push(tableEntry);
         }
 
-        res[db].children.push({
-            id: `${db} ${table}`,
-            label: table
-        });
+        tableEntry.children.push({ id: String(idCounter++), label: column });
     });
 
-    return Object.values(res);
-}
+    return result;
+};
 
 
 const DatabaseInfoPanel = ({handleChange}) => {
@@ -105,7 +100,26 @@ const DatabaseInfoPanel = ({handleChange}) => {
                 </Button>
             </div>
 
-            <Box sx={{minHeight: 352, minWidth: 250}}>
+            <Box
+                sx={{
+                    height: 770,
+                    minWidth: 250,
+                    overflowY: "scroll",
+                    '&::-webkit-scrollbar': {
+                        width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        background: '#f1f1f1',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        background: '#888',
+                        borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb:hover': {
+                        background: '#555',
+                    },
+                }}
+            >
                 <RichTreeView
                     items={tablesData}
                     expandedItems={expandedItems}

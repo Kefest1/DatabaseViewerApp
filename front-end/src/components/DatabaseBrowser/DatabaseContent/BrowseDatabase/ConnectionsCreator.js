@@ -11,7 +11,7 @@ import {
 import {DatabaseSchemaNode} from "../components/database-schema-node";
 import React, {useEffect, useState} from "react";
 import Select from "@mui/material/Select";
-import {MenuItem} from "@mui/material";
+import {MenuItem, Paper} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import Button from "@mui/material/Button";
 
@@ -278,64 +278,64 @@ function ConnectionsCreator() {
     }, [edges]);
 
     return (
-        <div className="h-full w-full" style={{ width: '1000px', height: '600px' }}>
-            <Select
-                labelId="demo-simple-select-database"
-                id="demo-simple-database"
-                value={selectedDatabase}
-                label="Select Database"
-                onChange={(event) => setSelectedDatabase(event.target.value)}
-                variant={"outlined"}
-            >
-                {availableDatabases.map((option, index) => (
-                    <MenuItem key={index} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
-
-            {selectedDatabase && (
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
                 <Select
-                    labelId="demo-simple-select-table-one"
-                    id="demo-simple-table-one"
-                    value={selectedTableOne}
-                    label="Select First Table"
-                    onChange={(event) => setSelectedTableOne(event.target.value)}
+                    labelId="demo-simple-select-database"
+                    id="demo-simple-database"
+                    value={selectedDatabase}
+                    label="Select Database"
+                    onChange={(event) => setSelectedDatabase(event.target.value)}
                     variant={"outlined"}
                 >
-                    {availableTables.map((option, index) => (
+                    {availableDatabases.map((option, index) => (
                         <MenuItem key={index} value={option}>
                             {option}
                         </MenuItem>
                     ))}
                 </Select>
-            )}
 
-            {selectedDatabase && selectedTableOne && (
-                <Select
-                    labelId="demo-simple-select-table-many"
-                    id="demo-simple-table-many"
-                    value={selectedTableMany}
-                    label="Select Second Table"
-                    onChange={(event) => setSelectedTableMany(event.target.value)}
-                    variant={"outlined"}
-                >
-                    {filteredTables.map((option, index) => (
-                        <MenuItem key={index} value={option}>
-                            {option}
-                        </MenuItem>
-                    ))}
-                </Select>
-            )}
+                {selectedDatabase && (
+                    <Select
+                        labelId="demo-simple-select-table-one"
+                        id="demo-simple-table-one"
+                        value={selectedTableOne}
+                        label="Select First Table"
+                        onChange={(event) => setSelectedTableOne(event.target.value)}
+                        variant={"outlined"}
+                    >
+                        {availableTables.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
 
-            {
-                selectedDatabase !== "" && selectedTableOne !== "" && setSelectedTableMany !== "" && isEdgesSet === true && (
-                    <ReactFlowProvider>
-                        <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} selectedTableOne={selectedTableOne} selectedTableMany={selectedTableMany} id={connectionID}/>
-                    </ReactFlowProvider>
-                )
-            }
-        </div>
+                {selectedDatabase && selectedTableOne && (
+                    <Select
+                        labelId="demo-simple-select-table-many"
+                        id="demo-simple-table-many"
+                        value={selectedTableMany}
+                        label="Select Second Table"
+                        onChange={(event) => setSelectedTableMany(event.target.value)}
+                        variant={"outlined"}
+                    >
+                        {filteredTables.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
+
+                {
+                    selectedDatabase !== "" && selectedTableOne !== "" && setSelectedTableMany !== "" && isEdgesSet === true && (
+                        <ReactFlowProvider>
+                            <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} selectedTableOne={selectedTableOne} selectedTableMany={selectedTableMany} id={connectionID}/>
+                        </ReactFlowProvider>
+                    )
+                }
+        </Paper>
     );
 
 }
@@ -343,9 +343,6 @@ function ConnectionsCreator() {
 const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTableOne, selectedTableMany, id }) => {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    console.log(id);
-    console.log(selectedTableMany);
-    console.log(selectedTableOne);
 
     const onConnect = (params) => {
         const sourceNode = nodes.find(node => node.id === params.source);
@@ -470,8 +467,8 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
         >
             <Panel position="top-left">
                 <h4 style={{ marginBottom: '10px' }}>Selected database: {selectedDatabase}</h4>
-                <Button onClick={addEdges}>
-                    Log nodes
+                <Button onClick={addEdges} variant={"contained"} color={"primary"}>
+                    Commit changes
                 </Button>
             </Panel>
             <Background />

@@ -2,6 +2,7 @@ import * as React from 'react';
 import {useState} from "react";
 import {TextField, Snackbar, IconButton, SnackbarContent, Button} from "@mui/material";
 import {getCookie} from "../../../getCookie";
+import Box from '@mui/material/Box';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
 
@@ -126,38 +127,41 @@ function DatabaseCreator() {
     return (
         <div>
             <h1>Create a database</h1>
-            <TextField
-                id="outlined-basic"
-                label="Database Name"
-                variant="outlined"
-                value={databaseName}
-                onChange={handleInputChange}
-            />
-            <TextField
-                id="outlined-basic"
-                label="Table Name"
-                variant="outlined"
-                value={tableName}
-                onChange={handleInputTableNameChange}
-            />
-            <TextField
-                id="outlined-basic"
-                label="Primary key column name"
-                variant="outlined"
-                value={primaryColumnName}
-                onChange={handleColumnName}
-            />
-            <TextField
-                id="outlined-basic"
-                label="DB description (optional)"
-                variant="outlined"
-                value={databaseDescription}
-                onChange={handleInputDescriptionChange}
-            />
-            <br/>
+            <Box display="flex" alignItems="center" gap={1}>
+                <TextField
+                    id="outlined-basic"
+                    label="Database Name"
+                    variant="outlined"
+                    value={databaseName}
+                    onChange={handleInputChange}
+                />
+                <TextField
+                    id="outlined-basic"
+                    label="Table Name"
+                    variant="outlined"
+                    value={tableName}
+                    onChange={handleInputTableNameChange}
+                />
+                <TextField
+                    id="outlined-basic"
+                    label="Primary key column name"
+                    variant="outlined"
+                    value={primaryColumnName}
+                    onChange={handleColumnName}
+                />
+                <TextField
+                    id="outlined-basic"
+                    label="DB description (optional)"
+                    variant="outlined"
+                    value={databaseDescription}
+                    onChange={handleInputDescriptionChange}
+                />
+            </Box>
+
             <Button variant="contained" onClick={handleSubmit} style={{marginTop: 5}}>
                 Add database
             </Button>
+
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

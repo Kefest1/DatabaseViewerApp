@@ -100,7 +100,7 @@ function DatabaseRemove() {
                     label="Select Table"
                     onChange={(event) => setSelectedDatabase(event.target.value)}
                     variant={"outlined"}
-                    style={{width: "200px"}}
+                    style={{width: "200px", marginBottom: "10px"}}
                 >
                     {availableDatabases.map((option, index) => (
                         <MenuItem key={index} value={option}>

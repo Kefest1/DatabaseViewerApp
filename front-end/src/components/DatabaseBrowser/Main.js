@@ -29,7 +29,7 @@ const Main = () => {
                 <div style={{ flex: 1 , background: 'lightgray', border: '5px solid #FFF', borderRadius: '10px', padding: '10px' }}>
                     <DatabaseInfoPanel handleChange={handleSelectedTableChange} />
                 </div>
-                <div style={{ flex: 3 }}>
+                <div style={{ flex: 5 }}>
                     <DatabaseContent selectedTable={selectedTable} setSelectedTable={handleSelectedTableChange} />
                 </div>
             </div>

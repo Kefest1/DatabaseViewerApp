@@ -4,7 +4,7 @@ import "./Statictics.css";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import {Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import {Container} from '@mui/material';
+import {Container, Paper} from '@mui/material';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
@@ -126,6 +126,8 @@ const Statistics = () => {
     }
 
     return (
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
+
         <Box sx={{ padding: 2 }}>
             <Box sx={{ padding: 2 }}>
                 <Grid2 container spacing={2} alignItems="center">
@@ -335,6 +337,7 @@ const Statistics = () => {
                 </motion.div>
             )}
         </Box>
+        </Paper>
     );
 };
 

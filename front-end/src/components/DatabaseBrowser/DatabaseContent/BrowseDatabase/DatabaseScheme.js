@@ -15,7 +15,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import '@xyflow/react/dist/style.css';
 import Dagre from '@dagrejs/dagre';
 import {getCookie} from "../../../getCookie";
-import {MenuItem} from "@mui/material";
+import {MenuItem, Paper} from "@mui/material";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 
@@ -230,6 +230,8 @@ function DatabaseScheme() {
     }, [connections]);
 
     return (
+        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
+
         <div className="h-full w-full" style={{ height: 783, width: 1400 }}>
 
             {selectedDatabase === "" && (
@@ -255,6 +257,7 @@ function DatabaseScheme() {
                 </ReactFlowProvider>
             )}
         </div>
+        </Paper>
     );
 }
 
