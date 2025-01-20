@@ -81,8 +81,6 @@ public class UserInfoController {
 
     @GetMapping("/getByUsername")
     public boolean getByUsername(@RequestParam("userName") String userName, @RequestParam("password") String password) {
-        System.out.println(userName);
-        System.out.println(password);
         Optional<Long> userId = userInfoRepository.checkLoginData(userName, password);
         return userId.isPresent();
     }
