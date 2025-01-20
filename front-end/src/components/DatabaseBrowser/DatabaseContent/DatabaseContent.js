@@ -12,9 +12,18 @@ import StructureModifier from "./BrowseDatabase/StructureModifier";
 import DatabaseScheme from "./BrowseDatabase/DatabaseScheme";
 import BrowseMultipleTables from "./BrowseDatabase/BrowseMultipleTables";
 import ConnectionsCreator from "./BrowseDatabase/ConnectionsCreator";
-import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
+import {
+    Dialog, DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    Snackbar,
+    SnackbarContent
+} from "@mui/material";
 import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
+import Button from "@mui/material/Button";
 
 function popOccupied(occupiedTableInfo) {
     const tableName = occupiedTableInfo["tableName"];
@@ -43,21 +52,18 @@ const DatabaseContent = () => {
     const handleButtonClick = (buttonIndex) => {
         if (activeButton === 2) {
             if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
-                if (window.confirm("You have unsaved changes. Are you sure you want to leave this page?")) {
-                    setMessage("Changes were not saved!");
-                    setOpenSnackbar(true);
-                } else {
-                    popOccupied(occupiedTableInfo);
-                    return;
-                }
-            }
-            else {
+                setPendingButtonIndex(buttonIndex);
+                setOpenDialog(true);
+                return;
+            } else {
                 popOccupied(occupiedTableInfo);
             }
-            console.log(dataQueryTool);
         }
         setActiveButton(buttonIndex);
     };
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [pendingButtonIndex, setPendingButtonIndex] = useState(null);
 
     const renderButtonContent = () => {
         switch (activeButton) {
@@ -87,6 +93,19 @@ const DatabaseContent = () => {
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const confirmLeave = () => {
+        setOpenDialog(false);
+        setMessage("Changes were not saved!");
+        setOpenSnackbar(true);
+        popOccupied(occupiedTableInfo);
+        setActiveButton(pendingButtonIndex);
+    };
+
 
     return (
         <div>
@@ -159,6 +178,26 @@ const DatabaseContent = () => {
                     {renderButtonContent()}
                 </motion.div>
             </AnimatePresence>
+
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+            >
+                <DialogTitle>Unsaved Changes</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        You have unsaved changes. Are you sure you want to leave this page?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmLeave} color="secondary">
+                        Leave
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Snackbar
                 open={openSnackbar}

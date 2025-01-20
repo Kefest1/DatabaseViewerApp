@@ -1,6 +1,17 @@
 import {getCookie} from ".././.././../getCookie";
 import React, {useEffect, useState} from "react";
-import {FormControl, IconButton, InputLabel, MenuItem, Snackbar, SnackbarContent} from "@mui/material";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent, DialogContentText,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Snackbar,
+    SnackbarContent
+} from "@mui/material";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import {InfoIcon} from "lucide-react";
@@ -60,6 +71,24 @@ function DatabaseRemove() {
         }
     }
 
+    const [openDialog, setOpenDialog] = useState(false);
+
+
+    const handleDeleteClick = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const confirmDelete = () => {
+        deleteDatabase(selectedDatabase);
+        setOpenDialog(false);
+        setMessage(`Database ${selectedDatabase} deleted successfully.`);
+        setOpenSnackbar(true);
+    };
+
     return (
         <div>
             <FormControl variant="outlined">
@@ -85,12 +114,32 @@ function DatabaseRemove() {
                 <div>
                     <Button
                         variant="contained"
-                        onClick={() => deleteDatabase(selectedDatabase)}
+                        onClick={handleDeleteClick}
                     >
                         Delete a database
                     </Button>
                 </div>
             )}
+
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+            >
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete the database "{selectedDatabase}"? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} color="secondary">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Snackbar
                 open={openSnackbar}
