@@ -129,7 +129,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
             .then((response) => response.text())
             .then((data) => {
                 console.log(data);
-                setIsAvailable(data);
+                setIsAvailable(data === "true");
                 setIsOcc(true);
                 return data === "true";
             })
@@ -138,6 +138,53 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 return false;
             });
     }
+
+    function checkPosition(selectedDatabase, selectedTable) {
+        return fetch(`http://localhost:8080/api/accesscontroller/checkPosition/${selectedDatabase}/${selectedTable}/${userName}`)
+            .then((response) => response.text())
+            .then((data) => {
+                console.log(data);
+                return data;
+            })
+            .catch((error) => {
+                return -1;
+            });
+    }
+
+    useEffect(() => {
+        console.log("isAvailable: ", isAvailable);
+        console.log("isButtonPressed: ", isButtonPressed);
+        if (isAvailable === false && isButtonPressed === true) {
+            const fetchData = async () => {
+                const data = await checkPosition(selectedDatabase, selectedTable);
+                return data;
+            };
+
+            fetchData();
+
+            const intervalId = setInterval(async () => {
+                const res = await fetchData();
+                console.log(res);
+                if (res === "0") {
+                    clearInterval(intervalId);
+
+                    runQuery(selectedDatabase, selectedTable, selectedColumns)
+                        .then(result => {
+                            setQueryResult(result);
+                            setIsButtonPressed(true);
+                            setTableBrowserKey(prevKey => prevKey + 1);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                    setIsOcc(true);
+                }
+            }, 1000);
+
+            return () => clearInterval(intervalId);
+        }
+    }, [isButtonPressed, selectedDatabase, selectedTable, userName]);
+
 
     useEffect(() => {
         if (selectedDatabase) {
@@ -314,26 +361,28 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                     style={{marginLeft: 16}}
                                     onClick={async () => {
                                         const res = await getTableTakenStatus(selectedDatabase, selectedTable);
+                                        setOccupiedTableInfo({
+                                            databaseName: selectedDatabase,
+                                            tableName: selectedTable,
+                                            userName: getCookie("userName")
+                                        });
 
                                         if (res) {
-                                            setOccupiedTableInfo({
-                                                databaseName: selectedDatabase,
-                                                tableName: selectedTable,
-                                                userName: getCookie("userName")
-                                            });
-                                            console.log("res");
                                             runQuery(selectedDatabase, selectedTable, selectedColumns)
                                                 .then(result => {
                                                     setQueryResult(result);
-                                                    setIsButtonPressed(true);
+                                                    console.log(result);
+                                                    console.log(tableStructure);
                                                     setTableBrowserKey(prevKey => prevKey + 1);
+                                                    setIsButtonPressed(true);
                                                 })
                                                 .catch(error => {
                                                     console.error(error);
                                                 });
                                         }
-
-
+                                        else {
+                                            setIsButtonPressed(true);
+                                        }
                                     }}
                                 >
                                     Fetch Data
@@ -343,7 +392,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                     </Grid2>
                 </Grid2>
 
-                {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && occ && (
+                {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && "result" in queryResult && occ && (
 
                         <Grid2 style={{marginTop: '16px'}}>
                             <TableBrowserNew

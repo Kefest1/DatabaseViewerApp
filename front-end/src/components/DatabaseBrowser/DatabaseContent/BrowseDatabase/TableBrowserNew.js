@@ -65,7 +65,10 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
 
 let newId = -1;
 
-function TableBrowserNew({ data, ColumnNames, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData }) {
+function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData }) {
+    console.log(data);
+    console.log(selectedColumns);
+    console.log(tableStructure);
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);

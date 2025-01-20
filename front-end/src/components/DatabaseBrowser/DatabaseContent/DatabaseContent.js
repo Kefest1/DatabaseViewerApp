@@ -20,14 +20,16 @@ function popOccupied(occupiedTableInfo) {
     const tableName = occupiedTableInfo["tableName"];
     const databaseName = occupiedTableInfo["databaseName"];
     const userName = occupiedTableInfo["userName"];
-
-    const response = fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+    if (tableName === "" || databaseName === "" || userName === "") {
+        return;
+    }
+    fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
 }
 
 const DatabaseContent = () => {
     const isAdmin = getCookie("isAdmin");
 
-    const [activeButton, setActiveButton] = useState(null);
+    const [activeButton, setActiveButton] = useState(1);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -39,7 +41,6 @@ const DatabaseContent = () => {
     });
 
     const handleButtonClick = (buttonIndex) => {
-        console.log("occupiedTableInfo");
         if (activeButton === 2) {
             if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
                 if (window.confirm("You have unsaved changes. Are you sure you want to leave this page?")) {
