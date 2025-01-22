@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import Box from "@mui/material/Box";
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import {Button, Stack} from "@mui/material";
@@ -31,7 +30,7 @@ const organizeData = (data) => {
 
         tableEntry.children.push({ id: String(idCounter++), label: column });
     });
-
+    console.log(result);
     return result;
 };
 

@@ -41,6 +41,7 @@ const DatabaseContent = () => {
     const [activeButton, setActiveButton] = useState(1);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
+    const [messageDialog, setMessageDialog] = useState("");
 
     const [dataQueryTool, setDataQueryTool] = useState({"update" : [], "insert" : []});
     const [occupiedTableInfo, setOccupiedTableInfo] = useState({
@@ -48,15 +49,27 @@ const DatabaseContent = () => {
         "databaseName": "",
         "userName": ""
     });
+    const [canSwitchFromAdmin, setCanSwitchFromAdmin] = useState(true);
 
     const handleButtonClick = (buttonIndex) => {
         if (activeButton === 2) {
             if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
                 setPendingButtonIndex(buttonIndex);
                 setOpenDialog(true);
+                setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
                 return;
             } else {
                 popOccupied(occupiedTableInfo);
+            }
+        }
+        if (activeButton === 5) {
+            console.log(canSwitchFromAdmin);
+            if (canSwitchFromAdmin === false) {
+                setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
+                setPendingButtonIndex(buttonIndex);
+                setOpenDialog(true);
+                setCanSwitchFromAdmin(true);
+                return;
             }
         }
         setActiveButton(buttonIndex);
@@ -76,7 +89,7 @@ const DatabaseContent = () => {
             case 4:
                 return <Statistics />;
             case 5:
-                return isAdmin ? <AdminPanel name={"Admin panel"} /> : <div>TODO</div>;
+                return isAdmin ? <AdminPanel name={"Admin panel"} setOccupiedAdmin={setCanSwitchFromAdmin} /> : <div>TODO</div>;
             case 6:
                 return <QueryLoggerComponent />;
             case 7:

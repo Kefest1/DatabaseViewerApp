@@ -161,8 +161,28 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
             edgesFocusable={false}
         >
             <Panel position="top-left">
-                <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
-                <Button variant={"contained"} onClick={() => applyLayout('LR')}>
+                <h4 style={{
+                    fontSize: '1.5rem',
+                    color: '#333',
+                    marginBottom: '15px',
+                    fontFamily: 'Arial, sans-serif',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+                    letterSpacing: '0.5px',
+                    padding: '10px 0',
+                    borderBottom: '2px solid #2A70C6FF',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                }}>
+                    Selected database: {selectedDatabase}
+                </h4>
+
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => applyLayout('LR')}
+                    style={{ marginLeft: '62,5px', width: '200px', height: '35px' }}
+                >
                     Layout scheme
                 </Button>
             </Panel>
@@ -232,7 +252,7 @@ function DatabaseScheme() {
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
 
-        <div className="h-full w-full" style={{ height: 783, width: 1400 }}>
+        <div className="h-full w-full" style={{ height: 770, width: 1400 }}>
 
             {selectedDatabase === "" && (
                 <Select
@@ -251,7 +271,7 @@ function DatabaseScheme() {
                 </Select>
             )}
 
-            {selectedDatabase !== "" && nodes.length > 0 && (
+            {selectedDatabase !== "" && nodes.length > 0 && edges.length > 0 && (
                 <ReactFlowProvider>
                     <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges}/>
                 </ReactFlowProvider>

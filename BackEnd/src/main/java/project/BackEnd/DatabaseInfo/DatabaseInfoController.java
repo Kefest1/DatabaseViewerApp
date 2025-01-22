@@ -47,7 +47,7 @@ public class DatabaseInfoController {
 
     @GetMapping("/getfoldermap/{username}")
     public List<String> getFolderMap(@PathVariable String username) {
-        return databaseInfoRepository.findAllUsersTable(username);
+        return databaseInfoRepository.findAllUsersTableAndColumnNames(username);
     }
 
     @GetMapping("/getAvailableDatabaseNames/{userName}")

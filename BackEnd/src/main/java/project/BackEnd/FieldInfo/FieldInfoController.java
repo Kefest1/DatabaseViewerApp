@@ -11,6 +11,7 @@ import project.BackEnd.TableConnections.TableConnection;
 import project.BackEnd.TableConnections.TableConnectionRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/fieldinfo")
@@ -37,6 +38,17 @@ public class FieldInfoController {
 
     @GetMapping("/getColumns/{databasename}/{tablename}/{columnname}")
     public List<String> getSingleColumnData(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
+
+        List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
+        rows.forEach(System.out::println);
+
+        return rows.stream()
+                .map(s -> s.split(",", 2)[0])
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/getColumnsForPlot/{databasename}/{tablename}/{columnname}")
+    public List<String> getSingleColumnDataForPlot(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
 
         List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
         return rows;

@@ -1,0 +1,21 @@
+.log-item-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.log-item-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.log-item-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.log-item-exit-active {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 300ms, transform 300ms;
+}

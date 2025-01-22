@@ -417,7 +417,7 @@ public class TableInfoController {
     }
 
     @PostMapping("/getAllFields")
-    public List<List<FieldInfo>> getFields(@RequestBody  request) {
+    public List<List<FieldInfo>> getFields(@RequestBody TableInfoRequest request) {
         List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(request.getColumns(), request.getTable());
 
         Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()

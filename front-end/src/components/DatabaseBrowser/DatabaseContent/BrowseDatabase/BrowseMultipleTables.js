@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
-import QueryLogger from './QueryLogger';
+import QueryLogger, {logging_level} from './QueryLogger';
 import Select from '@mui/material/Select';
 import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput, Paper} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
@@ -68,6 +68,7 @@ async function runQuery(database, table, columns) {
         });
         const endTime = performance.now();
         const fetchTime = endTime - startTime;
+        QueryLogger.addLog(`Fetched data for table ${table} in database ${database}`, logging_level.SELECT);
 
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);
@@ -101,8 +102,6 @@ const QueryTool = ({selectedDbTable}) => {
 
     const [tableBrowserKey, setTableBrowserKey] = useState(0);
 
-    const logger = QueryLogger.getInstance();
-
     const userName = getCookie("userName");
 
     function handleSelectOne(event) {
@@ -132,7 +131,7 @@ const QueryTool = ({selectedDbTable}) => {
 
     useEffect(() => {
         setAvailableColumns([]);
-
+        setSelectedColumns([]);
         if (selectedTable) {
             fetchColumnsForTable(userName, selectedDatabase, selectedTable)
                 .then((response) => {
@@ -151,6 +150,14 @@ const QueryTool = ({selectedDbTable}) => {
     }, [availableColumns]);
 
     useEffect(() => {
+        setIsButtonPressed(false);
+        setAvailableColumns([]);
+        setSelectedColumns([]);
+    }, [selectedDatabase]);
+
+    useEffect(() => {
+        setIsButtonPressed(false);
+
         if (selectedDatabase && selectedTable) {
             fetchPrimaryKeyName(selectedDatabase, selectedTable)
                 .then((response) => {
@@ -185,14 +192,14 @@ const QueryTool = ({selectedDbTable}) => {
                 <Grid2 container spacing={2} alignItems="center" direction="row">
                     <Grid2 item>
                         <FormControl variant="outlined">
-                            <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
+                            <InputLabel id="demo-simple-select-label">Select a Database</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={selectedDatabase}
                                 onChange={handleSelectOne}
                                 variant={"outlined"}
-                                style={{ width: '125px' }}
+                                style={{ width: '175px' }}
                             >
                                 {availableDatabases.map((option, index) => (
                                     <MenuItem key={index} value={option}>
@@ -259,6 +266,7 @@ const QueryTool = ({selectedDbTable}) => {
                     {selectedTable && selectedColumns.length > 0 && (
                         <Grid2 item>
                             <Button
+                                className="button button-insert"
                                 size={"large"}
                                 variant="contained"
                                 style={{marginLeft: 16}}

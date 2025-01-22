@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
-import QueryLogger from './QueryLogger';
+import QueryLogger, {logging_level} from './QueryLogger';
 import Select from '@mui/material/Select';
 import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput, Paper} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
@@ -73,6 +73,8 @@ async function runQuery(database, table, columns) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
+        QueryLogger.addLog(`Selecting from table ${table} from database ${database}`, logging_level.SELECT);
+
         const endTime = performance.now();
         const fetchTime = endTime - startTime;
 
@@ -108,7 +110,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     const [occ, setIsOcc] = useState(false);
     // setData("Query Tool");
 
-    const logger = QueryLogger.getInstance();
 
     const userName = getCookie("userName");
 
@@ -152,8 +153,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }
 
     useEffect(() => {
-        console.log("isAvailable: ", isAvailable);
-        console.log("isButtonPressed: ", isButtonPressed);
         if (isAvailable === false && isButtonPressed === true) {
             const fetchData = async () => {
                 const data = await checkPosition(selectedDatabase, selectedTable);
@@ -218,12 +217,15 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
             setSelectedColumns(availableColumns);
         }
     }, [availableColumns]);
+    //
+    // useEffect(() => {
+    //     setIsButtonPressed(false);
+    //     setSelectedColumns([]);
+    // }, [selectedTable]);
 
     useEffect(() => {
-        setSelectedColumns([]);
-    }, [selectedTable]);
+        setIsButtonPressed(false);
 
-    useEffect(() => {
         if (selectedDatabase && selectedTable) {
             fetchPrimaryKeyName(selectedDatabase, selectedTable)
                 .then((response) => {
@@ -236,6 +238,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }, [selectedDatabase, selectedTable]);
 
     useEffect(() => {
+        setIsButtonPressed(false);
         if (selectedDatabase && selectedTable) {
             fetchTableStructure(selectedDatabase, selectedTable)
                 .then((response) => {
@@ -265,19 +268,20 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
             <Grid2 container direction="column" alignItems="flex-start" spacing={2} style={{marginTop: '12px'}}>
-                {!("result" in queryResult) && (
+                {/*{!("result" in queryResult) && (*/}
+                {(
                     <Grid2>
                         <Grid2 container spacing={2} alignItems="center" direction="row">
-                            {!("result" in queryResult) && (<Grid2>
+                            {(<Grid2>
                                 <FormControl variant="outlined">
-                                    <InputLabel id="demo-simple-select-label">Select Database</InputLabel>
+                                    <InputLabel id="demo-simple-select-label">Select a Database</InputLabel>
                                     <Select
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         value={selectedDatabase}
                                         onChange={handleSelectOne}
                                         variant={"outlined"}
-                                        style={{width: '125px'}}
+                                        style={{width: '175px'}}
                                     >
                                         {availableDatabases.map((option, index) => (
                                             <MenuItem key={index} value={option}>
@@ -290,7 +294,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
 
                             {transitions(
                                 (style, item) =>
-                                    item && !("result" in queryResult) && (
+                                    item && true && (
                                         <animated.div style={style}>
                                             <Grid2>
                                                 <FormControl variant="outlined">
@@ -315,7 +319,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                     )
                             )}
 
-                            {selectedTable && !("result" in queryResult) && (
+                            {selectedTable && (
                                 <Grid2 item>
                                     <FormControl variant="outlined">
                                         <InputLabel id="demo-multiple-checkbox-label">Select Columns</InputLabel>
@@ -346,9 +350,10 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                 </Grid2>
                             )}
 
-                            {selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && !("result" in queryResult) && (
+                            {selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && (
                                 <Grid2 item>
                                     <Button
+                                        className="button button-insert"
                                         size={"large"}
                                         variant="contained"
                                         style={{marginLeft: 16}}
@@ -364,8 +369,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                                 runQuery(selectedDatabase, selectedTable, selectedColumns)
                                                     .then(result => {
                                                         setQueryResult(result);
-                                                        console.log(result);
-                                                        console.log(tableStructure);
                                                         setTableBrowserKey(prevKey => prevKey + 1);
                                                         setIsButtonPressed(true);
                                                     })

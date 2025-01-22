@@ -8,7 +8,8 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import UploadFile from '@mui/icons-material/UploadFile';
-
+import QueryLogger, { logging_level } from './QueryLogger';
+import './TableBrowserNew.css';
 import {
     DataGrid,
     GridActionsCellItem,
@@ -89,6 +90,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 },
                 body: JSON.stringify(fieldsToUpdate),
             });
+            QueryLogger.addLog(`Updated table ${tableName}\'s ${fieldsToUpdate.length} rows`, logging_level.UPDATE);
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -99,7 +101,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 ...prevData,
                 update: []
             }));
-            console.log(result);
             console.log(result);
         } catch (error) {
             console.error('Error:', error);
@@ -174,6 +175,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         processData(data, setRows);
     }, [data, selectedColumns]);
 
+
     const handleEditClick = (id) => () => {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
@@ -244,6 +246,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         if (params < 0) {
             return;
         }
+        QueryLogger.addLog(`Deleted one row from table ${tableName}`, logging_level.DELETE);
+
         fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
             method: 'DELETE',
             headers: {
@@ -280,7 +284,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 res.forEach((num) => {
                     setRows(rows.filter((row) => row.id !== num));
                 });
-                setMessage("????");
+
+                QueryLogger.addLog(`Deleted from table ${tableName} ${res.length} rows`, logging_level.DELETE);
 
                 if (res.length === 0) {
                     console.log("No rows were deleted");
@@ -316,6 +321,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     })
                 }
             }
+
             finalList.push(nodeList);
         });
 
@@ -330,7 +336,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     ...prevData,
                     insert: []
                 }));
-
+                QueryLogger.addLog(`Inserted to table ${tableName} ${finalList.length} rows`, logging_level.INSERT);
                 const res = response.text();
             })
             .catch(error => console.error('Error:', error));
@@ -365,10 +371,10 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     return (
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button variant="contained" onClick={() => logUpdatable()}>Update altered fields</Button>
-                <Button variant="contained" onClick={commitDeleteManyRows}>Delete selected rows</Button>
-                <Button variant="contained" onClick={commitInsertNewRows}>Commit Insertion</Button>
-                <Button variant="contained" onClick={Debug}>Debug</Button>
+                <Button className="button button-update" onClick={() => logUpdatable()}>Update Altered Fields</Button>
+                <Button className="button button-delete" onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
+                <Button className="button button-insert" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
+                {/*<Button variant="contained" onClick={Debug}>Debug</Button>*/}
             </Box>
             <DataGrid
                 rows={rows}

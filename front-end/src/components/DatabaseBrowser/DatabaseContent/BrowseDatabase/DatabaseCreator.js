@@ -126,7 +126,7 @@ function DatabaseCreator() {
 
     return (
         <div>
-            <h1>Create a database</h1>
+            <h6>Create a database</h6>
             <Box display="flex" alignItems="center" gap={1}>
                 <TextField
                     id="outlined-basic"

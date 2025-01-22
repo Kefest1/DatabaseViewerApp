@@ -1,13 +1,23 @@
 import React, {useEffect, useState} from "react";
 import {getCookie} from "../../getCookie";
 import Select from "@mui/material/Select";
-import {Button, Grid2, List, ListItemButton, ListItemIcon, MenuItem, Paper, Typography} from "@mui/material";
+import {
+    Button, FormControl,
+    Grid2,
+    InputLabel,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    MenuItem,
+    Paper,
+    Typography
+} from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import { ArrowBack, ArrowLeft, ArrowRight, ArrowForward } from "@mui/icons-material";
 
 
-const AdminPanel = () => {
+const AdminPanel = ({setOccupiedAdmin}) => {
     const [selectedSubordinate, setSelectedSubordinate] = useState("");
     const [subordinates, setSubordinates] = useState([]);
 
@@ -142,6 +152,13 @@ const AdminPanel = () => {
     const handleAllRight = () => {
         setAllowedTables(allowedTables.concat(availableTables));
         setAvailableTables([]);
+
+        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
+        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
     };
 
     const handleCheckedRight = () => {
@@ -149,6 +166,13 @@ const AdminPanel = () => {
         setAllowedTables(allowedTables.concat(leftChecked));
         setAvailableTables(not(availableTables, leftChecked));
         setChecked(not(checked, leftChecked));
+
+        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
+        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
     };
 
     const handleCheckedLeft = () => {
@@ -156,19 +180,35 @@ const AdminPanel = () => {
         setAvailableTables(availableTables.concat(rightChecked));
         setAllowedTables(not(allowedTables, rightChecked));
         setChecked(not(checked, rightChecked));
+
+        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
+        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
     };
 
     const handleAllLeft = () => {
         setAvailableTables(availableTables.concat(allowedTables));
         setAllowedTables([]);
+
+
+        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
+        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
     };
 
     function DEBUG() {
         let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
         let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
 
-        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
+        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item));
         toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
+        setOccupiedAdmin(true);
 
         fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
             method: 'DELETE'
@@ -187,43 +227,47 @@ const AdminPanel = () => {
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
 
         <div style={{ marginLeft: '20px' }}>
-                <Typography variant="h6" gutterBottom>Select Options</Typography>
-
-                <Select
-                    labelId="select-subordinate-label"
-                    id="select-subordinate"
-                    label="Select Subordinate"
-                    variant="outlined"
-                    value={selectedSubordinate}
-                    onChange={handleSelectSubordinate}
-                    fullWidth
-                    style={{ marginBottom: '16px', width: '300px', height: '50px' }}
-                >
-                    <MenuItem value=""><em>Select a subordinate</em></MenuItem>
-                    {subordinates.map((subordinate) => (
-                        <MenuItem key={subordinate.id} value={subordinate.username}>
-                            {subordinate.username}
-                        </MenuItem>
-                    ))}
-                </Select>
-
-                <Select
-                    labelId="select-database-label"
-                    id="select-database"
-                    label="Select Table"
-                    variant="outlined"
-                    value={selectedDatabase}
-                    onChange={handleSelectDatabase}
-                    fullWidth
-                    style={{ marginBottom: '16px', width: '300px', height: '50px' }}
-                >
-                    <MenuItem value=""><em>Select a database</em></MenuItem>
-                    {availableDatabases.map((database) => (
-                        <MenuItem key={database.id} value={database.databaseName}>
-                            {database.databaseName}
-                        </MenuItem>
-                    ))}
-                </Select>
+                <Typography variant="h6" gutterBottom>Select subordinate and tables</Typography>
+                <FormControl variant="outlined">
+                    <InputLabel id="select-subordinate-label">Select subordinate</InputLabel>
+                    <Select
+                        labelId="select-subordinate-label"
+                        id="select-subordinate"
+                        label="Select Subordinate"
+                        variant="outlined"
+                        value={selectedSubordinate}
+                        onChange={handleSelectSubordinate}
+                        fullWidth
+                        style={{ marginBottom: '16px',marginRight: '10px', width: '300px', height: '50px' }}
+                    >
+                        <MenuItem value=""><em>Select a subordinate</em></MenuItem>
+                        {subordinates.map((subordinate) => (
+                            <MenuItem key={subordinate.id} value={subordinate.username}>
+                                {subordinate.username}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+               <FormControl variant="outlined">
+                   <InputLabel id="select-database-label">Select a Database</InputLabel>
+                    <Select
+                        labelId="select-database-label"
+                        id="select-database"
+                        label="Select Table"
+                        variant="outlined"
+                        value={selectedDatabase}
+                        onChange={handleSelectDatabase}
+                        fullWidth
+                        style={{ marginBottom: '16px', width: '300px', height: '50px' }}
+                    >
+                        <MenuItem value=""><em>Select a database</em></MenuItem>
+                        {availableDatabases.map((database) => (
+                            <MenuItem key={database.id} value={database.databaseName}>
+                                {database.databaseName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+               </FormControl>
 
                 {selectedDatabase && selectedSubordinate && (
                     <div>

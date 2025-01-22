@@ -9,15 +9,21 @@ class QueryLogger {
         return QueryLogger.instance;
     }
 
-    addLog(log) {
-        QueryLogger.logs.push(log);
-        console.log("PUSHED")
-        console.log(QueryLogger.logs)
+    static addLog(message, level) {
+        QueryLogger.logs.push({ message, level });
     }
 
-    getLogs() {
+    static getLogs() {
         return QueryLogger.logs;
     }
 }
+
+export const logging_level = {
+    INSERT: 'insert',
+    DELETE: 'delete',
+    UPDATE: 'update',
+    SELECT: 'select',
+    ALTER_STRUCTURE: 'alter_structure'
+};
 
 export default QueryLogger;
