@@ -126,7 +126,6 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     const {fitView} = useReactFlow();
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [isLayoutApplied, setIsLayoutApplied] = useState(0);
 
     const applyLayout = useCallback(
         (direction) => {
@@ -143,10 +142,7 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     );
 
     useEffect(() => {
-        if (isLayoutApplied < 4) {
             applyLayout('LR');
-            setIsLayoutApplied(isLayoutApplied + 1);
-        }
     }, [applyLayout]);
 
     return (
