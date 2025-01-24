@@ -107,7 +107,21 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         }
         else {
             return (
-                <h3>No tables to joined!</h3>
+                <h5 style={{
+                    fontSize: '1.5rem',
+                    color: '#333',
+                    marginBottom: '15px',
+                    fontFamily: 'Arial, sans-serif',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+                    letterSpacing: '0.5px',
+                    padding: '10px 0',
+                    borderBottom: '2px solid #2A70C6FF',
+                    backgroundColor: '#f9f9f9',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                }}>
+                    No tables to join!
+                </h5>
             )
         }
     }
@@ -273,11 +287,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
         console.log(params);
     }
 
-    function Debug() {
-        console.log(rows);
-        console.log(columns);
-    }
-
     const CustomToolbar = () => {
         return (
             <GridToolbarContainer>
@@ -287,10 +296,7 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     };
 
     return (
-            <Box sx={{height: 600, width: 1200}}>
-                <Box sx={{display: 'flex', gap: 1, mb: 2}}>
-                    <Button onClick={Debug}>Debug</Button>
-                </Box>
+            <Box sx={{height: 600, width: 1400}}>
                 <JoinPanel/>
                 <DataGrid
                     rows={rows}

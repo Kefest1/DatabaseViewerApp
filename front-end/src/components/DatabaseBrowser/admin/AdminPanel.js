@@ -3,19 +3,20 @@ import {getCookie} from "../../getCookie";
 import Select from "@mui/material/Select";
 import {
     Button, FormControl,
-    Grid2,
+    Grid2, IconButton,
     InputLabel,
     List,
     ListItemButton,
     ListItemIcon,
     MenuItem,
-    Paper,
+    Paper, Snackbar, SnackbarContent,
     Typography
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
 import { ArrowBack, ArrowLeft, ArrowRight, ArrowForward } from "@mui/icons-material";
-
+import CloseIcon from "@mui/icons-material/Close";
+import DoneOutline from '@mui/icons-material/DoneOutline';
 
 const AdminPanel = ({setOccupiedAdmin}) => {
     const [selectedSubordinate, setSelectedSubordinate] = useState("");
@@ -35,6 +36,10 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     const leftChecked = intersection(checked, availableTables);
     const rightChecked = intersection(checked, allowedTables);
     const adminName = getCookie("userName");
+
+
+    const [message, setMessage] = useState("");
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
@@ -62,7 +67,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
             `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`
         );
         const data = await response.json();
-        console.log(data);
         setSubordinates(data);
     };
 
@@ -75,7 +79,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
             `http://localhost:8080/api/tableinfo/getAvailableDatabasesObject/${adminName}`
         );
         const data = await response.json();
-        console.log(data);
         setAvailableDatabases(data);
     };
 
@@ -118,14 +121,12 @@ const AdminPanel = ({setOccupiedAdmin}) => {
             `http://localhost:8080/api/tableinfo/getAvailableTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`
         );
         const availableTables = await response.json();
-        console.log(availableTables);
 
         const response2 = await fetch(
             `http://localhost:8080/api/tableinfo/getAllowedTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`
         );
 
         const allowedTables = await response2.json();
-        console.log(allowedTables);
 
         setAvailableTables(availableTables);
         setAllowedTables(allowedTables);
@@ -134,12 +135,10 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     };
 
     const handleSelectDatabase = async (event) => {
-        console.log(event.target.value);
         setSelectedDatabase(event.target.value);
     }
 
     const handleSelectSubordinate = async (event) => {
-        console.log(event.target.value)
         setSelectedSubordinate(event.target.value)
     }
 
@@ -162,7 +161,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     };
 
     const handleCheckedRight = () => {
-        console.log(leftChecked);
         setAllowedTables(allowedTables.concat(leftChecked));
         setAvailableTables(not(availableTables, leftChecked));
         setChecked(not(checked, leftChecked));
@@ -176,7 +174,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     };
 
     const handleCheckedLeft = () => {
-        console.log(rightChecked);
         setAvailableTables(availableTables.concat(rightChecked));
         setAllowedTables(not(allowedTables, rightChecked));
         setChecked(not(checked, rightChecked));
@@ -202,6 +199,10 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     function DEBUG() {
         let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
         let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
@@ -209,6 +210,12 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item));
         toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
         setOccupiedAdmin(true);
+
+        if (toRemoveTables.length === 0 && toInsertTables.length === 0) {
+            setMessage('No changes!');
+            setOpenSnackbar(true);
+            return;
+        }
 
         fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
             method: 'DELETE'
@@ -221,6 +228,9 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         })
             .then(response => response.text())
             .then(data => console.log(data));
+
+        setMessage('Database ownership has been updated!');
+        setOpenSnackbar(true);
     }
 
     return (
@@ -341,6 +351,32 @@ const AdminPanel = ({setOccupiedAdmin}) => {
                     </div>
                 )}
             </div>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#117311' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <DoneOutline style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Paper>
     );
 };

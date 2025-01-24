@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.BackEnd.Table.TableInfoRepository;
-import project.BackEnd.Table.TableStructure;
 import project.BackEnd.Table.TableStructureRepository;
 import project.BackEnd.TableConnections.TableConnection;
 import project.BackEnd.TableConnections.TableConnectionRepository;
@@ -100,6 +99,7 @@ public class FieldInfoController {
     @PostMapping("/insertvalues/{databasename}")
     public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
 
+        System.out.println(fieldInfos);
         for (List<InsertPayload> fieldInfoList : fieldInfos) {
             insertValuesBuff(databasename, fieldInfoList);
         }
@@ -115,17 +115,13 @@ public class FieldInfoController {
         String primaryKey = tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename);
 
         FieldInfo insertPayloadPrimaryKey = new FieldInfo();
-        String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
+        String datatype = fieldInfoRepository.findDatatype(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
         insertPayloadPrimaryKey.setDataType(datatype);
         insertPayloadPrimaryKey.setColumnName(tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename));
         insertPayloadPrimaryKey.setDataValue(String.valueOf(smallestKey));
         insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
         insertPayloadPrimaryKey.setColumnId(newID);
         fieldInfoRepository.save(insertPayloadPrimaryKey);
-
-        System.out.println("insertPayloadPrimaryKey");
-        System.out.println(insertPayloadPrimaryKey);
-        System.out.println("insertPayloadPrimaryKey");
 
         for (InsertPayload fieldInfo : fieldInfos) {
             if (!Objects.equals(fieldInfo.columnName, primaryKey))
@@ -135,14 +131,13 @@ public class FieldInfoController {
     }
 
     private FieldInfo insertValueHelper(InsertPayload fieldInfo, Long newID) {
-        String datatype = fieldInfoRepository.findTopDataTypeByColumnNameOrdered(fieldInfo.columnName, fieldInfo.tableName).get(0);
+        String datatype = fieldInfoRepository.findDatatype(fieldInfo.columnName, fieldInfo.tableName).get(0);
         FieldInfo fieldInfoToSave = new FieldInfo();
         fieldInfoToSave.setDataType(datatype);
         fieldInfoToSave.setColumnName(fieldInfo.columnName);
         fieldInfoToSave.setDataValue(fieldInfo.dataValue);
         fieldInfoToSave.setColumnId(newID);
         fieldInfoToSave.setTableInfo(tableInfoRepository.findByTableName(fieldInfo.tableName));
-        System.out.println(fieldInfoToSave);
         return fieldInfoRepository.save(fieldInfoToSave);
     }
 

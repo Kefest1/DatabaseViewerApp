@@ -100,16 +100,25 @@ function RegisterPage() {
         fetch('http://localhost:8080/api/userinfo/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userPayload)
+            body: JSON.stringify(userPayload),
         })
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                
+                    return response.text().then(errorMessage => {
+                        throw new Error(`Error ${response.status}: ${errorMessage}`);
+                    });
+                }
+                return response.text();
+            })
             .then(data => {
                 setCaption(data);
-                console.log(data);
+                console.log("Success:", data);
             })
-            .then(data => console.log(data))
-            .catch(error => console.error(error));
-
+            .catch(error => {
+                setCaption(error.message);
+                console.error("Error:", error);
+            });
         return is !== false;
     }
 

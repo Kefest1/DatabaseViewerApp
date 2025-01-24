@@ -1,11 +1,12 @@
 import random
-
+import logging
 from locust import task, constant, HttpUser, between
+from faker import Faker
 
+fake = Faker()
 api_host = "http://localhost:8080/api"
-
-def generate_unique_username():
-    return f"delete_{random.randint(1000, 999999)}"
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def generate_unique_email():
@@ -14,6 +15,11 @@ def generate_unique_email():
 
 def generate_unique_password():
     return f"delete_{random.randint(1000, 999999)}"
+
+
+def generate_unique_code():
+    return f"{random.randint(1000, 999999)}"
+
 
 def generate_random_tablename():
     table_names = [
@@ -29,26 +35,47 @@ def generate_random_tablename():
     return table_names[random.randint(0, len(table_names) - 1)]
 
 
-class Testing_user_api(HttpUser):
-    host = api_host
+class UserRegistrationAndLogin(HttpUser ):
+    host = "http://localhost:8080/api"
     wait_time = between(1, 3)
 
+    def on_start(self):
+        self.register_user()
 
-    @task(4)
-    def simulate_login(self):
-        self.client.get("/userinfo/getByUsername", params={"userName": "user1", "password": "pass1"})
+    def register_user(self):
+        self.username = fake.user_name()
+        self.password = fake.password()
+        self.email = f"delete_{fake.email()}"
 
-    @task(2)
-    def simulate_getting_subordinates(self):
-        self.client.get("/userinfo/getsubordinates/user1")
+        response = self.client.post("/userinfo/add", json={
+            "username": self.username,
+            "password_hash": self.password,
+            "email": self.email,
+            "hash": "",
+            "adminName": "user1"
+        })
+
+        if response.status_code == 201:
+            self.login_user()
+        else:
+            logger.error(f"Registration failed for {self.username}: {response.status_code} - {response.text}")
+
+    def login_user(self):
+        response = self.client.get("/userinfo/getByUsername", params={
+            "userName": self.username,
+            "password": self.password
+        })
+
+        if response.status_code == 200:
+            self.fetch_user_info()
+        else:
+            logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
 
     @task(1)
-    def simulate_registering(self):
-        self.client.post("/userinfo/add", json={"username": generate_unique_username(),
-                                       "password_hash": generate_unique_password(),
-                                       "email": generate_unique_email(),
-                                       "hash": "",
-                                       "adminName": "user1"})
+    def fetch_user_info(self):
+        response = self.client.get(f"/userinfo/details/{self.username}")
+        if response.status_code != 200:
+            logger.error(f"Failed to fetch profile for {self.username}: {response.status_code} - {response.text}")
 
 
 class Testing_data_fetching(HttpUser):
@@ -68,6 +95,96 @@ class Testing_data_fetching(HttpUser):
             json=request_body
         )
 
+    @task(2)
+    def simulate_getting_subordinates(self):
+        self.client.get("/userinfo/getsubordinates/user1")
+
     @task(3)
     def simulate_getting_table_folder_map(self):
         self.client.get(f"/databaseinfo/getfoldermap/user1")
+
+
+from locust import HttpUser , task, between
+
+class DefiningNewDatabase(HttpUser ):
+    host = api_host
+    wait_time = between(1, 3)
+
+    @task(1)
+    def simulate_create_database(self):
+        code = generate_unique_code()
+        database_name = f"database_{code}"
+        table_name = f"table_{code}"
+        column_name = f"column_name_{code}"
+        userName = "user2"
+        databaseDescription = f"database_description_{code}"
+
+        response = self.client.post("/databaseinfo/add", json={
+            "databaseName": database_name,
+            "tableName": table_name,
+            "columnName": column_name,
+            "userName": userName,
+            "databaseDescription": databaseDescription
+        })
+
+        if response.status_code == 201:
+            print(f"Database '{database_name}' created successfully.")
+            self.create_tables(database_name)
+        else:
+            print(f"Failed to create database: {response.text}")
+
+    def create_tables(self, database_name):
+        for i in range(6):
+            code = generate_unique_code()
+            table_name = f"table_name_{code}"
+            primary_key = f"primary_key_{code}"
+            username = "user2"
+
+            response = self.client.post("/tableinfo/addenhanced", json={
+                "databaseName": database_name,
+                "tableName": table_name,
+                "primaryKey": primary_key,
+                "username": username,
+            })
+
+            if response.status_code == 201:
+                print(f"Table '{table_name}' added successfully to database '{database_name}'.")
+
+                field_info_array = [
+                    {"columnName": "delete_column1", "columnType": "VARCHAR"},
+                    {"columnName": "delete_column2", "columnType": "INT"},
+                    {"columnName": "delete_column3", "columnType": "DATE"},
+                    {"columnName": "delete_column4", "columnType": "VARCHAR"},
+                    {"columnName": "delete_column5", "columnType": "INT"},
+                    {"columnName": "delete_column6", "columnType": "DATE"}
+                ]
+
+                response = self.client.post(
+                    f"/tableinfo/addTableStructure/{table_name}/{username}/{database_name}",
+                    json=field_info_array,
+                    name="/tableinfo/addTableStructure"
+                )
+
+                if response.status_code != 201:
+                    print(f"Failed to add structure to table '{table_name}': {response.text}")
+
+                finalList = []
+                for j in range(6):
+                    innerList = []
+                    for k in range(6):
+                        insertPayload = {
+                            "columnName": f"delete_column{k + 1}",
+                            "dataValue": f"delete_{generate_unique_code()}",
+                            "tableName": f"{table_name}"
+                        }
+                        innerList.append(insertPayload)
+
+                    finalList.append(innerList)
+
+                response = self.client.post(f"/fieldinfo/insertvalues/{database_name}", json=finalList, profile="/fieldinfo/insertvalues/")
+
+                if response.status_code != 201:
+                    print(f"Failed to add fields to table '{table_name}': {response.text}")
+
+            else:
+                print(f"Failed to add table '{table_name}': {response.text}. Response code : {response.status_code}")

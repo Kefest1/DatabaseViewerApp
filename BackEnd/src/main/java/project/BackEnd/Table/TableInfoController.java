@@ -66,19 +66,20 @@ public class TableInfoController {
     }
 
     @PostMapping("/addenhanced")
-    public ResponseEntity<String> saveInfoEnhanced(@RequestParam("tableName") String tableName,
-                                   @RequestParam("databaseName") String databaseName,
-                                   @RequestParam("primaryKey") String primaryKey,
-                                   @RequestParam("username") String username
+    public ResponseEntity<String> saveInfoEnhanced(@RequestBody TableInfoRequestPayload payload) {
+        System.out.println(payload);
+        String tableName = payload.getTableName();
+        String databaseName = payload.getDatabaseName();
+        String primaryKey = payload.getPrimaryKey();
+        String username = payload.getUsername();
 
-    ) {
-        List<String> tables = tableInfoRepository.findTableInfoAndByUserName(username, databaseName);
-        if (!tables.isEmpty()) {
+        boolean isPresent = tableInfoRepository.checkIfTableExists(databaseName, username, tableName).isPresent();
+        if (isPresent) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body("Table with that name already exists");
         }
-        TableInfo tableInfo = new TableInfo();
 
+        TableInfo tableInfo = new TableInfo();
         tableInfo.setDatabaseInfo(databaseInfoRepository.getDatabaseInfoByDatabaseName(databaseName));
         tableInfo.setTableName(tableName);
         tableInfo.setPrimary_key(primaryKey);
@@ -88,8 +89,21 @@ public class TableInfoController {
 
         OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Table created successfully");
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class TableInfoRequestPayload {
+        private String tableName;
+        private String databaseName;
+        private String primaryKey;
+        private String username;
     }
 
     @DeleteMapping("/deletetable")
@@ -270,6 +284,40 @@ public class TableInfoController {
         System.out.println("Field information received successfully");
 
         return "Field information received successfully";
+    }
+
+    @PostMapping("/addTableStructure/{tableName}/{userName}/{databaseName}")
+    public ResponseEntity<String> addTableStructure(
+            @RequestBody FieldInfoDTO[] fieldInfoArray,
+            @PathVariable("userName") String userName,
+            @PathVariable("tableName") String tableName,
+            @PathVariable("databaseName") String databaseName
+    ) {
+
+        TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseNameAndUserName(tableName, databaseName, userName);
+        if (tableInfo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Table not found");
+        }
+
+        if (tableInfo.getTableStructure() == null) {
+            tableInfo.setTableStructure(new ArrayList<>());
+        }
+        try {
+            for (FieldInfoDTO fieldInfo : fieldInfoArray) {
+                if (fieldInfo.getColumnName() == null || fieldInfo.getColumnType() == null) {
+                    return ResponseEntity.badRequest().body("Column name and type must not be null");
+                }
+                TableStructure tableStructure = new TableStructure();
+                tableStructure.setColumnName(fieldInfo.getColumnName());
+                tableStructure.setColumnType(fieldInfo.getColumnType());
+                tableStructure.setTableInfo(tableInfo);
+                tableStructureRepository.save(tableStructure);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while adding table structure");
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Table structure defined successfully");
     }
 
     @Getter

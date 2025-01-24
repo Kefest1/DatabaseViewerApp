@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -80,6 +80,28 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
+
+    const [test, setTest] = useState(0);
+    const testRef = useRef(test);
+
+    useEffect(() => {
+        testRef.current = test;
+
+        const intervalId = setInterval(() => {
+            setTest(1);
+        }, 1000);
+
+
+        return () => {
+            clearInterval(intervalId);
+            const userName = getCookie("userName");
+            console.log(userName);
+            if (testRef.current === 1) {
+                fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+                console.log(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+            }
+        };
+    }, [test]);
 
     const logUpdatable = async () => {
         try {

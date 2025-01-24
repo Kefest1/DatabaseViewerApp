@@ -165,7 +165,6 @@ function DatabaseModifier() {
         };
 
         const handleDelete = () => {
-            console.log(selectedRowsIndex);
             selectedRowsIndex.forEach(index => {
                 setRows(rows.filter((row) => row.id !== index));
             })
@@ -209,27 +208,23 @@ function DatabaseModifier() {
                 }
             });
 
-            console.log(positive);
-            console.log(negative);
 
             negative.forEach(obj => {
                 const userName = getCookie("userName");
 
-                const params = new URLSearchParams();
-                params.append('tableName', obj.tableName);
-                params.append('databaseName', selectedDatabase);
-                params.append('primaryKey', obj.primaryKey);
-                params.append('username', userName);
-
+                const payload = {
+                    tableName: obj.tableName,
+                    databaseName: selectedDatabase,
+                    primaryKey: obj.primaryKey,
+                    username: userName
+                };
 
                 fetch(`http://localhost:8080/api/tableinfo/addenhanced`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: params.toString()
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 })
-                    .then(response => response.json())
+                    .then(response => response.text())
                     .catch(error => console.error('Error:', error));
             });
 

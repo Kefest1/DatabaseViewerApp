@@ -13,13 +13,23 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
     }
 
     const userName = getCookie("userName");
-    const url = `http://localhost:8080/api/databaseinfo/add/${databaseName}/${tableName}/${primaryColumnName}/${databaseDescription}/${userName}`;
+    const url = "http://localhost:8080/api/databaseinfo/add";
+
+    const payload = {
+        databaseName: databaseName,
+        databaseDescription: databaseDescription,
+        tableName: tableName,
+        columnName: primaryColumnName,
+        userName: userName
+    };
+    console.log(payload);
 
     return fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
+        body: JSON.stringify(payload),
     })
         .then(response => {
             if (response.status === 200) {
@@ -37,6 +47,10 @@ function addDatabase(databaseName, databaseDescription, primaryColumnName, table
                     throw new Error(message);
                 });
             }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            throw error;
         });
 }
 

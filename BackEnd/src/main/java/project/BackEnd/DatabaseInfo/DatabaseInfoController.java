@@ -1,5 +1,6 @@
 package project.BackEnd.DatabaseInfo;
 
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import project.BackEnd.User.UserInfoRepository;
 import java.util.*;
 
 @RestController
-@RequestMapping("api/databaseinfo")
+@RequestMapping("/api/databaseinfo")
 @CrossOrigin(origins = "http://localhost:3000")
 public class DatabaseInfoController {
 
@@ -92,36 +93,40 @@ public class DatabaseInfoController {
         return getStats(userName, databaseName);
     }
 
-    @PostMapping("/add/{databaseName}/{tableName}/{columnName}/{databaseDescription}/{userName}")
-    public ResponseEntity<String> add(
-            @PathVariable("databaseName") String databaseName,
-            @PathVariable("databaseDescription") String databaseDescription,
-            @PathVariable("columnName") String columnName,
-            @PathVariable("tableName") String tableName,
-            @PathVariable("userName") String userName
-    ) {
+    @PostMapping("/add")
+    public ResponseEntity<String> addDatabase(@RequestBody DatabaseRequestPayload payload) {
+        List<String> existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(payload.getUserName(), payload.getDatabaseName());
 
-        List<String> existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(userName, databaseName);
-        System.out.println(databaseName);
-        System.out.println(existingDatabaseName);
         if (!existingDatabaseName.isEmpty()) {
-            System.out.println("Database already exists");
             return new ResponseEntity<>("Database with that name already exists", HttpStatus.OK);
         }
 
-        DatabaseInfo databaseInfo = new DatabaseInfo(databaseName, databaseDescription);
+        DatabaseInfo databaseInfo = new DatabaseInfo(payload.getDatabaseName(), payload.getDatabaseDescription());
         DatabaseInfo savedDatabaseInfo = databaseInfoRepository.save(databaseInfo);
-        TableInfo tableInfo = new TableInfo(savedDatabaseInfo, tableName, columnName);
 
+        TableInfo tableInfo = new TableInfo(savedDatabaseInfo, payload.getTableName(), payload.getColumnName());
         TableInfo savedTableInfo = tableInfoRepository.save(tableInfo);
-        TableStructure tableStructure = new TableStructure(columnName, "Long", savedTableInfo);
 
+        TableStructure tableStructure = new TableStructure(payload.getColumnName(), "Long", savedTableInfo);
         tableStructureRepository.save(tableStructure);
 
-        Long userID = userInfoRepository.findUserIDByUsername(userName);
+        Long userID = userInfoRepository.findUserIDByUsername(payload.getUserName());
         ownershipDetailsService.addOwnershipDetails(new OwnershipDetailsPayload(userID, savedTableInfo.getId()));
 
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class DatabaseRequestPayload {
+        private String databaseName;
+        private String tableName;
+        private String columnName;
+        private String userName;
+        private String databaseDescription;
     }
 
     private DatabaseStatisticsDTO getStats(String userName, String databaseName) {
@@ -144,9 +149,6 @@ public class DatabaseInfoController {
         tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnNamesByTableName(tableName);
         tableStatistics.columnCounts = fieldInfoRepository.countDistinctColumnIDByColumnId(tableName);
         List<TableStructure> tableStructures = tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, "user1", tableName);
-        System.out.println(tableStructures);
-        System.out.println(databaseName);
-        System.out.println(tableName);
         tableStatistics.rowNames = tableStructures.stream()
                 .map(ts -> new ColumnsDTO(ts.getColumnName(), ts.getColumnType()))
                 .toList();

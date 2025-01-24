@@ -32,7 +32,7 @@ function popOccupied(occupiedTableInfo) {
     if (tableName === "" || databaseName === "" || userName === "") {
         return;
     }
-    fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+    // fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
 }
 
 const DatabaseContent = () => {

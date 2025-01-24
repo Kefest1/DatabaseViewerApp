@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
 import Box from "@mui/material/Box";
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import {Button, Stack} from "@mui/material";
+import { Button, Stack } from "@mui/material";
 
 async function fetchAvailableDatabases(userName) {
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
@@ -34,11 +34,9 @@ const organizeData = (data) => {
     return result;
 };
 
-
-const DatabaseInfoPanel = ({handleChange}) => {
+const DatabaseInfoPanel = ({ handleChange }) => {
     const userName = getCookie("userName");
     const [tablesData, setTablesData] = useState([]);
-
     const [expandedItems, setExpandedItems] = React.useState([]);
 
     const handleExpandedItemsChange = (event, itemIds) => {
@@ -65,7 +63,7 @@ const DatabaseInfoPanel = ({handleChange}) => {
         return itemIds;
     };
 
-    useEffect(() => {
+    const fetchAndSetTablesData = () => {
         fetchAvailableDatabases(userName)
             .then((data) => {
                 const organizedData = organizeData(data);
@@ -74,11 +72,13 @@ const DatabaseInfoPanel = ({handleChange}) => {
             .catch((error) => {
                 console.error("Error fetching data:", error);
             });
+    };
+
+    useEffect(() => {
+        fetchAndSetTablesData();
     }, [userName]);
 
-
     const handleNodeClick = (event, nodeId) => {
-
         const parentDatabase = tablesData.find((db) =>
             db.children.some((child) => child.id === nodeId)
         );
@@ -96,6 +96,9 @@ const DatabaseInfoPanel = ({handleChange}) => {
             <div>
                 <Button onClick={handleExpandClick}>
                     {expandedItems.length === 0 ? 'Expand all' : 'Collapse all'}
+                </Button>
+                <Button onClick={fetchAndSetTablesData} style={{ marginLeft: '10px' }}>
+                    Refresh
                 </Button>
             </div>
 
@@ -126,9 +129,7 @@ const DatabaseInfoPanel = ({handleChange}) => {
                     onItemClick={handleNodeClick}
                 />
             </Box>
-
         </Stack>
-
     );
 };
 

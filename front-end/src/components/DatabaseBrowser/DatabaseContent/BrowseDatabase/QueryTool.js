@@ -129,7 +129,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
         return fetch(`http://localhost:8080/api/accesscontroller/addAndCheck/${selectedDatabase}/${selectedTable}/${userName}`)
             .then((response) => response.text())
             .then((data) => {
-                console.log(data);
                 setIsAvailable(data === "true");
                 setIsOcc(true);
                 return data === "true";
@@ -171,7 +170,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                         .then(result => {
                             setQueryResult(result);
                             setIsButtonPressed(true);
-                            setTableBrowserKey(prevKey => prevKey + 1);
+                            // setTableBrowserKey(prevKey => prevKey + 1);
                         })
                         .catch(error => {
                             console.error(error);
@@ -217,11 +216,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
             setSelectedColumns(availableColumns);
         }
     }, [availableColumns]);
-    //
-    // useEffect(() => {
-    //     setIsButtonPressed(false);
-    //     setSelectedColumns([]);
-    // }, [selectedTable]);
+
 
     useEffect(() => {
         setIsButtonPressed(false);
@@ -369,7 +364,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                                 runQuery(selectedDatabase, selectedTable, selectedColumns)
                                                     .then(result => {
                                                         setQueryResult(result);
-                                                        setTableBrowserKey(prevKey => prevKey + 1);
+                                                        // setTableBrowserKey(prevKey => prevKey + 1);
                                                         setIsButtonPressed(true);
                                                     })
                                                     .catch(error => {

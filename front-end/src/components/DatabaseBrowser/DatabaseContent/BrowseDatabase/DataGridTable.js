@@ -17,6 +17,8 @@ import {getCookie} from "../../../getCookie";
 import {useEffect, useState} from "react";
 import {FormControl, InputLabel, MenuItem} from "@mui/material";
 import Select from "@mui/material/Select";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 
 async function fetchStructure(databaseName, selectedTable) {
@@ -39,6 +41,14 @@ async function checkIfTableIsEmpty(selectedTable, selectedDatabase) {
     return await tables.json();
 }
 
+async function fetchPrimaryKeyName(databaseName, tableName) {
+    const userName = getCookie("userName");
+    const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`
+    const response = await fetch(url);
+    return await response.text();
+}
+
+
 let idBuf = -1;
 
 function DataGridTable({ databaseName, selectedTable }) {
@@ -47,6 +57,18 @@ function DataGridTable({ databaseName, selectedTable }) {
     const [rowModesModel, setRowModesModel] = useState({});
     const [tablesToDelete, setTablesToDelete] = useState([]);
     const [isEmpty, setIsEmpty] = useState(false);
+    const [primaryKey, setPrimaryKey] = useState(false);
+
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackbarOpen(false);
+    };
 
     function EditToolbar(props) {
         const { setRows, setRowModesModel } = props;
@@ -91,21 +113,15 @@ function DataGridTable({ databaseName, selectedTable }) {
     useEffect(() => {
         const loadTableStructure = async () => {
             try {
-                console.log("false");
                 const ret = await checkIfTableIsEmpty(selectedTable, databaseName);
                 if (ret === false) {
                     setIsEmpty(false);
-                    console.log("false");
                 }
                 else {
                     setIsEmpty(true);
-                    console.log("true");
                 }
 
                 const structure = await fetchStructure(databaseName, selectedTable);
-                console.log(ret);
-                console.log("true");
-                console.log(structure);
                 const rowsWithUniqueIds = structure.map(item => ({
                     ...item,
                     id: item.id || idBuf,
@@ -125,6 +141,12 @@ function DataGridTable({ databaseName, selectedTable }) {
         setRows([]);
     }, [databaseName]);
 
+    useEffect(() => {
+        fetchPrimaryKeyName(databaseName, selectedTable).then((data) => {
+            setPrimaryKey(data);
+        });
+    }, []);
+
     const handleRowEditStop = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
             event.defaultMuiPrevented = true;
@@ -137,6 +159,7 @@ function DataGridTable({ databaseName, selectedTable }) {
 
     function commitDelete(tablesToDelete) {
         const url = `http://localhost:8080/api/tableinfo/deleteFieldInfo`
+        console.log(rows);
         fetch(url, {
             method: 'DELETE',
             headers: {
@@ -198,6 +221,12 @@ function DataGridTable({ databaseName, selectedTable }) {
     };
 
     const handleDeleteClick = (id) => () => {
+        const result = rows.find(item => item.id === id)["columnName"];
+        if (result === primaryKey) {
+            setSnackbarMessage("Cannot delete primary key");
+            setSnackbarOpen(true);
+            return;
+        }
         setTablesToDelete((prevTables) => [...prevTables, id]);
         setRows(rows.filter((row) => row.id !== id));
     };
@@ -422,7 +451,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                             },
                         }}
                     >
-                        <h4>Cannot delete and change types of empty columns</h4>
+                        <h4>Cannot delete or change types in non-empty table!</h4>
                         <DataGrid
                             rows={rows}
                             columns={columnsForEmpty}
@@ -439,6 +468,12 @@ function DataGridTable({ databaseName, selectedTable }) {
                     </Box>
                 )
             }
+
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <MuiAlert onClose={handleCloseSnackbar} severity="warning" sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </MuiAlert>
+            </Snackbar>
         </div>
     );
 }

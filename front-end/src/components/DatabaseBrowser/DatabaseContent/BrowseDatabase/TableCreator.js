@@ -44,19 +44,19 @@ function TableCreator() {
         const url = `http://localhost:8080/api/tableinfo/addenhanced`;
         const userName = getCookie("userName");
 
-
-        const data = new URLSearchParams();
-        data.append('tableName', tableName);
-        data.append('username', userName);
-        data.append('databaseName', databaseName);
-        data.append('primaryKey', primaryColumnName);
+        const payload = {
+            tableName: tableName,
+            primaryKey: primaryColumnName,
+            databaseName: databaseName,
+            username: userName
+        };
 
         return fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: data.toString()
+            body: JSON.stringify(payload)
         })
             .then(response => {
                 if (!response.ok) {

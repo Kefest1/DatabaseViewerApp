@@ -1,10 +1,14 @@
 package project.BackEnd.User;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.HttpStatus;
 import java.util.*;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,13 +25,13 @@ public class UserInfoController {
     UserInfoRepository userInfoRepository;
 
     @PostMapping("/add")
-    public String add(@RequestBody UserPayload userPayload) {
+    public ResponseEntity<Object> add(@RequestBody UserPayload userPayload) {
         System.out.println(userPayload);
         if (userInfoRepository.findByUsername(userPayload.getUsername()) != null) {
-            return "Username is already taken";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already taken");
         }
         if (userInfoRepository.findByEmail(userPayload.getEmail()) != null) {
-            return "Email is already in use";
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use");
         }
         try {
             UserInfo userInfo;
@@ -37,7 +41,7 @@ public class UserInfoController {
                 if (!Arrays.asList(availableHashes).contains(userPayload.getHash())) {
                     System.out.println(userPayload.getHash());
                     System.out.println("BadHash");
-                    return "Hash incorrect";
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Hash incorrect");
                 }
 
                 userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), true, null);
@@ -45,18 +49,19 @@ public class UserInfoController {
                 UserInfo admin = userInfoRepository.findByUsername(userPayload.getAdminName());
                 if (admin == null) {
                     System.out.println("Incorrect admin");
-                    return "Incorrect admin";
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Incorrect admin");
                 }
                 userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), false, admin);
             }
             usersService.saveUsers(userInfo);
-        } catch (DataIntegrityViolationException  e) {
-            return e.getMessage();
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Data integrity violation: " + e.getMessage());
         } catch (Exception e) {
-            return "An error has occured";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error has occurred: " + e.getMessage());
         }
-        return "New user is added";
+        return ResponseEntity.status(HttpStatus.CREATED).body("New user is added");
     }
+
 
     @GetMapping("/getall")
     public List<UserInfo> list() {
@@ -94,6 +99,32 @@ public class UserInfoController {
     @GetMapping("/checkExistenceByUsername/{userInfoName}")
     public boolean checkExistenceByUsername(@PathVariable("userInfoName") String userInfoName) {
         return usersService.checkExistenceByUsername(userInfoName);
+    }
+
+    @GetMapping("/details/{userName}")
+    public ResponseEntity<UserDetailsResponse> getUserDetails(@PathVariable("userName") String userName) {
+        try {
+            var userInfo = userInfoRepository.findByUsername(userName);
+            UserDetailsResponse userDetails = new UserDetailsResponse(userInfo.getUsername(), userInfo.getEmail());
+            if (userInfo != null) {
+                return ResponseEntity.ok(userDetails);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(null);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @ToString
+    public class UserDetailsResponse {
+        private String username;
+        private String email;
     }
 
     static String[] availableHashes = {"abc", "qwerty"};

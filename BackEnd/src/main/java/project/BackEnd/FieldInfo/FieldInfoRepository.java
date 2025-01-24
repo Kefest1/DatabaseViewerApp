@@ -47,14 +47,9 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT COUNT(DISTINCT fi.columnName) FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
     Long countDistinctColumnNamesByTableName(@Param("tableName") String tableName);
 
-    @Query("SELECT DISTINCT fi.columnName FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName")
-    List<String> findDistinctColumnNamesByTableName(@Param("tableName") String tableName);
+    @Query("SELECT DISTINCT ts.columnType FROM TableInfo ti JOIN ti.tableStructure ts JOIN ti.databaseInfo WHERE ts.columnName = :columnName AND ti.tableName = :tableName")
+    List<String> findDatatype(@Param("columnName") String columnName, @Param("tableName") String tableName);
 
-    @Query("SELECT DISTINCT fi.dataType FROM FieldInfo fi JOIN fi.tableInfo ti WHERE fi.columnName = :columnName AND ti.tableName = :tableName")
-    List<String> findTopDataTypeByColumnNameOrdered(@Param("columnName") String columnName, @Param("tableName") String tableName);
-
-//    @Query("SELECT DISTINCT fi.columnName, ti.tableName FROM FieldInfo fi JOIN fi.tableInfo ti JOIN fi.tableInfo.ownershipDetails od JOIN od.user WHERE od.user.username = :username")
-//    List<String> findWithUsersAndTables(@Param("username") String username);
 
     @Query("SELECT fi.dataValue FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName = :primaryKeyName")
     List<String> findFirstFreeKeyFieldWithUsersAndTables(@Param("tableName") String tableName, @Param("primaryKeyName") String primaryKeyName);

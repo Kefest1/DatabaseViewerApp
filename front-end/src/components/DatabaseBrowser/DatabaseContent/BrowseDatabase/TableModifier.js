@@ -19,6 +19,14 @@ async function fetchAvailableTables(selectedDatabase) {
     return await tables.json();
 }
 
+
+async function fetchPrimaryKeyName(database, table) {
+    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
+    const response = await fetch(url);
+    return await response.text();
+}
+
+
 function TableModifier() {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [selectedTable, setSelectedTable] = useState("");
