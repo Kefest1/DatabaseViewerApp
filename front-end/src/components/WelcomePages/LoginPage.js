@@ -51,7 +51,7 @@ function LoginPage() {
 
         let data;
         try {
-            const response = await fetch(`http://localhost:8080/api/userinfo/getByUsername?userName=${username}&password=${password}`);
+            const response = await fetch(`http://localhost:8080/api/userinfo/getByUsername/${username}/${password}`);
 
             if (!response.ok) {
                 console.error('Fetch error:', response.status, response.statusText);

@@ -93,14 +93,22 @@ public class UserInfoController {
         return userInfoRepository.findByUsername(userName).getSubordinates();
     }
 
-    @GetMapping("/getByUsername")
-    public boolean getByUsername(@RequestParam("userName") String userName, @RequestParam("password") String password) {
+    @GetMapping("/getByUsername/{userName}/{password}")
+    public boolean getByUsername(@PathVariable("userName") String userName, @PathVariable("password") String password) {
+        System.out.println("userName");
+        System.out.println(userName);
+        System.out.println(password);
+
         Optional<Long> userId = userInfoRepository.checkLoginData(userName, password);
+        System.out.println("userId");
+        System.out.println(userId);
         return userId.isPresent();
     }
 
     @GetMapping("/getIdByUsername/{username}")
     public Long getIDByUsername(@PathVariable("username") String userInfoName) {
+        System.out.println("DOCKER");
+        System.out.println("userInfoName");
         System.out.println(userInfoName);
         return usersService.getUsersByUsername(userInfoName).getId();
     }
