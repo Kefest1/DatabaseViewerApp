@@ -120,11 +120,6 @@ const Statistics = () => {
         setGenerateHistogramClicked(false);
     }
 
-    function flipHistogram() {
-        setGenerateHistogramClicked(true);
-        setGenerateGraphClicked(false);
-    }
-
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
 
@@ -216,7 +211,7 @@ const Statistics = () => {
 
                 )}
 
-                {selectedTable && (
+                {selectedTable && databaseStatistics.tableStatistics.columnCounts > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -344,7 +339,7 @@ const Statistics = () => {
 function PrepareTree(stats) {
     let tree = [{
         id: 'tree',
-        label: 'Browser column statistics for ' + stats.stats.tableName,
+        label: 'Browse column statistics for ' + stats.stats.tableName,
         children: []
     }];
 
@@ -356,6 +351,13 @@ function PrepareTree(stats) {
         tree[0].children.push(treeNode);
     });
 
+    if (tree[0]["children"].length === 0) {
+        return (
+            <Box>
+                <Typography variant="h6">No columns to display statistics for.</Typography>
+            </Box>
+        );
+    }
     return (
         <RichTreeView items={tree} />
     );

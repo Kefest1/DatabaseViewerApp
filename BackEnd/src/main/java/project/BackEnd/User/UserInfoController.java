@@ -78,6 +78,15 @@ public class UserInfoController {
         return userInfoRepository.findByUsernameAndIsAdmin(userName, true) != null;
     }
 
+    @GetMapping("/getAdmin/{userName}")
+    public String getAdmin(@PathVariable("userName") String userName) {
+        return userInfoRepository.findAdmin(userName);
+    }
+
+    @GetMapping("/getAdminMail/{userName}")
+    public String findAdminEmail(@PathVariable("userName") String userName) {
+        return userInfoRepository.findAdminEmail(userName);
+    }
 
     @GetMapping("/getsubordinates/{userName}")
     public List<UserInfo> getSubordinates(@PathVariable("userName") String userName) {

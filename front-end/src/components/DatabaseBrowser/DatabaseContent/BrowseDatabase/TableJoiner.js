@@ -132,23 +132,18 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
 
     async function performJoin() {
         let informationJoin = [];
-        console.log(joinInfo);
-        console.log(selectedJoinTable)
         joinInfo.forEach(info => {
             if (info.oneTableName === selectedJoinTable) {
                 informationJoin = info;
             }
         });
-        console.log(informationJoin)
 
         fetchJoinTable(databaseName, informationJoin.oneTableName)
             .then(async fetchedJoinTable => {
-                console.log(fetchedJoinTable);
                 mergeTwoTables(fetchedJoinTable, (fetchedJoinTable[0].map(column => column.columnName))
                     .filter(item => item !== informationJoin.oneColumnName), informationJoin);
 
                 const res = await fetchJoinInfo(databaseName, informationJoin.oneTableName);
-                console.log(joinAbleTables);
                 if (res.length === 0) {
                     return;
                 }
@@ -161,8 +156,6 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
             });
 
         const response = await fetchJoinInfo(databaseName, selectedJoinTable);
-        console.log(joinInfo);
-        console.log(response);
         const mergedJoinInfo = joinInfo.concat(response);
         setJoinInfo(mergedJoinInfo);
     }
@@ -170,18 +163,27 @@ function TableJoiner({ data, ColumnNames, fetchTime, tableName, databaseName, se
     function mergeTwoTables(rowsToMerge, columnsToMerge, informationJoin) {
         let finalRows = [];
 
-        console.log(rowsToMerge);
-        console.log(columnsToMerge);
-
         const deepCopyRows = JSON.parse(JSON.stringify(rows));
         deepCopyRows.forEach(row => {
             const joinId = row[informationJoin.manyColumnName];
             const nodes = findRowToJoin(rowsToMerge, informationJoin.oneColumnName, joinId);
-            nodes.forEach(item => {
-                const key = Object.keys(item)[0];
-                row[key] = item[key];
-            });
 
+            const tempNode = [];
+            if (nodes === null) {
+                columnsToMerge.forEach(col => {
+                    tempNode.push({[col]: "null"});
+                });
+                tempNode.forEach(item => {
+                    const key = Object.keys(item)[0];
+                    row[key] = item[key];
+                });
+            }
+            else {
+                nodes.forEach(item => {
+                    const key = Object.keys(item)[0];
+                    row[key] = item[key];
+                });
+            }
             finalRows.push(row);
         });
 

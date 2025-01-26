@@ -24,19 +24,12 @@ import {
 import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
+import UserAdminPanel from "../admin/UserAdminPanel";
 
-function popOccupied(occupiedTableInfo) {
-    const tableName = occupiedTableInfo["tableName"];
-    const databaseName = occupiedTableInfo["databaseName"];
-    const userName = occupiedTableInfo["userName"];
-    if (tableName === "" || databaseName === "" || userName === "") {
-        return;
-    }
-    // fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
-}
+
 
 const DatabaseContent = () => {
-    const isAdmin = getCookie("isAdmin");
+    const isAdmin = getCookie("isAdmin") === "true";
 
     const [activeButton, setActiveButton] = useState(1);
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -58,12 +51,9 @@ const DatabaseContent = () => {
                 setOpenDialog(true);
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
                 return;
-            } else {
-                popOccupied(occupiedTableInfo);
             }
         }
         if (activeButton === 5) {
-            console.log(canSwitchFromAdmin);
             if (canSwitchFromAdmin === false) {
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
                 setPendingButtonIndex(buttonIndex);
@@ -89,7 +79,7 @@ const DatabaseContent = () => {
             case 4:
                 return <Statistics />;
             case 5:
-                return isAdmin ? <AdminPanel name={"Admin panel"} setOccupiedAdmin={setCanSwitchFromAdmin} /> : <div>TODO</div>;
+                return isAdmin ? <AdminPanel name={"Admin panel"} setOccupiedAdmin={setCanSwitchFromAdmin} /> : <UserAdminPanel />;
             case 6:
                 return <QueryLoggerComponent />;
             case 7:
@@ -115,7 +105,6 @@ const DatabaseContent = () => {
         setOpenDialog(false);
         setMessage("Changes were not saved!");
         setOpenSnackbar(true);
-        popOccupied(occupiedTableInfo);
         setActiveButton(pendingButtonIndex);
     };
 

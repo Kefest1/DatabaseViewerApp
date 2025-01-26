@@ -5,26 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7463e9c2-7dec-4348-921d-4d1c7aece0a2" name="Changes" comment="More">
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/DatabaseInfo/DatabaseInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/FieldInfo/FieldInfoRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/Table/TableInfoRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/UserAdminPanel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/User/UserInfoController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/User/UserInfoController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../EfficiencyTest/locustfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/../EfficiencyTest/locustfile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/User/UserInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/src/main/java/project/BackEnd/User/UserInfoRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DataGridTable.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DataGridTable.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseCreator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseModifier.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseModifier.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/QueryTool.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/QueryTool.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseRemove.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/DatabaseRemove.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/StructureModifier.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/StructureModifier.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableBrowserNew.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableCreator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableCreator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableJoiner.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableJoiner.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableModifier.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableModifier.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseContent.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseContent.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseInfoPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/admin/AdminPanel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/WelcomePages/RegisterPage.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseStatistics/Statistics.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/DatabaseStatistics/Statistics.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,8 +31,8 @@
       <list>
         <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
-        <option value="JavaScript File" />
         <option value="CSS File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -238,6 +233,9 @@
       <workItem from="1737629717954" duration="1809000" />
       <workItem from="1737639687277" duration="2115000" />
       <workItem from="1737728424523" duration="5047000" />
+      <workItem from="1737798370827" duration="2710000" />
+      <workItem from="1737830128410" duration="1397000" />
+      <workItem from="1737879990273" duration="2163000" />
     </task>
     <task id="LOCAL-00001" summary="More">
       <option name="closed" value="true" />
@@ -261,5 +259,17 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="More" />
     <option name="LAST_COMMIT_MESSAGE" value="More" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/components/DatabaseBrowser/DatabaseContent/BrowseDatabase/TableJoiner.js</url>
+          <line>162</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -366,6 +366,7 @@ function DatabaseModifier() {
 
     return (
         <div style={{width: '90%'}}>
+            <h6>Modify database structure</h6>
             <FormControl variant="outlined">
                 <InputLabel id="demo-simple-select-table">Select a Database</InputLabel>
                 <Select

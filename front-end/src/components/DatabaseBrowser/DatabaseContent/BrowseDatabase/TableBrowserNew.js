@@ -95,10 +95,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         return () => {
             clearInterval(intervalId);
             const userName = getCookie("userName");
-            console.log(userName);
             if (testRef.current === 1) {
                 fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
-                console.log(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
             }
         };
     }, [test]);

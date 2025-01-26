@@ -91,6 +91,7 @@ function DatabaseRemove() {
 
     return (
         <div>
+            <h6>Delete database structure</h6>
             <FormControl variant="outlined">
                 <InputLabel id="demo-simple-select-table">Select a Database</InputLabel>
                 <Select

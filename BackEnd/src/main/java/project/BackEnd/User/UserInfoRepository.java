@@ -14,6 +14,12 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     @Query("SELECT ui FROM UserInfo ui WHERE ui.username = :username")
     UserInfo findByUsername(String username);
 
+    @Query("SELECT ui.admin.username FROM UserInfo ui WHERE ui.username = :username")
+    String findAdmin(String username);
+
+    @Query("SELECT ui.admin.email    FROM UserInfo ui WHERE ui.username = :username")
+    String findAdminEmail(String username);
+
     @Query("SELECT ui.id FROM UserInfo ui WHERE ui.username = :username")
     Long findUserIDByUsername(String username);
 

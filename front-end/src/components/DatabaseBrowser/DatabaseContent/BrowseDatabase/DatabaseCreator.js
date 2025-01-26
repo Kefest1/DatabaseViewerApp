@@ -65,7 +65,7 @@ function DatabaseCreator() {
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [openSnackbarSuccess, setOpenSnackbarSuccess] = useState(false);
-    const [successMessage, setSucessMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const handleColumnName = (event) => {
         setPrimaryColumnName(event.target.value);
@@ -124,7 +124,7 @@ function DatabaseCreator() {
         addDatabase(databaseName, databaseDescription, primaryColumnName, tableName)
             .then(({ status, message }) => {
                 if (status === 201) {
-                    setSucessMessage('Database added successfully');
+                    setSuccessMessage('Database added successfully');
                     setOpenSnackbarSuccess(true);
                 } else if (status === 200) {
                     setErrorMessage(`Database with that name already exists`);
