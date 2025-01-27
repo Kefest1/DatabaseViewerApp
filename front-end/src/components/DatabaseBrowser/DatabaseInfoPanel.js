@@ -3,7 +3,9 @@ import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
 import Box from "@mui/material/Box";
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { Button, Stack } from "@mui/material";
+import {Button, IconButton, Snackbar, SnackbarContent, Stack} from "@mui/material";
+import {InfoIcon} from "lucide-react";
+import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases(userName) {
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
@@ -38,6 +40,13 @@ const DatabaseInfoPanel = ({ handleChange }) => {
     const userName = getCookie("userName");
     const [tablesData, setTablesData] = useState([]);
     const [expandedItems, setExpandedItems] = React.useState([]);
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
 
     const handleExpandedItemsChange = (event, itemIds) => {
         setExpandedItems(itemIds);
@@ -97,7 +106,11 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 <Button onClick={handleExpandClick}>
                     {expandedItems.length === 0 ? 'Expand all' : 'Collapse all'}
                 </Button>
-                <Button onClick={fetchAndSetTablesData} style={{ marginLeft: '10px' }}>
+                <Button onClick={() => {
+                    fetchAndSetTablesData();
+                    setMessage("Updated structure");
+                    setOpenSnackbar(true);
+                }} style={{ marginLeft: '10px' }}>
                     Refresh
                 </Button>
             </div>
@@ -129,6 +142,31 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                     onItemClick={handleNodeClick}
                 />
             </Box>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#4365da' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Stack>
     );
 };

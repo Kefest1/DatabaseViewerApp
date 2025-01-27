@@ -35,7 +35,7 @@ async function fetchDatabaseStructure(selectedDatabase) {
 
 let iter = -1;
 
-function DatabaseModifier() {
+function DatabaseModifier({setMessage, setOpenSnackbar}) {
 
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [availableDatabases, setAvailableDatabases] = useState([]);

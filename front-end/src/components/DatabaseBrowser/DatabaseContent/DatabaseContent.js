@@ -27,7 +27,6 @@ import Button from "@mui/material/Button";
 import UserAdminPanel from "../admin/UserAdminPanel";
 
 
-
 const DatabaseContent = () => {
     const isAdmin = getCookie("isAdmin") === "true";
 

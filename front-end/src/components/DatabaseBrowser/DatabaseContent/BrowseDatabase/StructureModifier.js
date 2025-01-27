@@ -1,12 +1,21 @@
-import React from "react";
+import React, {useState} from "react";
 import DatabaseCreator from "./DatabaseCreator";
 import TableCreator from "./TableCreator";
 import DatabaseModifier from "./DatabaseModifier";
 import TableModifier from "./TableModifier";
 import DatabaseRemove from "./DatabaseRemove";
-import {Paper} from "@mui/material";
+import {IconButton, Paper, Snackbar, SnackbarContent} from "@mui/material";
+import {InfoIcon} from "lucide-react";
+import CloseIcon from "@mui/icons-material/Close";
 
 function StructureModifier() {
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    function handleCloseSnackbar() {
+        setOpenSnackbar(false);
+    }
 
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
@@ -30,16 +39,42 @@ function StructureModifier() {
                 <DatabaseCreator/>
                 <br/>
 
-                <TableCreator/>
+                <TableCreator setMessage={setMessage} setOpenSnackbar={setOpenSnackbar} />
                 <br/>
 
-                <DatabaseModifier/>
+                <DatabaseModifier setMessage={setMessage} setOpenSnackbar={setOpenSnackbar} />
                 <br/>
 
-                <TableModifier/>
+                <TableModifier setMessage={setMessage} setOpenSnackbar={setOpenSnackbar} />
                 <br/>
 
-                <DatabaseRemove/>
+                <DatabaseRemove setMessage={setMessage} setOpenSnackbar={setOpenSnackbar} />
+
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <SnackbarContent
+                        style={{ backgroundColor: '#4365da' }}
+                        message={
+                            <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                                {message}
+                        </span>
+                        }
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="close"
+                                color="inherit"
+                                onClick={handleCloseSnackbar}
+                            >
+                                <CloseIcon />
+                            </IconButton>,
+                        ]}
+                    />
+                </Snackbar>
             </div>
         </Paper>
     )

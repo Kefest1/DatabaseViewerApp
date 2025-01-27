@@ -26,11 +26,13 @@ public class UserInfoController {
 
     @PostMapping("/add")
     public ResponseEntity<Object> add(@RequestBody UserPayload userPayload) {
-        System.out.println(userPayload);
+        System.out.println("add");
         if (userInfoRepository.findByUsername(userPayload.getUsername()) != null) {
+            System.out.println("Username is already taken");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already taken");
         }
         if (userInfoRepository.findByEmail(userPayload.getEmail()) != null) {
+            System.out.println("Email is already in use");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use");
         }
         try {
@@ -39,7 +41,6 @@ public class UserInfoController {
 
             if (isAdmin) {
                 if (!Arrays.asList(availableHashes).contains(userPayload.getHash())) {
-                    System.out.println(userPayload.getHash());
                     System.out.println("BadHash");
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Hash incorrect");
                 }
@@ -53,10 +54,13 @@ public class UserInfoController {
                 }
                 userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), false, admin);
             }
+            System.out.println("Saves");
             usersService.saveUsers(userInfo);
         } catch (DataIntegrityViolationException e) {
+            System.out.println("Data integrity violation: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Data integrity violation: " + e.getMessage());
         } catch (Exception e) {
+            System.out.println("An error has occurred: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error has occurred: " + e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("New user is added");
@@ -122,8 +126,8 @@ public class UserInfoController {
     public ResponseEntity<UserDetailsResponse> getUserDetails(@PathVariable("userName") String userName) {
         try {
             var userInfo = userInfoRepository.findByUsername(userName);
-            UserDetailsResponse userDetails = new UserDetailsResponse(userInfo.getUsername(), userInfo.getEmail());
             if (userInfo != null) {
+                UserDetailsResponse userDetails = new UserDetailsResponse(userInfo.getUsername(), userInfo.getEmail());
                 return ResponseEntity.ok(userDetails);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)

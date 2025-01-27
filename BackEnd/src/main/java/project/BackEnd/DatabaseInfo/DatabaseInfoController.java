@@ -93,6 +93,22 @@ public class DatabaseInfoController {
         return getStats(userName, databaseName);
     }
 
+    @PutMapping("/updateDatabaseDescription/{databaseName}/{userName}")
+    public ResponseEntity<String> updateDatabaseDescription(
+            @PathVariable String databaseName,
+            @PathVariable String userName,
+            @RequestBody String databaseDescription
+    ) {
+        try {
+            DatabaseInfo databaseInfo = databaseInfoRepository.findDatabaseInfo(databaseName, userName);
+            databaseInfo.setDescription(databaseDescription);
+            databaseInfoRepository.save(databaseInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to edit database description");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body("Success");
+    }
+
     @PostMapping("/add")
     public ResponseEntity<String> addDatabase(@RequestBody DatabaseRequestPayload payload) {
         List<String> existingDatabaseName = tableInfoRepository.findDatabaseNamesByUserName(payload.getUserName(), payload.getDatabaseName());
@@ -103,7 +119,6 @@ public class DatabaseInfoController {
 
         DatabaseInfo databaseInfo = new DatabaseInfo(payload.getDatabaseName(), payload.getDatabaseDescription());
         DatabaseInfo savedDatabaseInfo = databaseInfoRepository.save(databaseInfo);
-
         TableInfo tableInfo = new TableInfo(savedDatabaseInfo, payload.getTableName(), payload.getColumnName());
         TableInfo savedTableInfo = tableInfoRepository.save(tableInfo);
 
@@ -132,6 +147,7 @@ public class DatabaseInfoController {
     private DatabaseStatisticsDTO getStats(String userName, String databaseName) {
         DatabaseStatisticsDTO databaseStatistics = new DatabaseStatisticsDTO();
         databaseStatistics.tableCount = tableInfoRepository.findCountWithUsersAndTables(userName, databaseName);
+        databaseStatistics.databaseDescription = databaseInfoRepository.findDatabaseDescription(userName, databaseName);
         databaseStatistics.tableStatistics = new LinkedList<>();
 
         List<String> tableNames = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);

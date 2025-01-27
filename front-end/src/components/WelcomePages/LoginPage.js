@@ -34,16 +34,36 @@ function LoginPage() {
         setOpenSnackbarOk(false);
     };
 
+    const checkCookieAndRedirect = () => {
+        const getCookie = (name) => {
+            const cookies = document.cookie.split("; ");
+            for (const cookie of cookies) {
+                const [key, value] = cookie.split("=");
+                if (key === name) {
+                    return value;
+                }
+            }
+            return null;
+        };
+
+        const userName = getCookie("isExp");
+        if (!userName) {
+            window.location.href = "/login";
+            document.cookie = "userName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "isAdmin=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
+    };
+
+    setInterval(checkCookieAndRedirect, 5000);
+
     const Login = async () => {
         console.log("Login button clicked");
         if (username.length === 0) {
-            console.log("2222");
             setMessage("Enter username")
             setOpenSnackbar(true);
             return;
         }
         if (password.length === 0) {
-            console.log("2222");
             setMessage("Enter password");
             setOpenSnackbar(true);
             return;
@@ -69,8 +89,12 @@ function LoginPage() {
 
                 const expirationTime = new Date();
                 expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
+
+                const expirationTimeInfo = new Date();
+                expirationTimeInfo.setTime(expirationTime.getTime() + 60 * 180 * 900);
                 document.cookie = `userName=${username}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
                 document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
+                document.cookie = `isExp=true; expires=${expirationTimeInfo.toUTCString()}; secure; samesite=strict`;
 
                 window.location.href = 'http://localhost:3000';
             } else {

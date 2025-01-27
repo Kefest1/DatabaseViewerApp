@@ -103,6 +103,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     const logUpdatable = async () => {
         try {
+            if (fieldsToUpdate.length === 0) {
+                setMessage("No fields to update");
+                setOpenSnackbar(true);
+                return;
+            }
             const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
                 method: 'PUT',
                 headers: {
@@ -122,7 +127,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 update: []
             }));
             console.log(result);
+
+            setMessage("Fields updated successfully");
+            setOpenSnackbar(true);
         } catch (error) {
+            setMessage("Failed to update fields");
+            setOpenSnackbar(true);
             console.error('Error:', error);
         }
     };
@@ -308,15 +318,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 QueryLogger.addLog(`Deleted from table ${tableName} ${res.length} rows`, logging_level.DELETE);
 
                 if (res.length === 0) {
-                    console.log("No rows were deleted");
                     setMessage("No rows were deleted");
                 }
                 else if (selectedCount === res.length) {
-                    console.log("All selected rows deleted successfully");
                     setMessage("All selected rows deleted successfully");
                 }
                 else if (selectedCount > res.length) {
-                    console.log("Some rows were not deleted");
                     setMessage("Some rows were not deleted");
                 }
 
@@ -345,7 +352,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             finalList.push(nodeList);
         });
 
-        console.log(finalList);
+        if (finalList.length === 0) {
+            setMessage("No rows awaiting to be sent!");
+            setOpenSnackbar(true);
+            return;
+        }
+
         fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -358,16 +370,18 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 }));
                 QueryLogger.addLog(`Inserted to table ${tableName} ${finalList.length} rows`, logging_level.INSERT);
                 const res = response.text();
+                setMessage("New rows inserted successfully");
+                setOpenSnackbar(true);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                setMessage("Failed to insert new rows updated successfully");
+                setOpenSnackbar(true);
+            });
     }
 
     function processError(params) {
         console.log(params);
-    }
-
-    function Debug() {
-        console.log(rows);
     }
 
     const handleCloseSnackbar = () => {
@@ -391,10 +405,9 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     return (
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button className="button button-update" onClick={() => logUpdatable()}>Update Altered Fields</Button>
-                <Button className="button button-delete" onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
-                <Button className="button button-insert" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
-                {/*<Button variant="contained" onClick={Debug}>Debug</Button>*/}
+                <Button className="button button-update" color="primary" variant={"contained"} onClick={() => logUpdatable()}>Update Altered Fields</Button>
+                <Button className="button button-delete" color="secondary" variant={"contained"} onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
+                <Button className="button button-insert" color="warning" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
             </Box>
             <DataGrid
                 rows={rows}
@@ -420,7 +433,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 onClose={handleCloseSnackbar}
             >
                 <SnackbarContent
-                    style={{ backgroundColor: '#766ff4' }}
+                    style={{ backgroundColor: '#4365da' }}
                     message={
                         <span style={{ display: 'flex', alignItems: 'center' }}>
                             <InfoIcon style={{ marginRight: 8 }} />

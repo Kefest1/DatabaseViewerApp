@@ -4,7 +4,17 @@ import "./Statictics.css";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import {Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import {Container, FormControl, InputLabel, Paper} from '@mui/material';
+import {
+    Container,
+    Dialog, DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+    Paper,
+    TextField
+} from '@mui/material';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { FixedSizeList } from 'react-window';
@@ -29,6 +39,13 @@ const Statistics = () => {
 
     const [generateGraphClicked, setGenerateGraphClicked] = useState(false);
     const [generateHistogramClicked, setGenerateHistogramClicked] = useState(false);
+
+    const [description, setDescription] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
 
     async function GetDatabases() {
         const userName = getCookie("userName");
@@ -99,9 +116,50 @@ const Statistics = () => {
             `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`
         );
         const data = await response.json();
-        console.log(data);
         setDatabaseStatistics(data);
+        setDescription(data.databaseDescription);
     }
+
+    function isValidInput(input) {
+        const SAFE_INPUT_REGEX = /^[a-zA-Z0-9 .,!@#$%^&*()_\-+=]+$/;
+
+        if (typeof input !== "string" || input.trim() === "") {
+            return false;
+        }
+
+        return SAFE_INPUT_REGEX.test(input);
+    }
+
+    const handleLog = (databaseName) => {
+        const userName = getCookie("userName");
+        const url = `http://localhost:8080/api/databaseinfo/updateDatabaseDescription/${databaseName}/${userName}`;
+        if (isValidInput(description) === false) {
+            setOpenDialog(true);
+            return;
+        }
+
+        fetch(url, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(description).replace(/^"|"$/g, ''),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to update database description");
+                }
+                return response.text();
+            })
+            .then((data) => {
+                console.log("Response:", data);
+                alert("Database description updated successfully!");
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("Error updating database description");
+            });
+    };
 
     const handleTableChange = (event) => {
         setSelectedTable(event.target.value);
@@ -119,6 +177,10 @@ const Statistics = () => {
         setGenerateGraphClicked(true);
         setGenerateHistogramClicked(false);
     }
+
+    const confirmLeave = () => {
+        setOpenDialog(false);
+    };
 
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
@@ -159,13 +221,24 @@ const Statistics = () => {
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.2 }}
                         >
-                        <Grid2 container spacing={2} alignItems="center" sx={{ marginTop: 1 }}>
-                            <Grid2 item>
+                        <Grid2>
+                            <Grid2 container spacing={2} alignItems="center" sx={{ marginTop: 1 }}>
+                                <TextField
+                                    label="Description"
+                                    variant="outlined"
+                                    fullWidth
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    style={{ marginBottom: "1rem", width: '20%' }}
+                                />
+                                <Button variant="contained" color="primary" onClick={() => handleLog(selectedDatabase)}>
+                                    Update Description
+                                </Button>
+                            </Grid2>
+                            <Grid2 container spacing={2} alignItems="center" sx={{ marginTop: 1 }}>
                                 <Typography variant="h5">
                                     Select from {databaseStatistics.tableCount} tables:
                                 </Typography>
-                            </Grid2>
-                            <Grid2 item>
                                 <Select
                                     labelId="table-select-label"
                                     id="table-select"
@@ -207,6 +280,7 @@ const Statistics = () => {
                                     </Box>
                                 ))}
                         </Box>
+
                     </motion.div>
 
                 )}
@@ -331,6 +405,25 @@ const Statistics = () => {
                     </motion.div>
                 )}
             </Box>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+            >
+                <DialogTitle>Unsaved Changes</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Remove characters such as \" - or ; from the description.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmLeave} color="secondary">
+                        Leave
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Paper>
     );
 };

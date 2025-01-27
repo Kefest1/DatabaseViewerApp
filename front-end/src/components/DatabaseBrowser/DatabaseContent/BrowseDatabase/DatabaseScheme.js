@@ -126,6 +126,8 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     const {fitView} = useReactFlow();
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [isLayoutApplied, setIsLayoutApplied] = useState(0);
+
 
     const applyLayout = useCallback(
         (direction) => {
@@ -142,50 +144,54 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     );
 
     useEffect(() => {
+        if (isLayoutApplied < 4) {
             applyLayout('LR');
+            setIsLayoutApplied(isLayoutApplied + 1);
+        }
     }, [applyLayout]);
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            fitView
-            nodeTypes={nodeTypes}
-            nodesConnectable={false}
-            edgesFocusable={false}
-        >
-            <Panel position="top-left">
-                <h4 style={{
-                    fontSize: '1.5rem',
-                    color: '#333',
-                    marginBottom: '15px',
-                    fontFamily: 'Arial, sans-serif',
-                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
-                    letterSpacing: '0.5px',
-                    padding: '10px 0',
-                    borderBottom: '2px solid #2A70C6FF',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '4px',
-                    textAlign: 'center',
-                }}>
-                    Selected database: {selectedDatabase}
-                </h4>
+        <div style={{ width: '100%', height: '100%' }}>
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                fitView
+                nodeTypes={nodeTypes}
+                nodesConnectable={false}
+                edgesFocusable={false}
+            >
+                <Panel position="top-left">
+                    <h4 style={{
+                        fontSize: '1.5rem',
+                        color: '#333',
+                        marginBottom: '15px',
+                        fontFamily: 'Arial, sans-serif',
+                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+                        letterSpacing: '0.5px',
+                        padding: '10px 0',
+                        borderBottom: '2px solid #2A70C6FF',
+                        backgroundColor: '#f9f9f9',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                    }}>
+                        Selected database: {selectedDatabase}
+                    </h4>
 
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => applyLayout('LR')}
-                    style={{ marginLeft: '62,5px', width: '200px', height: '35px' }}
-                >
-                    Layout scheme
-                </Button>
-            </Panel>
-            <MiniMap/>
-            <Background/>
-        </ReactFlow>
-
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => applyLayout('LR')}
+                        style={{marginLeft: '62,5px', width: '200px', height: '35px'}}
+                    >
+                        Layout scheme
+                    </Button>
+                </Panel>
+                <MiniMap/>
+                <Background/>
+            </ReactFlow>
+        </div>
     );
 };
 

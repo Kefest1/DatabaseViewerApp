@@ -26,19 +26,12 @@ async function fetchAvailableDatabases() {
 
 
 
-function TableCreator() {
+function TableCreator({setMessage, setOpenSnackbar}) {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [availableDatabases, setAvailableDatabases] = useState([]);
 
     const [tableName, setTableName] = useState('');
     const [primaryColumnName, setPrimaryColumnName] = useState('');
-
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [message, setMessage] = useState("");
-
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false);
-    }
 
     function addTable(tableName, primaryColumnName, databaseName) {
         const url = `http://localhost:8080/api/tableinfo/addenhanced`;
@@ -143,31 +136,6 @@ function TableCreator() {
                 </Box>
             )}
 
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-            >
-                <SnackbarContent
-                    style={{ backgroundColor: '#f44336' }}
-                    message={
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                            <InfoIcon style={{ marginRight: 8 }} />
-                            {message}
-                        </span>
-                    }
-                    action={[
-                        <IconButton
-                            key="close"
-                            aria-label="close"
-                            color="inherit"
-                            onClick={handleCloseSnackbar}
-                        >
-                            <CloseIcon />
-                        </IconButton>,
-                    ]}
-                />
-            </Snackbar>
         </div>
     );
 }

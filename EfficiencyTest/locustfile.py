@@ -2,7 +2,6 @@ import random
 import logging
 from locust import task, constant, HttpUser, between
 from faker import Faker
-
 fake = Faker()
 api_host = "http://localhost:8080/api"
 logging.basicConfig(level=logging.INFO)
@@ -52,19 +51,16 @@ class UserRegistrationAndLogin(HttpUser ):
             "password_hash": self.password,
             "email": self.email,
             "hash": "",
-            "adminName": "user1"
+            "adminName": "admin_test"
         })
-
+        print(response)
         if response.status_code == 201:
             self.login_user()
         else:
             logger.error(f"Registration failed for {self.username}: {response.status_code} - {response.text}")
 
     def login_user(self):
-        response = self.client.get("/userinfo/getByUsername", params={
-            "userName": self.username,
-            "password": self.password
-        })
+        response = self.client.get(f"/userinfo/getByUsername/{self.username}/{self.password}", name="/userinfo/getByUsername")
 
         if response.status_code == 200:
             self.fetch_user_info()
@@ -73,7 +69,7 @@ class UserRegistrationAndLogin(HttpUser ):
 
     @task(1)
     def fetch_user_info(self):
-        response = self.client.get(f"/userinfo/details/{self.username}")
+        response = self.client.get(f"/userinfo/details/{self.username}", name="/userinfo/details")
         if response.status_code != 200:
             logger.error(f"Failed to fetch profile for {self.username}: {response.status_code} - {response.text}")
 
@@ -104,8 +100,6 @@ class Testing_data_fetching(HttpUser):
         self.client.get(f"/databaseinfo/getfoldermap/user1")
 
 
-from locust import HttpUser , task, between
-
 class DefiningNewDatabase(HttpUser ):
     host = api_host
     wait_time = between(1, 3)
@@ -116,7 +110,7 @@ class DefiningNewDatabase(HttpUser ):
         database_name = f"database_{code}"
         table_name = f"table_{code}"
         column_name = f"column_name_{code}"
-        userName = "user2"
+        userName = "test_user"
         databaseDescription = f"database_description_{code}"
 
         response = self.client.post("/databaseinfo/add", json={
@@ -133,12 +127,13 @@ class DefiningNewDatabase(HttpUser ):
         else:
             print(f"Failed to create database: {response.text}")
 
+
     def create_tables(self, database_name):
         for i in range(6):
             code = generate_unique_code()
             table_name = f"table_name_{code}"
             primary_key = f"primary_key_{code}"
-            username = "user2"
+            username = "test_user"
 
             response = self.client.post("/tableinfo/addenhanced", json={
                 "databaseName": database_name,
@@ -181,10 +176,33 @@ class DefiningNewDatabase(HttpUser ):
 
                     finalList.append(innerList)
 
-                response = self.client.post(f"/fieldinfo/insertvalues/{database_name}", json=finalList, profile="/fieldinfo/insertvalues/")
+                response = self.client.post(f"/fieldinfo/insertvalues/{database_name}", json=finalList, name="/fieldinfo/insertvalues/")
 
-                if response.status_code != 201:
-                    print(f"Failed to add fields to table '{table_name}': {response.text}")
+                # if response.status_code != 201:
+                #     print(f"Failed to add fields to table '{table_name}': {response.text}")
 
+                rand = random.randint(0, 10)
+                if rand != 0:
+                    print("GetAllFieldsAllColumns")
+                    request_body = {
+                        "database": database_name,
+                        "table": f"{table_name}"
+                    }
+
+                    res = self.client.post(
+                        "/tableinfo/getAllFieldsAllColumns",
+                        json=request_body,
+                        name="/tableinfo/getAllFieldsAllColumns"
+                    )
+                    response_data = res.json()
+                    for k in response_data:
+                        if random.randint(0, 3) == 0:
+                            delete_request_body = int(k[0]["columnId"])
+                            primary_key = f"primary_key_{code}"
+                            res = self.client.delete(
+                                f"/fieldinfo/delete/{database_name}/{table_name}/{primary_key}",
+                                json=delete_request_body,
+                                name="/fieldinfo/delete"
+                            )
             else:
                 print(f"Failed to add table '{table_name}': {response.text}. Response code : {response.status_code}")

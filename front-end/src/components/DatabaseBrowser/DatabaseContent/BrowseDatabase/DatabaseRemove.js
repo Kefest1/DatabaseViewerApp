@@ -29,7 +29,7 @@ async function fetchAvailableDatabases() {
 
 
 
-function DatabaseRemove() {
+function DatabaseRemove({setMessage, setOpenSnackbar}) {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [availableDatabases, setAvailableDatabases] = useState([]);
 
@@ -42,9 +42,6 @@ function DatabaseRemove() {
         loadDatabases();
     }, []);
 
-
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-    const [message, setMessage] = useState("");
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
@@ -142,31 +139,6 @@ function DatabaseRemove() {
                 </DialogActions>
             </Dialog>
 
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-            >
-                <SnackbarContent
-                    style={{ backgroundColor: '#3d69cc' }}
-                    message={
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                            <InfoIcon style={{ marginRight: 8 }} />
-                            {message}
-                        </span>
-                    }
-                    action={[
-                        <IconButton
-                            key="close"
-                            aria-label="close"
-                            color="inherit"
-                            onClick={handleCloseSnackbar}
-                        >
-                            <CloseIcon />
-                        </IconButton>,
-                    ]}
-                />
-            </Snackbar>
         </div>
 
     );

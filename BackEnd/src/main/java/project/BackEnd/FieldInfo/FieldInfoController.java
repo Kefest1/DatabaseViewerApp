@@ -99,7 +99,7 @@ public class FieldInfoController {
     @PostMapping("/insertvalues/{databasename}")
     public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
 
-        System.out.println(fieldInfos);
+
         for (List<InsertPayload> fieldInfoList : fieldInfos) {
             insertValuesBuff(databasename, fieldInfoList);
         }

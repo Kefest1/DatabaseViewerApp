@@ -27,7 +27,7 @@ async function fetchPrimaryKeyName(database, table) {
 }
 
 
-function TableModifier() {
+function TableModifier({setMessage, setOpenSnackbar}) {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [selectedTable, setSelectedTable] = useState("");
 

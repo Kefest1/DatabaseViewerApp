@@ -32,9 +32,17 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
             "WHERE ui.username = :userName AND db.databaseName = :databaseName")
     List<String> findTablesForDatabase(@Param("userName") String userName, @Param("databaseName") String databaseName);
 
+    @Query("SELECT DISTINCT db.description FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
+            "WHERE ui.username = :userName AND db.databaseName = :databaseName")
+    String findDatabaseDescription(@Param("userName") String userName, @Param("databaseName") String databaseName);
+
+    @Query("SELECT DISTINCT ti.databaseInfo FROM TableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
+            "WHERE ui.username = :userName AND ti.databaseInfo.databaseName = :databaseName")
+    DatabaseInfo findDatabaseInfo(@Param("databaseName") String databaseName, @Param("userName") String userName);
+
     @Query("SELECT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
             "WHERE ui.username = :userName AND db.databaseName = :databaseName")
-    List<Long> findTablesIdsForDatabase(@Param("userName") String userName, @Param("databaseName") String databaseName);
+    List<Long> findTablesIdsForDatabase(@Param("databaseName") String databaseName, @Param("userName") String userName);
 
     @Modifying
     @Query("DELETE FROM DatabaseInfo db WHERE db.id = :databaseID")

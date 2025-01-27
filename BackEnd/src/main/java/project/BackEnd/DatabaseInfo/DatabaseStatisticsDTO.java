@@ -13,5 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 class DatabaseStatisticsDTO {
     Long tableCount;
+    String databaseDescription;
     List<TableStatisticsDTO> tableStatistics;
 }
