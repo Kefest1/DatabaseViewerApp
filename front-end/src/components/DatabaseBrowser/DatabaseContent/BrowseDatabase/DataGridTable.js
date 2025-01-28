@@ -19,7 +19,7 @@ import {FormControl, InputLabel, MenuItem} from "@mui/material";
 import Select from "@mui/material/Select";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-
+import './DataGridTable.css';
 
 async function fetchStructure(databaseName, selectedTable) {
     const userName = getCookie("userName");
@@ -104,7 +104,7 @@ function DataGridTable({ databaseName, selectedTable }) {
         return (
             <GridToolbarContainer>
                 <Button color="primary" startIcon={<AddIcon />} onClick={handleCommit}>
-                    Debug?
+                    Commit changes
                 </Button>
             </GridToolbarContainer>
         );
@@ -183,8 +183,6 @@ function DataGridTable({ databaseName, selectedTable }) {
     }
 
     function handleCommit() {
-
-        commitDelete(tablesToDelete);
         let rowsDTO = [];
 
         rows.forEach(row => {
@@ -347,6 +345,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             // headerAlign: 'left',
             editable: false
         },
+        /*
         {
             field: 'actions',
             type: 'actions',
@@ -387,6 +386,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                 ];
             },
         },
+        */
     ];
 
     const processRowUpdate = (newRow) => {
@@ -451,7 +451,9 @@ function DataGridTable({ databaseName, selectedTable }) {
                             },
                         }}
                     >
-                        <h4>Cannot delete or change types in non-empty table!</h4>
+                        <div className="alert alert-warning">
+                            <strong>Action Not Allowed:</strong> Cannot delete or modify types in a non-empty table.
+                        </div>
                         <DataGrid
                             rows={rows}
                             columns={columnsForEmpty}
@@ -460,7 +462,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                             onRowModesModelChange={handleRowModesModelChange}
                             onRowEditStop={handleRowEditStop}
                             processRowUpdate={processRowUpdate}
-                            slots={{toolbar: EditToolbarEmpty}}
+                            // slots={{toolbar: EditToolbarEmpty}}
                             slotProps={{
                                 toolbar: {setRows, setRowModesModel},
                             }}

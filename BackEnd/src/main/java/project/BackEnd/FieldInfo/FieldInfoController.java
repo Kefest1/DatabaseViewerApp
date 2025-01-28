@@ -174,12 +174,12 @@ public class FieldInfoController {
 
     }
 
-    @DeleteMapping("/deleteArray/{databaseName}/{tableName}/{primaryKey}")
+    @DeleteMapping("/deleteArray/{databaseName}/{tableName}/{primaryKey}/{userName}")
     public ResponseEntity<List<Long>> deleteFieldInfos(@RequestBody Long[] columnIds,
                                                    @PathVariable("databaseName") String databaseName,
                                                    @PathVariable("primaryKey") String primaryKey,
-                                                   @PathVariable("tableName") String tableName
-//                                  @PathVariable("userName") String userName
+                                                   @PathVariable("tableName") String tableName,
+                                                    @PathVariable("userName") String userName
     ) {
         boolean isAllRemoved = true;
         boolean isSomethingRemoved = false;
@@ -225,14 +225,6 @@ public class FieldInfoController {
             String connectedColumnName = tc.getManyColumnName();
 
             List<FieldInfo> finfo = fieldInfoRepository.getFieldsByColumnName(databaseName, "user1", connectedTableName, connectedColumnName, fieldInfo.getDataValue());
-            System.out.println("fieldInfo");
-            System.out.println(fieldInfo);
-
-            System.out.println("tc");
-            System.out.println(tc);
-
-            System.out.println("finfo");
-            System.out.println(finfo);
 
             if (!finfo.isEmpty()) {
                 return Boolean.FALSE;

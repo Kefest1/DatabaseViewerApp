@@ -108,7 +108,6 @@ public class TableInfoController {
 
     @DeleteMapping("/deletetable")
     public ResponseEntity<String> deleteTable(@RequestBody Long id) {
-        System.out.println(id);
         try {
             tableStructureRepository.deleteTableStructureByTableInfo(id);
             tableInfoRepository.deleteTableInfoById(id);
@@ -472,6 +471,44 @@ public class TableInfoController {
                 .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
 
         return (List<List<FieldInfo>>) new ArrayList<List<FieldInfo>>(fieldInfoMap.values());
+    }
+
+    @PostMapping("/getAllFieldsForTable/{userName}")
+    public ResponseEntity<?> getAllFieldsForTable(@RequestBody TableInfoRequest request,
+                                                  @PathVariable("userName") String userName) {
+        try {
+            List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableNameByUserName(
+                    request.getColumns(), request.getTable(), userName);
+
+            Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()
+                    .collect(Collectors.groupingBy(o -> (Long) o[0],
+                            Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));
+
+            List<List<FieldInfoResultDTO>> response = fieldInfoMap.values().stream()
+                    .map(fieldInfoList -> fieldInfoList.stream()
+                            .map(field -> new FieldInfoResultDTO(
+                                    field.getDataValue(),
+                                    field.getColumnName(),
+                                    String.valueOf(field.getColumnId())))
+                            .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
+            System.out.println(response);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Failed to retrieve field information for table."));
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    public static class FieldInfoResultDTO {
+        String dataValue;
+        String columnName;
+        String columnId;
     }
 
 

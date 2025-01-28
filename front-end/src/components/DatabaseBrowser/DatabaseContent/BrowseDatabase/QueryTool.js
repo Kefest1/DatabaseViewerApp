@@ -2,11 +2,23 @@ import React, {useEffect, useState} from "react";
 import {getCookie} from "../../../getCookie";
 import QueryLogger, {logging_level} from './QueryLogger';
 import Select from '@mui/material/Select';
-import {Button, FormControl, Grid2, InputLabel, MenuItem, OutlinedInput, Paper} from "@mui/material";
+import {
+    Button,
+    FormControl,
+    Grid2,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Paper, Snackbar,
+    SnackbarContent
+} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
 import TableBrowserNew from "./TableBrowserNew";
 import { useTransition, animated } from 'react-spring';
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases(userName) {
     const response = await fetch(
@@ -62,26 +74,27 @@ async function fetchTableStructure(database, table) {
     return await response.json();
 }
 
-async function runQuery(database, table, columns) {
+async function runQuery(database, table, columns, setErrorMessage, setOpenSnackbar) {
     try {
+        const userName = getCookie("userName");
         const requestBody = { database, table, columns: [...columns] };
 
-        const url = 'http://localhost:8080/api/tableinfo/getAllFields';
+        const url = `http://localhost:8080/api/tableinfo/getAllFieldsForTable/${userName}`;
         const startTime = performance.now();
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
-        QueryLogger.addLog(`Selecting from table ${table} from database ${database}`, logging_level.SELECT);
 
-        const endTime = performance.now();
-        const fetchTime = endTime - startTime;
+        QueryLogger.addLog(`Selecting from table ${table} from database ${database}`, logging_level.SELECT);
+        const fetchTime = performance.now() - startTime;
 
         if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
+            setErrorMessage("Failed to fetch from table!");
+            setOpenSnackbar(true);
+            return;
         }
-
         const result = await response.json();
         return { result, fetchTime };
     } catch (error) {
@@ -108,10 +121,15 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
 
     const [isAvailable, setIsAvailable] = useState(false);
     const [occ, setIsOcc] = useState(false);
-    // setData("Query Tool");
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const userName = getCookie("userName");
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
 
     function handleSelectOne(event) {
         setSelectedDatabase(event.target.value);
@@ -166,7 +184,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 if (res === "0") {
                     clearInterval(intervalId);
 
-                    runQuery(selectedDatabase, selectedTable, selectedColumns)
+                    runQuery(selectedDatabase, selectedTable, selectedColumns, setErrorMessage, setOpenSnackbar)
                         .then(result => {
                             setQueryResult(result);
                             setIsButtonPressed(true);
@@ -263,7 +281,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
             <Grid2 container direction="column" alignItems="flex-start" spacing={2} style={{marginTop: '12px'}}>
-                {/*{!("result" in queryResult) && (*/}
                 {(
                     <Grid2>
                         <Grid2 container spacing={2} alignItems="center" direction="row">
@@ -361,7 +378,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                             });
 
                                             if (res) {
-                                                runQuery(selectedDatabase, selectedTable, selectedColumns)
+                                                runQuery(selectedDatabase, selectedTable, selectedColumns, setErrorMessage, setOpenSnackbar)
                                                     .then(result => {
                                                         setQueryResult(result);
                                                         // setTableBrowserKey(prevKey => prevKey + 1);
@@ -400,7 +417,35 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 )}
 
             </Grid2>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#f44336' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {errorMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Paper>
+
+
 
     );
 

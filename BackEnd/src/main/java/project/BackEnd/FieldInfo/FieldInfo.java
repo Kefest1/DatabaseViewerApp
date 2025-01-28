@@ -36,6 +36,7 @@ public class FieldInfo {
 
     @ManyToOne
     @JsonBackReference
+    @JsonIgnore
     @JoinColumn(name = "id")
     private TableInfo tableInfo;
 

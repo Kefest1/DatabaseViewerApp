@@ -151,7 +151,7 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     }, [applyLayout]);
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{width: '100%', height: '100%'}}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}

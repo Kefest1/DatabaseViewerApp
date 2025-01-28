@@ -222,7 +222,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     const handleDeleteClick = (id) => () => {
         setRows(rows.filter((row) => row.id !== id));
-        commitDeleteSingleRow(id);
+        setSelectedRowsIndex([...selectedRowsIndex, id]);
+        // commitDeleteSingleRow(id);
     };
 
     const handleCancelClick = (id) => () => {
@@ -293,7 +294,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     };
 
     const commitDeleteManyRows = () => {
-        console.log(selectedRowsIndex);
+        const userName = getCookie("userName");
         const selectedCount = selectedRowsIndex.length;
         if (selectedCount === 0) {
             setMessage("No rows selected!");
@@ -301,7 +302,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             return;
         }
 
-        fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
+        fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}/${userName}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
@@ -310,7 +311,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         })
             .then(async response => {
                 const res = await response.json();
-                console.log(res);
                 res.forEach((num) => {
                     setRows(rows.filter((row) => row.id !== num));
                 });
@@ -329,7 +329,10 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
                 setOpenSnackbar(true);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                setMessage("An error has occured while deleting rows");
+                setOpenSnackbar(true);
+            });
     };
 
     const commitInsertNewRows = () => {
@@ -405,9 +408,9 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     return (
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button className="button button-update" color="primary" variant={"contained"} onClick={() => logUpdatable()}>Update Altered Fields</Button>
-                <Button className="button button-delete" color="secondary" variant={"contained"} onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
-                <Button className="button button-insert" color="warning" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
+                <Button className="button button-update" size="small" color="primary" variant={"contained"} onClick={() => logUpdatable()}>Update Altered Fields</Button>
+                <Button className="button button-delete" size="small" color="secondary" variant={"contained"} onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
+                <Button className="button button-insert" size="small" color="warning" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
             </Box>
             <DataGrid
                 rows={rows}
