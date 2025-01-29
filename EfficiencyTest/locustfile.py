@@ -35,9 +35,10 @@ def generate_random_tablename():
     return table_names[random.randint(0, len(table_names) - 1)]
 
 
-class UserRegistrationAndLogin(HttpUser ):
+class UserRegistrationAndLogin(HttpUser):
     host = "http://localhost:8080/api"
     wait_time = between(1, 3)
+    token = None  # Ensure token is always defined
 
     def on_start(self):
         self.register_user()
@@ -54,27 +55,42 @@ class UserRegistrationAndLogin(HttpUser ):
             "hash": "",
             "adminName": "admin_test"
         })
-        print(response)
+
         if response.status_code == 201:
             self.login_user()
         else:
             logger.error(f"Registration failed for {self.username}: {response.status_code} - {response.text}")
 
     def login_user(self):
-        response = self.client.get(f"/userinfo/getByUsername/{self.username}/{self.password}", name="/userinfo/getByUsername")
+        response = self.client.post(
+            f"/auth/login",
+            name="/auth/login",
+            json={
+                "username": self.username,
+                "password": self.password
+            }
+        )
 
         if response.status_code == 200:
-            self.fetch_user_info()
+            self.token = response.text.strip()
+            logger.info(f"Login successful for {self.username}, token: {self.token}")
         else:
             logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
+            self.token = None
 
     @task(1)
     def fetch_user_info(self):
-        response = self.client.get(f"/userinfo/details/{self.username}", name="/userinfo/details")
+        if not self.token:
+            logger.warning(f"Skipping fetch_user_info for {self.username}, no token available.")
+            return
+
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = self.client.get(f"/userinfo/details/{self.username}", headers=headers, name="/userinfo/details")
+
         if response.status_code != 200:
             logger.error(f"Failed to fetch profile for {self.username}: {response.status_code} - {response.text}")
 
-
+"""
 class Testing_data_fetching(HttpUser):
     host = api_host
     wait_time = between(1, 3)
@@ -207,3 +223,4 @@ class DefiningNewDatabase(HttpUser ):
                             )
             else:
                 print(f"Failed to add table '{table_name}': {response.text}. Response code : {response.status_code}")
+"""

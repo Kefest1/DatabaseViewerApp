@@ -179,6 +179,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
             },
             body: JSON.stringify(tablesToDelete),
         })
@@ -212,6 +213,7 @@ function DataGridTable({ databaseName, selectedTable }) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
             },
             body: JSON.stringify(rowsDTO),
         })

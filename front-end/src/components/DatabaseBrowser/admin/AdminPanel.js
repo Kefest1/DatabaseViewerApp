@@ -237,13 +237,19 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         }
 
         fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            }
         })
             .then(response => response.text())
             .then(data => console.log(data));
 
         fetch(`http://localhost:8080/api/ownershipdetails/add/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toInsertTables.join('&tableNames=')} `, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            }
         })
             .then(response => response.text())
             .then(data => console.log(data));

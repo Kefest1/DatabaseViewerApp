@@ -173,7 +173,11 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }
 
     function getTableTakenStatus(selectedDatabase, selectedTable) {
-        return fetch(`http://localhost:8080/api/accesscontroller/addAndCheck/${selectedDatabase}/${selectedTable}/${userName}`)
+        return fetch(`http://localhost:8080/api/accesscontroller/addAndCheck/${selectedDatabase}/${selectedTable}/${userName}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            }
+        })
             .then((response) => response.text())
             .then((data) => {
                 setIsAvailable(data === "true");
@@ -187,7 +191,11 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }
 
     function checkPosition(selectedDatabase, selectedTable) {
-        return fetch(`http://localhost:8080/api/accesscontroller/checkPosition/${selectedDatabase}/${selectedTable}/${userName}`)
+        return fetch(`http://localhost:8080/api/accesscontroller/checkPosition/${selectedDatabase}/${selectedTable}/${userName}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            }
+        })
             .then((response) => response.text())
             .then((data) => {
                 console.log(data);
@@ -234,7 +242,12 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     useEffect(() => {
         if (selectedDatabase) {
             fetch(
-                `http://localhost:8080/api/tableinfo/getTables/${userName}/${selectedDatabase}`
+                `http://localhost:8080/api/tableinfo/getTables/${userName}/${selectedDatabase}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                    }
+                }
+
             )
                 .then((response) => response.json())
                 .then((data) => setTablesForSelectedDatabase(data))

@@ -96,7 +96,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             clearInterval(intervalId);
             const userName = getCookie("userName");
             if (testRef.current === 1) {
-                fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`);
+                fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                    }
+                });
             }
         };
     }, [test]);
@@ -285,7 +289,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify([params])
         })
@@ -308,7 +313,8 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}/${userName}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(selectedRowsIndex)
         })
@@ -366,7 +372,10 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
         fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            },
             body: JSON.stringify(finalList)
         })
             .then(response => {

@@ -193,7 +193,8 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
         fetch('http://localhost:8080/api/fieldinfo/deleteArray', {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(toDeleteRows)
         })
@@ -205,7 +206,10 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     const commitUpdate = () => { // TODO remove duplicates before sending
         fetch('http://localhost:8080/api/fieldinfo/update', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            },
             body: JSON.stringify(updatedRows),
         })
             .then(response => response.text())

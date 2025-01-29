@@ -181,7 +181,8 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
             fetch(`http://localhost:8080/api/tableinfo/deletetableindexes`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
                 },
                 body: JSON.stringify(selectedRowsIndex)
             })
@@ -252,7 +253,8 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
                 fetch(`http://localhost:8080/api/tableinfo/updateTable`, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
                     },
                     body: JSON.stringify(requestBody)
                 })
@@ -306,7 +308,8 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
         fetch(`http://localhost:8080/api/tableinfo/deletetable`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(id)
         })

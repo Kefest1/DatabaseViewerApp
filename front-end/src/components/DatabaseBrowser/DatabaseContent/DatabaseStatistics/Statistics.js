@@ -172,6 +172,7 @@ const Statistics = () => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(description).replace(/^"|"$/g, ''),
         })

@@ -98,7 +98,10 @@ function RegisterPage() {
 
         fetch('http://localhost:8080/api/userinfo/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+            },
             body: JSON.stringify(userPayload),
         })
             .then(response => {
