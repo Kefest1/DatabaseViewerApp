@@ -21,24 +21,41 @@ import Button from "@mui/material/Button";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
-    const tables = await fetch(
-        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
-    );
+
+    const token = localStorage.getItem("jwtToken");
+    console.log(token);
+    const tables = await fetch("http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     return await tables.json();
 }
 
 async function fetchAvailableConnections(databaseName) {
     const userName = getCookie("userName");
+
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/tableconnection/getDatabaseConnection/" + databaseName + "/" + userName
+        "http://localhost:8080/api/tableconnection/getDatabaseConnection/" + databaseName + "/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        }
     );
     return await tables.json();
 }
 
 async function fetchDatabaseStructure(databaseName) {
     const url = "http://localhost:8080/api/tableinfo/getDatabaseStructure/" + databaseName;
+
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        url
+        url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        }
     );
     return await tables.json();
 }

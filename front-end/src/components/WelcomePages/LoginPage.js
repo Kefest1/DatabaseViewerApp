@@ -54,12 +54,12 @@ function LoginPage() {
         }
     };
 
-    setInterval(checkCookieAndRedirect, 5000);
+    // setInterval(checkCookieAndRedirect, 5000);
 
     const Login = async () => {
         console.log("Login button clicked");
         if (username.length === 0) {
-            setMessage("Enter username")
+            setMessage("Enter username");
             setOpenSnackbar(true);
             return;
         }
@@ -69,22 +69,33 @@ function LoginPage() {
             return;
         }
 
-        let data;
         try {
-            const response = await fetch(`http://localhost:8080/api/userinfo/getByUsername/${username}/${password}`);
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
 
             if (!response.ok) {
                 console.error('Fetch error:', response.status, response.statusText);
                 throw new Error('Network response was not ok');
             }
 
-            data = await response.json();
-            console.log(data);
+            const token = await response.text();
 
-            if (data) {
+            if (token) {
+                localStorage.setItem("jwtToken", token);
                 setOpenSnackbarOk(true);
 
-                const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`);
+                const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                        method: 'GET'
+                    },
+                );
                 const isAdmin = await adminResponse.json();
 
                 const expirationTime = new Date();
@@ -99,7 +110,7 @@ function LoginPage() {
                 window.location.href = 'http://localhost:3000';
             } else {
                 console.log("Invalid user or password");
-                setMessage("User not found");
+                setMessage("User  not found");
                 setOpenSnackbar(true);
                 setPassword("");
             }

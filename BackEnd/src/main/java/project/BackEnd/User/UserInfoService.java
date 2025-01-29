@@ -1,11 +1,12 @@
 package project.BackEnd.User;
 
 import org.apache.catalina.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
 
-public interface UserInfoService {
+public interface UserInfoService extends UserDetailsService {
     public UserInfo saveUsers(UserInfo userInfo);
     public List<UserInfo> getAllUsers();
     public UserInfo getUsersByUsername(String username);

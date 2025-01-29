@@ -18,8 +18,14 @@ import {InfoIcon} from "lucide-react";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
+
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
+        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await tables.json();
 }

@@ -19,16 +19,26 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
+        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await tables.json();
 }
 
 async function fetchDatabaseStructure(selectedDatabase) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/databaseinfo/getDatabaseStructure/" + userName + "/" + selectedDatabase
+        "http://localhost:8080/api/databaseinfo/getDatabaseStructure/" + userName + "/" + selectedDatabase, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await tables.json();
 }

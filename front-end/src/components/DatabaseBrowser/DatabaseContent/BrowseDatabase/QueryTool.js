@@ -21,8 +21,14 @@ import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases(userName) {
+
+    const token = localStorage.getItem("jwtToken");
     const response = await fetch(
-        "http://localhost:8080/api/databaseinfo/getfoldermap/" + userName
+        "http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     const data = await response.json();
     const databases = extractDatabaseNames(data);
@@ -55,22 +61,40 @@ function extractDatabaseNames(data) {
 }
 
 async function fetchColumnsForTable(userName, database, table) {
+    const token = localStorage.getItem("jwtToken");
+
     const response = await fetch(
-        `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
+        `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await response.json();
 }
 
 async function fetchPrimaryKeyName(database, table) {
     const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
-    const response = await fetch(url);
+
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await response.text();
 }
 
 async function fetchTableStructure(database, table) {
     const userName = getCookie("userName");
+
+    const token = localStorage.getItem("jwtToken");
     const url = `http://localhost:8080/api/tableinfo/getColumnsWithTypes/${userName}/${database}/${table}`
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await response.json();
 }
 
@@ -81,9 +105,14 @@ async function runQuery(database, table, columns, setErrorMessage, setOpenSnackb
 
         const url = `http://localhost:8080/api/tableinfo/getAllFieldsForTable/${userName}`;
         const startTime = performance.now();
+
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(requestBody)
         });
 

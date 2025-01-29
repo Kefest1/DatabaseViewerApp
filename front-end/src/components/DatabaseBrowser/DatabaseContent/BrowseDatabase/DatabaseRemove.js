@@ -20,8 +20,13 @@ import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
+        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await tables.json();
 }
@@ -50,9 +55,13 @@ function DatabaseRemove({setMessage, setOpenSnackbar}) {
     async function deleteDatabase(selectedDatabase) {
         const userName = getCookie("userName");
 
+        const token = localStorage.getItem("jwtToken");
         try {
             const response = await fetch(`http://localhost:8080/api/databaseinfo/delete/${selectedDatabase}/${userName}`, {
                 method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             if (response.ok) {

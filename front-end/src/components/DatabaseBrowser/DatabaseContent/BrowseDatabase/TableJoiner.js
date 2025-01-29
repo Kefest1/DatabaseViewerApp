@@ -36,7 +36,13 @@ function prepareColumns(selectedColumns, primaryKey) {
 
 const fetchJoinInfo = async (databaseName, tableName) => {
     const userName = getCookie("userName");
-    const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`)
+
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
     return await response.json();
 }
 

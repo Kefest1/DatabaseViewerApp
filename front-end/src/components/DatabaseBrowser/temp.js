@@ -3,7 +3,14 @@ import './DatabaseInfoPanel.css';
 import {getCookie} from "../getCookie";
 
 async function fetchAvailableDatabases(userName) {
-    const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
+
+    const token = localStorage.getItem("jwtToken");
+
+    const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await tables.json();
 }
 

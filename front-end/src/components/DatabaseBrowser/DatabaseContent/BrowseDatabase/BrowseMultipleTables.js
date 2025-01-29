@@ -9,8 +9,14 @@ import TableJoiner from "./TableJoiner";
 import { useTransition, animated } from 'react-spring';
 
 async function fetchAvailableDatabases(userName) {
+
+    const token = localStorage.getItem("jwtToken");
     const response = await fetch(
-        "http://localhost:8080/api/databaseinfo/getfoldermap/" + userName
+        "http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     const data = await response.json();
     const databases = extractDatabaseNames(data);
@@ -43,27 +49,43 @@ function extractDatabaseNames(data) {
 }
 
 async function fetchColumnsForTable(userName, database, table) {
+
+    const token = localStorage.getItem("jwtToken");
     const response = await fetch(
-        `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`
+        `http://localhost:8080/api/tableinfo/getColumns/${userName}/${database}/${table}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await response.json();
 }
 
 async function fetchPrimaryKeyName(database, table) {
     const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
-    const response = await fetch(url);
+
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     return await response.text();
 }
 
 async function runQuery(database, table, columns) {
     try {
         const requestBody = { database, table, columns: [...columns] };
+        const token = localStorage.getItem("jwtToken");
 
         const url = 'http://localhost:8080/api/tableinfo/getAllFields';
         const startTime = performance.now();
         const response = await fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(requestBody)
         });
         const endTime = performance.now();
@@ -118,8 +140,14 @@ const QueryTool = ({selectedDbTable}) => {
 
     useEffect(() => {
         if (selectedDatabase) {
+
+            const token = localStorage.getItem("jwtToken");
             fetch(
-                `http://localhost:8080/api/tableinfo/getTables/${userName}/${selectedDatabase}`
+                `http://localhost:8080/api/tableinfo/getTables/${userName}/${selectedDatabase}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
             )
                 .then((response) => response.json())
                 .then((data) => setTablesForSelectedDatabase(data))

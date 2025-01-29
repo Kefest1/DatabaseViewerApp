@@ -3,11 +3,18 @@ import Select from "@mui/material/Select";
 import DataGridTable from "./DataGridTable";
 import React, {useEffect, useState} from "react";
 import {getCookie} from "./../../../getCookie";
+import Button from "@mui/material/Button";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
+
+    const token = localStorage.getItem("jwtToken");
     const tables = await fetch(
-        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
+        "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     return await tables.json();
 }
@@ -15,14 +22,26 @@ async function fetchAvailableDatabases() {
 async function fetchAvailableTables(selectedDatabase) {
     const userName = getCookie("userName");
     const url = "http://localhost:8080/api/tableinfo/getAvailableTables/" + userName + "/" + selectedDatabase;
-    const tables = await fetch(url);
+
+    const token = localStorage.getItem("jwtToken");
+    const tables = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await tables.json();
 }
 
 
 async function fetchPrimaryKeyName(database, table) {
     const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
-    const response = await fetch(url);
+
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await response.text();
 }
 
@@ -33,6 +52,8 @@ function TableModifier({setMessage, setOpenSnackbar}) {
 
     const [availableTables, setAvailableTables] = useState([]);
     const [availableDatabases, setAvailableDatabases] = useState([]);
+
+    const [isButtonPressed, setIsButtonPressed] = useState(false);
 
     useEffect(() => {
         const loadDatabases = async () => {
@@ -56,6 +77,10 @@ function TableModifier({setMessage, setOpenSnackbar}) {
         loadTables();
     }, [selectedDatabase]);
 
+    useEffect(() => {
+        setIsButtonPressed(false);
+    }, [selectedDatabase, selectedTable]);
+
     return (
         <div>
             <h6>Modify table structure</h6>
@@ -68,7 +93,7 @@ function TableModifier({setMessage, setOpenSnackbar}) {
                     label="Select Table"
                     onChange={(event) => setSelectedDatabase(event.target.value)}
                     variant={"outlined"}
-                    style={{width: "200px"}}
+                    style={{width: "200px", marginRight: "10px"}}
                 >
                     {availableDatabases.map((option, index) => (
                         <MenuItem key={index} value={option}>
@@ -88,6 +113,7 @@ function TableModifier({setMessage, setOpenSnackbar}) {
                         label="Select Table"
                         onChange={(event) => setSelectedTable(event.target.value)}
                         variant={"outlined"}
+                        style={{marginRight: "10px"}}
                     >
                         {availableTables.map((option, index) => (
                             <MenuItem key={index} value={option}>
@@ -99,6 +125,17 @@ function TableModifier({setMessage, setOpenSnackbar}) {
             }
             {
                 selectedTable !== "" && selectedDatabase !== "" &&
+                (
+                    <Button
+                        onClick={() => setIsButtonPressed(true)}
+                        variant={"contained"}
+                    >
+                        Fetch data
+                    </Button>
+                )
+            }
+            {
+                selectedTable !== "" && selectedDatabase !== "" && isButtonPressed === true &&
                 (
                     <DataGridTable databaseName={selectedDatabase} selectedTable={selectedTable}></DataGridTable>
                 )

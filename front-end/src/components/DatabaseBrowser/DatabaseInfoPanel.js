@@ -8,7 +8,15 @@ import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases(userName) {
-    const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName);
+    const token = localStorage.getItem("jwtToken");
+
+    const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await tables.json();
 }
 

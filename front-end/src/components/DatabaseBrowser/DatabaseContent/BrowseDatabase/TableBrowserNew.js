@@ -108,10 +108,14 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 setOpenSnackbar(true);
                 return;
             }
+
+            const token = localStorage.getItem("jwtToken");
             const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
+
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(fieldsToUpdate),
             });
@@ -223,7 +227,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     const handleDeleteClick = (id) => () => {
         setRows(rows.filter((row) => row.id !== id));
         setSelectedRowsIndex([...selectedRowsIndex, id]);
-        // commitDeleteSingleRow(id);
     };
 
     const handleCancelClick = (id) => () => {
@@ -534,10 +537,13 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                         console.log('CSV File content:\n', content);
                         const payloadList = transformCSVToInsertPayload(content);
                         console.log(payloadList);
+
+                        const token = localStorage.getItem("jwtToken");
                         const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
                             },
                             body: JSON.stringify(payloadList),
                         });

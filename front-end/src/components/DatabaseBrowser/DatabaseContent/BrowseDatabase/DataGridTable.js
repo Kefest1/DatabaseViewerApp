@@ -24,8 +24,13 @@ import './DataGridTable.css';
 async function fetchStructure(databaseName, selectedTable) {
     const userName = getCookie("userName");
     console.log(`http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`);
+    const token = localStorage.getItem("jwtToken");
     const response = await fetch(
-        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`
+        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`,{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        }
     );
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -35,16 +40,26 @@ async function fetchStructure(databaseName, selectedTable) {
 
 async function checkIfTableIsEmpty(selectedTable, selectedDatabase) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const url = "http://localhost:8080/api/tableinfo/checkIfTableEmpty/" + selectedDatabase + "/" + selectedTable;
     console.log(url);
-    const tables = await fetch(url);
+    const tables = await fetch(url,{
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     return await tables.json();
 }
 
 async function fetchPrimaryKeyName(databaseName, tableName) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     return await response.text();
 }
 
@@ -220,7 +235,10 @@ function DataGridTable({ databaseName, selectedTable }) {
 
     const handleDeleteClick = (id) => () => {
         const result = rows.find(item => item.id === id)["columnName"];
+        console.log(result);
+        console.log(primaryKey);
         if (result === primaryKey) {
+            console.log("Cannot delete primary key");
             setSnackbarMessage("Cannot delete primary key");
             setSnackbarOpen(true);
             return;

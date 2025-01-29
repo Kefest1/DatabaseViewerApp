@@ -86,8 +86,7 @@ function RegisterPage() {
             return errMessage;
         }
 
-        const response = await fetch('http://localhost:8080/api/userinfo/checkExistenceByUsername/' + username);
-        const is = await response.json();
+        let isRegistered = true;
 
         const userPayload = {
             "username" : username,
@@ -104,8 +103,8 @@ function RegisterPage() {
         })
             .then(response => {
                 if (!response.ok) {
-                
                     return response.text().then(errorMessage => {
+                        isRegistered = false;
                         throw new Error(`Error ${response.status}: ${errorMessage}`);
                     });
                 }
@@ -119,7 +118,8 @@ function RegisterPage() {
                 setCaption(error.message);
                 console.error("Error:", error);
             });
-        return is !== false;
+
+        return isRegistered;
     }
 
     return (

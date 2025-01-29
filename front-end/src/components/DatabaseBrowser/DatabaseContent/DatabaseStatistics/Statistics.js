@@ -49,17 +49,28 @@ const Statistics = () => {
 
     async function GetDatabases() {
         const userName = getCookie("userName");
+        const token = localStorage.getItem("jwtToken");
 
         const response = await fetch(
-            "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName
+            "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setDatabases(data);
     }
 
     async function GetXPlot() {
+
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn1
+            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn1, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setXPlot(data);
@@ -67,8 +78,14 @@ const Statistics = () => {
     }
 
     async function GetYPlot() {
+
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn2
+            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn2, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setYPlot(data);
@@ -103,8 +120,15 @@ const Statistics = () => {
 
     async function getTables(databaseName) {
         const userName = getCookie("userName");
+
+        const token = localStorage.getItem("jwtToken");
+
         const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getTables/${userName}/${databaseName}`
+            `http://localhost:8080/api/tableinfo/getTables/${userName}/${databaseName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setTables(data);
@@ -112,8 +136,14 @@ const Statistics = () => {
 
     async function getDatabaseStatistics(databaseName) {
         const userName = getCookie("userName");
+
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`
+            `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setDatabaseStatistics(data);

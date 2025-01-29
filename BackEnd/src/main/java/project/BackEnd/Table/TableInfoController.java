@@ -67,7 +67,6 @@ public class TableInfoController {
 
     @PostMapping("/addenhanced")
     public ResponseEntity<String> saveInfoEnhanced(@RequestBody TableInfoRequestPayload payload) {
-        System.out.println(payload);
         String tableName = payload.getTableName();
         String databaseName = payload.getDatabaseName();
         String primaryKey = payload.getPrimaryKey();
@@ -89,6 +88,9 @@ public class TableInfoController {
 
         OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
+
+        TableStructure tableStructure = new TableStructure(primaryKey, "Long", tableInfo);
+        tableStructureRepository.save(tableStructure);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Table created successfully");
@@ -197,14 +199,11 @@ public class TableInfoController {
             @PathVariable("databasename") String databasename,
             @PathVariable("tableName") String tableName) {
 
-        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableName, databasename).getTableStructure();
+        List<TableStructure> tableStructures = tableInfoRepository.findTableInstanceByTableNameAndDatabaseNameAndUserName(tableName, databasename, userName).getTableStructure();
 
-        // Map TableStructure to FieldInfoDTO, including the ID
-        List<FieldInfoDTO> fieldInfoDTOs = tableStructures.stream()
+        return tableStructures.stream()
                 .map(ts -> new FieldInfoDTO(ts.getId(), ts.getColumnName(), ts.getColumnType()))
                 .collect(Collectors.toList());
-
-        return fieldInfoDTOs;
     }
 
     @PostMapping("/addFieldInformation/{databaseName}/{tableName}/{userName}")

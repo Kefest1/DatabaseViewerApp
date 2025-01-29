@@ -63,8 +63,13 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     }
 
     const getSubordinates = async () => {
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`
+            `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setSubordinates(data);
@@ -75,8 +80,13 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     }, []);
 
     const getDatabase = async () => {
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getAvailableDatabasesObject/${adminName}`
+            `http://localhost:8080/api/tableinfo/getAvailableDatabasesObject/${adminName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const data = await response.json();
         setAvailableDatabases(data);
@@ -117,13 +127,22 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     );
 
     const handleSelect = async () => {
+        const token = localStorage.getItem("jwtToken");
         const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getAvailableTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`
+            `http://localhost:8080/api/tableinfo/getAvailableTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
         const availableTables = await response.json();
 
         const response2 = await fetch(
-            `http://localhost:8080/api/tableinfo/getAllowedTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`
+            `http://localhost:8080/api/tableinfo/getAllowedTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
 
         const allowedTables = await response2.json();

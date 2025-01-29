@@ -2,6 +2,7 @@ import random
 import logging
 from locust import task, constant, HttpUser, between
 from faker import Faker
+
 fake = Faker()
 api_host = "http://localhost:8080/api"
 logging.basicConfig(level=logging.INFO)

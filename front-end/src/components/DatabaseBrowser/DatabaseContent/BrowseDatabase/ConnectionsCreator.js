@@ -70,21 +70,37 @@ const nodeTypes = {
 };
 
 async function fetchAvailableDatabases(userName) {
-    const tables = await fetch("http://localhost:8080/api/databaseinfo/getAvailableDatabaseNames/" + userName);
+    const token = localStorage.getItem("jwtToken");
+
+    const tables = await fetch("http://localhost:8080/api/databaseinfo/getAvailableDatabaseNames/" + userName, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await tables.json();
 }
 
 async function fetchAvailableTables(selectedDatabase) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const url = "http://localhost:8080/api/tableinfo/getAvailableTables/" + userName + "/" + selectedDatabase;
-    const tables = await fetch(url);
+    const tables = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await tables.json();
 }
 
 async function fetchStructure(databaseName, selectedTable) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     const response = await fetch(
-        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`
+        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
     );
     if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -94,10 +110,14 @@ async function fetchStructure(databaseName, selectedTable) {
 
 async function fetchConnection(databaseName, selectedTableOne, selectedTableMany) {
     const userName = getCookie("userName");
+    const token = localStorage.getItem("jwtToken");
     try {
-        console.log(`http://localhost:8080/api/tableconnection/getConnectionDetails/${databaseName}/${selectedTableOne}/${selectedTableMany}/${userName}`);
         const response = await fetch(
-            `http://localhost:8080/api/tableconnection/getConnectionDetails/${databaseName}/${selectedTableOne}/${selectedTableMany}/${userName}`
+            `http://localhost:8080/api/tableconnection/getConnectionDetails/${databaseName}/${selectedTableOne}/${selectedTableMany}/${userName}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
         );
 
         if (!response.ok) {
@@ -383,10 +403,12 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
             }
 
             try {
+                const token = localStorage.getItem("jwtToken");
                 const response = await fetch(`http://localhost:8080/api/tableconnection/addconnection`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(payload),
                 });
@@ -403,12 +425,14 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
             }
         }
         else {
+            const token = localStorage.getItem("jwtToken");
             if (edges.length === 0) {
                 try {
                     const response = await fetch(`http://localhost:8080/api/tableconnection/delete/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         },
                     });
 
@@ -437,6 +461,7 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify(updatedTableConnection),
                     });

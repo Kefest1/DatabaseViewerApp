@@ -6,14 +6,26 @@ async function fetchAdminName() {
     const userName = getCookie("userName");
     console.log("http://localhost:8080/api/userinfo/getAdmin/" + userName);
 
-    const res = await fetch("http://localhost:8080/api/userinfo/getAdmin/" + userName);
+    const token = localStorage.getItem("jwtToken");
+    const res = await fetch("http://localhost:8080/api/userinfo/getAdmin/" + userName, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await res.text()
 }
 
 async function fetchAdminMail() {
     const userName = getCookie("userName");
     console.log("http://localhost:8080/api/userinfo/getAdminMail/" + userName);
-    const res = await fetch("http://localhost:8080/api/userinfo/getAdminMail/" + userName);
+
+    const token = localStorage.getItem("jwtToken");
+
+    const res = await fetch("http://localhost:8080/api/userinfo/getAdminMail/" + userName, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
     return await res.text()
 }
 

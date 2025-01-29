@@ -19,7 +19,12 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     });
 
     const checkTableConnectionInfo = async () => {
-        const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`);
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(`http://localhost:8080/api/tableconnection/getconnectedtables/${databaseName}/${tableName}/${userName}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         return await response.json();
     }
 
@@ -60,7 +65,12 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
     }, [rows]);
 
     const joinColumn = async (id, tableToJoin, matchingManyColumnName, matchingOneColumnName, dataTypes) => {
-        const response = await fetch(`http://localhost:8080/api/tableinfo/getFields/${userName}/${databaseName}/${tableToJoin}`);
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(`http://localhost:8080/api/tableinfo/getFields/${userName}/${databaseName}/${tableToJoin}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const result = await response.json();
         const groupedData = {};
 
