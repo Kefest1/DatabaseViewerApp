@@ -252,7 +252,6 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
         </div>
     );
 };
-
 function DatabaseScheme() {
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
