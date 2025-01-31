@@ -18,6 +18,7 @@ import {getCookie} from "../../../getCookie";
 import {MenuItem, Paper} from "@mui/material";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
+import html2canvas from 'html2canvas';
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
@@ -139,16 +140,15 @@ function prepareEdges(data) {
     }));
 }
 
-const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
-    const {fitView} = useReactFlow();
+const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
+    const { fitView } = useReactFlow();
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [isLayoutApplied, setIsLayoutApplied] = useState(0);
 
-
     const applyLayout = useCallback(
         (direction) => {
-            const layouted = getLayoutedElements(nodes, edges, {direction});
+            const layouted = getLayoutedElements(nodes, edges, { direction });
 
             setNodes([...layouted.nodes]);
             setEdges([...layouted.edges]);
@@ -160,6 +160,32 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
         [nodes, edges, fitView]
     );
 
+    const downloadSchemaAsImage = () => {
+        const flowElement = document.querySelector('.react-flow');
+        if (flowElement) {
+            html2canvas(flowElement).then((canvas) => {
+                const link = document.createElement('a');
+                link.download = `${selectedDatabase}_schema.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    };
+
+    const downloadSchemaAsJson = () => {
+        const schemaData = {
+            nodes: nodes,
+            edges: edges,
+        };
+
+        const dataBlob = new Blob([JSON.stringify(schemaData, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+
+        link.download = `${selectedDatabase}_schema.json`;
+        link.href = URL.createObjectURL(dataBlob);
+        link.click();
+    };
+
     useEffect(() => {
         if (isLayoutApplied < 4) {
             applyLayout('LR');
@@ -168,7 +194,7 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
     }, [applyLayout]);
 
     return (
-        <div style={{width: '100%', height: '100%'}}>
+        <div style={{ width: '100%', height: '100%' }}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -196,17 +222,32 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
                         Selected database: {selectedDatabase}
                     </h4>
 
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => applyLayout('LR')}
-                        style={{marginLeft: '62,5px', width: '200px', height: '35px'}}
-                    >
-                        Layout scheme
-                    </Button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <Button
+                            variant="contained"
+                            style={{ backgroundColor: '#4CAF50', color: 'white', width: '200px', height: '35px' }}
+                            onClick={() => applyLayout('LR')}
+                        >
+                            Layout scheme
+                        </Button>
+                        <Button
+                            variant="contained"
+                            style={{ backgroundColor: '#2196F3', color: 'white', width: '200px', height: '35px' }}
+                            onClick={downloadSchemaAsImage}
+                        >
+                            Download as Image
+                        </Button>
+                        <Button
+                            variant="contained"
+                            style={{ backgroundColor: '#FF9800', color: 'white', width: '200px', height: '35px' }}
+                            onClick={downloadSchemaAsJson}
+                        >
+                            Download as JSON
+                        </Button>
+                    </div>
                 </Panel>
-                <MiniMap/>
-                <Background/>
+                <MiniMap />
+                <Background />
             </ReactFlow>
         </div>
     );
