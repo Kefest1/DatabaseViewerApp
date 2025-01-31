@@ -106,7 +106,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     }
                 });
             }
-            setData(prevData => ({
+            setData(() => ({
                 insert: [],
                 update: []
             }));
