@@ -102,7 +102,6 @@ function TableModifier({setMessage, setOpenSnackbar}) {
                     ))}
                 </Select>
             </FormControl>
-
             {
                 selectedDatabase !== "" &&
                 (

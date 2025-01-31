@@ -10,9 +10,9 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    FormControl,
+    FormControl, IconButton,
     InputLabel,
-    Paper,
+    Paper, SnackbarContent,
     TextField
 } from '@mui/material';
 import ListItem from '@mui/material/ListItem';
@@ -23,6 +23,10 @@ import Button from "@mui/material/Button";
 import { BarChart } from '@mui/x-charts/BarChart';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
 import {motion} from "framer-motion";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import {InfoIcon} from "lucide-react";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Statistics = () => {
     const [databases, setDatabases] = useState([]);
@@ -43,6 +47,12 @@ const Statistics = () => {
     const [description, setDescription] = useState('');
     const [openDialog, setOpenDialog] = useState(false);
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    function handleCloseSnackbar() {
+        setOpenSnackbar(false);
+    }
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
@@ -161,6 +171,7 @@ const Statistics = () => {
     }
 
     const handleLog = (databaseName) => {
+        console.log(databaseStatistics);
         const userName = getCookie("userName");
         const url = `http://localhost:8080/api/databaseinfo/updateDatabaseDescription/${databaseName}/${userName}`;
         if (isValidInput(description) === false) {
@@ -172,7 +183,7 @@ const Statistics = () => {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
             },
             body: JSON.stringify(description).replace(/^"|"$/g, ''),
         })
@@ -184,11 +195,13 @@ const Statistics = () => {
             })
             .then((data) => {
                 console.log("Response:", data);
-                alert("Database description updated successfully!");
+                setMessage("Database description updated successfully!");
+                setOpenSnackbar(true);
             })
             .catch((error) => {
                 console.error("Error:", error);
-                alert("Error updating database description");
+                setMessage("Error updating database description");
+                setOpenSnackbar(true);
             });
     };
 
@@ -212,6 +225,11 @@ const Statistics = () => {
     const confirmLeave = () => {
         setOpenDialog(false);
     };
+
+    function isColumnCountZero(database, tableName) {
+        const table = database.tableStatistics.find(table => table.tableName === tableName);
+        return table ? table.columnCounts === 0 : false;
+    }
 
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
@@ -316,7 +334,7 @@ const Statistics = () => {
 
                 )}
 
-                {selectedTable && databaseStatistics.tableStatistics.columnCounts > 0 && (
+                {selectedTable && isColumnCountZero(databaseStatistics, selectedTable) !== true && (
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -447,14 +465,37 @@ const Statistics = () => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="primary">
-                        Cancel
-                    </Button>
                     <Button onClick={confirmLeave} color="secondary">
                         Leave
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#4365da' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Paper>
     );
 };

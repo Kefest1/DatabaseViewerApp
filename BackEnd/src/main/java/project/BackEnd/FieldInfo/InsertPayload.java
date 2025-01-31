@@ -11,4 +11,5 @@ public class InsertPayload {
     String columnName;
     String dataValue;
     String tableName;
+    Long localID;
 }

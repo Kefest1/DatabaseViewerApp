@@ -13,3 +13,8 @@
 .alert strong {
     font-weight: bold;
 }
+
+.deleted-row {
+    text-decoration: line-through;
+    color: gray;
+}

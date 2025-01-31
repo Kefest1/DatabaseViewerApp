@@ -4,8 +4,9 @@ import RegisterPage from "./components/WelcomePages/RegisterPage";
 import Main from "./components/DatabaseBrowser/Main";
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
+import React, {useEffect} from 'react';
 import './index.css';
+import { checkCookieAndRedirect } from "./components/WelcomePages/authUtils";
 
 function AnimatedRoutes() {
     const location = useLocation();
@@ -48,6 +49,14 @@ function AnimatedRoutes() {
 
 
 function App() {
+    useEffect(() => {
+        checkCookieAndRedirect();
+
+        const intervalId = setInterval(checkCookieAndRedirect, 1000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     return (
         <BrowserRouter>
             <AnimatedRoutes />

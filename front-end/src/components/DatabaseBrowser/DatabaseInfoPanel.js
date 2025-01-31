@@ -10,6 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 async function fetchAvailableDatabases(userName) {
     const token = localStorage.getItem("jwtToken");
 
+    console.log(token);
     const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
         method: 'GET',
         headers: {

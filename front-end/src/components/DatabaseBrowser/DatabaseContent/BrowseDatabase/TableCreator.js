@@ -39,9 +39,26 @@ function TableCreator({setMessage, setOpenSnackbar}) {
     const [tableName, setTableName] = useState('');
     const [primaryColumnName, setPrimaryColumnName] = useState('');
 
+    const isValidName = (name) => {
+        const regex = /^[A-Za-z_][A-Za-z0-9_]*$/;
+        return regex.test(name) && name.length <= 63 && name.length >= 3;
+    };
+
     function addTable(tableName, primaryColumnName, databaseName) {
+
         const url = `http://localhost:8080/api/tableinfo/addenhanced`;
         const userName = getCookie("userName");
+
+        if (!isValidName(tableName)) {
+            setMessage("Invalid table name, needs to be between 3 and 63 characters and start with a letter or underscore");
+            setOpenSnackbar(true);
+            return;
+        }
+        if (!isValidName(primaryColumnName)) {
+            setMessage("Invalid primary key name, needs to be between 3 and 63 characters and start with a letter or underscore");
+            setOpenSnackbar(true);
+            return;
+        }
 
         const payload = {
             tableName: tableName,

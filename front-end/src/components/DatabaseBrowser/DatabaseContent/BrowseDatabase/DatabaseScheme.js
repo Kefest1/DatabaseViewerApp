@@ -215,9 +215,7 @@ const LayoutFlow = ({selectedDatabase, initialNodes, initialEdges}) => {
 function DatabaseScheme() {
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
-
     const [connections, setConnections] = useState([]);
-
     const [databaseStructure, setDatabaseStructure] = useState([]);
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
@@ -239,7 +237,6 @@ function DatabaseScheme() {
         if (selectedDatabase !== "") {
             loadConnections();
         }
-
     }, [selectedDatabase]);
 
     useEffect(() => {
@@ -250,7 +247,6 @@ function DatabaseScheme() {
 
         if (selectedDatabase !== "") {
             loadDatabaseStructure();
-            console.log(databaseStructure);
         }
     }, [selectedDatabase]);
 
@@ -268,34 +264,55 @@ function DatabaseScheme() {
         }
     }, [connections]);
 
+    const handleDatabaseChange = (event) => {
+        setSelectedDatabase(event.target.value);
+        setNodes([]);
+        setEdges([]);
+        setConnections([]);
+        setDatabaseStructure([]);
+    };
+
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
-
-        <div className="h-full w-full" style={{ height: 770, width: 1400 }}>
-
-            {selectedDatabase === "" && (
-                <Select
-                    labelId="demo-simple-select-table"
-                    id="demo-simple-table"
-                    value={selectedDatabase}
-                    label="Select Database"
-                    onChange={(event) => setSelectedDatabase(event.target.value)}
-                    variant={"outlined"}
-                >
-                    {availableDatabases.map((option, index) => (
-                        <MenuItem key={index} value={option}>
-                            {option}
+            <div className="h-full w-full" style={{ height: 'calc(80vh)',  width: 'calc(74vw)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0px' }}>
+                    <h4 style={{
+                        fontSize: '1.5rem',
+                        color: '#333',
+                        marginRight: '15px',
+                        fontFamily: 'Arial, sans-serif',
+                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+                        letterSpacing: '0.5px',
+                        fontWeight: '600',
+                    }}>
+                        Select database to view its schema
+                    </h4>
+                    <Select
+                        labelId="demo-simple-select-table"
+                        id="demo-simple-table"
+                        value={selectedDatabase}
+                        label="Select Database"
+                        onChange={handleDatabaseChange}
+                        variant={"outlined"}
+                        style={{ width: '200px', height: '35px' }}
+                    >
+                        <MenuItem value="">
+                            <em>Select a database</em>
                         </MenuItem>
-                    ))}
-                </Select>
-            )}
+                        {availableDatabases.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </div>
 
-            {selectedDatabase !== "" && nodes.length > 0 && edges.length > 0 && (
-                <ReactFlowProvider>
-                    <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges}/>
-                </ReactFlowProvider>
-            )}
-        </div>
+                {selectedDatabase !== "" && nodes.length > 0 && (
+                    <ReactFlowProvider>
+                        <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} />
+                    </ReactFlowProvider>
+                )}
+            </div>
         </Paper>
     );
 }

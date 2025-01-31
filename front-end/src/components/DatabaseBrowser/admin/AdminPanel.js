@@ -1,45 +1,50 @@
-import React, {useEffect, useState} from "react";
-import {getCookie} from "../../getCookie";
-import Select from "@mui/material/Select";
+import React, { useEffect, useState } from "react";
+import { getCookie } from "../../getCookie";
 import {
-    Button, FormControl,
-    Grid2, IconButton,
+    Button,
+    FormControl,
+    Grid2,
+    IconButton,
     InputLabel,
     List,
     ListItemButton,
     ListItemIcon,
     MenuItem,
-    Paper, Snackbar, SnackbarContent,
-    Typography
+    Paper,
+    Snackbar,
+    SnackbarContent,
+    Typography,
+    Box,
+    Select,
+    CircularProgress,
+    Avatar,
+    ListItemAvatar,
+    Stack,
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import ListItemText from "@mui/material/ListItemText";
-import { ArrowBack, ArrowLeft, ArrowRight, ArrowForward } from "@mui/icons-material";
+import { ArrowBack, ArrowForward, ArrowLeft, ArrowRight } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneOutline from '@mui/icons-material/DoneOutline';
 
-const AdminPanel = ({setOccupiedAdmin}) => {
+const AdminPanel = ({ setOccupiedAdmin }) => {
     const [selectedSubordinate, setSelectedSubordinate] = useState("");
     const [subordinates, setSubordinates] = useState([]);
-
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
-
     const [availableTables, setAvailableTables] = useState([]);
     const [allowedTables, setAllowedTables] = useState([]);
-
     const [initialAvailableTables, setInitialAvailableTables] = useState([]);
     const [initialAllowedTables, setInitialAllowedTables] = useState([]);
-
-    const [checked, setChecked] = React.useState([]);
+    const [checked, setChecked] = useState([]);
+    const [message, setMessage] = useState("");
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const intersection = (a, b) => a.filter((value) => b.includes(value));
 
     const leftChecked = intersection(checked, availableTables);
     const rightChecked = intersection(checked, allowedTables);
     const adminName = getCookie("userName");
-
-
-    const [message, setMessage] = useState("");
-    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleToggle = (value) => () => {
         const currentIndex = checked.indexOf(value);
@@ -54,13 +59,7 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         setChecked(newChecked);
     };
 
-    function not(a, b) {
-        return a.filter((value) => !b.includes(value));
-    }
-
-    function intersection(a, b) {
-        return a.filter((value) => b.includes(value));
-    }
+    const not = (a, b) => a.filter((value) => !b.includes(value));
 
     const getSubordinates = async () => {
         const token = localStorage.getItem("jwtToken");
@@ -74,10 +73,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         const data = await response.json();
         setSubordinates(data);
     };
-
-    useEffect(() => {
-        getSubordinates();
-    }, []);
 
     const getDatabase = async () => {
         const token = localStorage.getItem("jwtToken");
@@ -93,38 +88,9 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     };
 
     useEffect(() => {
+        getSubordinates();
         getDatabase();
     }, []);
-
-    const customList = (tablesInfo) => (
-        <Paper sx={{ width: 300, height: 360, overflow: 'auto' }}>
-            <List dense component="div" role="list">
-                {tablesInfo.map((val) => {
-                    const labelID = `list-${val}`;
-
-                    return (
-                        <ListItemButton
-                            key={val}
-                            onClick={handleToggle(val)}
-                            role="listitem"
-                        >
-                            <ListItemIcon>
-                                <Checkbox
-                                    checked={checked.includes(val)}
-                                    inputProps={{
-                                        'aria-labelledby': labelID,
-                                    }}
-                                    tabIndex={-1}
-                                    disableRipple
-                                />
-                            </ListItemIcon>
-                            <ListItemText id={labelID} primary={`Table: ${val}`} />
-                        </ListItemButton>
-                    );
-                })}
-            </List>
-        </Paper>
-    );
 
     const handleSelect = async () => {
         const token = localStorage.getItem("jwtToken");
@@ -153,14 +119,6 @@ const AdminPanel = ({setOccupiedAdmin}) => {
         setInitialAllowedTables(allowedTables);
     };
 
-    const handleSelectDatabase = async (event) => {
-        setSelectedDatabase(event.target.value);
-    }
-
-    const handleSelectSubordinate = async (event) => {
-        setSelectedSubordinate(event.target.value)
-    }
-
     useEffect(() => {
         if (selectedDatabase !== "" && selectedSubordinate !== "") {
             handleSelect().then(r => {});
@@ -170,157 +128,161 @@ const AdminPanel = ({setOccupiedAdmin}) => {
     const handleAllRight = () => {
         setAllowedTables(allowedTables.concat(availableTables));
         setAvailableTables([]);
-
-        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
-        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
-
-        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
-        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
-        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
+        setOccupiedAdmin(true);
     };
 
     const handleCheckedRight = () => {
         setAllowedTables(allowedTables.concat(leftChecked));
         setAvailableTables(not(availableTables, leftChecked));
         setChecked(not(checked, leftChecked));
-
-        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
-        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
-
-        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
-        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
-        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
+        setOccupiedAdmin(true);
     };
 
     const handleCheckedLeft = () => {
         setAvailableTables(availableTables.concat(rightChecked));
         setAllowedTables(not(allowedTables, rightChecked));
         setChecked(not(checked, rightChecked));
-
-        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
-        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
-
-        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
-        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
-        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
+        setOccupiedAdmin(true);
     };
 
     const handleAllLeft = () => {
         setAvailableTables(availableTables.concat(allowedTables));
         setAllowedTables([]);
-
-
-        let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
-        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
-
-        toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item))
-        toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
-        setOccupiedAdmin(toRemoveTables.length > 0 || toInsertTables.length > 0);
+        setOccupiedAdmin(true);
     };
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
 
-    function DEBUG() {
+    const DEBUG = async () => {
+        setLoading(true);
         let toRemoveTables = availableTables.filter(item => !initialAllowedTables.includes(item));
-        let toInsertTables= initialAllowedTables.filter(item => !availableTables.includes(item));
+        let toInsertTables = initialAllowedTables.filter(item => !availableTables.includes(item));
 
         toRemoveTables = availableTables.filter(item => !toRemoveTables.includes(item));
         toInsertTables = allowedTables.filter(item => !toInsertTables.includes(item));
-        setOccupiedAdmin(true);
 
         if (toRemoveTables.length === 0 && toInsertTables.length === 0) {
             setMessage('No changes!');
             setOpenSnackbar(true);
+            setLoading(false);
             return;
         }
 
-        fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
-            }
-        })
-            .then(response => response.text())
-            .then(data => console.log(data));
+        try {
+            await fetch(`http://localhost:8080/api/ownershipdetails/delete/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toRemoveTables.join('&tableNames=')} `, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
 
-        fetch(`http://localhost:8080/api/ownershipdetails/add/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toInsertTables.join('&tableNames=')} `, {
-            method: 'POST',
-            headers: {
-            'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
-            }
-        })
-            .then(response => response.text())
-            .then(data => console.log(data));
+            await fetch(`http://localhost:8080/api/ownershipdetails/add/${selectedSubordinate}/${adminName}/${selectedDatabase}?tableNames=${toInsertTables.join('&tableNames=')} `, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
 
-        setMessage('Database ownership has been updated!');
-        setOpenSnackbar(true);
-    }
+            setMessage('Database ownership has been updated!');
+            setOpenSnackbar(true);
+        } catch (error) {
+            setMessage('An error occurred!');
+            setOpenSnackbar(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const customList = (tablesInfo, title) => (
+        <Paper sx={{ width: 300, height: 360, overflow: 'auto' }}>
+            <Typography variant="subtitle1" style={{ fontWeight: 'bold', margin: '16px' }}>
+                {title}
+            </Typography>
+            <List dense component="div" role="list">
+                {tablesInfo.map((val) => {
+                    const labelID = `list-${val}`;
+
+                    return (
+                        <ListItemButton
+                            key={val}
+                            onClick={handleToggle(val)}
+                            role="listitem"
+                        >
+                            <ListItemIcon>
+                                <Checkbox
+                                    checked={checked.includes(val)}
+                                    inputProps={{
+                                        'aria-labelledby': labelID,
+                                    }}
+                                    tabIndex={-1}
+                                    disableRipple
+                                />
+                            </ListItemIcon>
+                            <ListItemText id={labelID} primary={`Table: ${val}`} />
+                        </ListItemButton>
+                    );
+                })}
+            </List>
+        </Paper>
+    );
 
     return (
         <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
-
-        <div style={{ marginLeft: '20px' }}>
+            <Box sx={{ marginLeft: '20px' }}>
                 <Typography variant="h6" gutterBottom>Select subordinate and tables</Typography>
-                <FormControl variant="outlined">
-                    <InputLabel id="select-subordinate-label">Select subordinate</InputLabel>
-                    <Select
-                        labelId="select-subordinate-label"
-                        id="select-subordinate"
-                        label="Select Subordinate"
-                        variant="outlined"
-                        value={selectedSubordinate}
-                        onChange={handleSelectSubordinate}
-                        fullWidth
-                        style={{ marginBottom: '16px',marginRight: '10px', width: '300px', height: '50px' }}
-                    >
-                        <MenuItem value=""><em>Select a subordinate</em></MenuItem>
-                        {subordinates.map((subordinate) => (
-                            <MenuItem key={subordinate.id} value={subordinate.username}>
-                                {subordinate.username}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-               <FormControl variant="outlined">
-                   <InputLabel id="select-database-label">Select a Database</InputLabel>
-                    <Select
-                        labelId="select-database-label"
-                        id="select-database"
-                        label="Select Table"
-                        variant="outlined"
-                        value={selectedDatabase}
-                        onChange={handleSelectDatabase}
-                        fullWidth
-                        style={{ marginBottom: '16px', width: '300px', height: '50px' }}
-                    >
-                        <MenuItem value=""><em>Select a database</em></MenuItem>
-                        {availableDatabases.map((database) => (
-                            <MenuItem key={database.id} value={database.databaseName}>
-                                {database.databaseName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-               </FormControl>
+                <Stack direction="row" spacing={2} sx={{ marginBottom: '16px' }}>
+                    <FormControl variant="outlined" sx={{ width: '300px' }}>
+                        <InputLabel id="select-subordinate-label">Select subordinate</InputLabel>
+                        <Select
+                            labelId="select-subordinate-label"
+                            id="select-subordinate"
+                            label="Select Subordinate"
+                            value={selectedSubordinate}
+                            onChange={(e) => setSelectedSubordinate(e.target.value)}
+                        >
+                            <MenuItem value=""><em>Select a subordinate</em></MenuItem>
+                            {subordinates.map((subordinate) => (
+                                <MenuItem key={subordinate.id} value={subordinate.username}>
+                                    {subordinate.username}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl variant="outlined" sx={{ width: '300px' }}>
+                        <InputLabel id="select-database-label">Select a Database</InputLabel>
+                        <Select
+                            labelId="select-database-label"
+                            id="select-database"
+                            label="Select Table"
+                            value={selectedDatabase}
+                            onChange={(e) => setSelectedDatabase(e.target.value)}
+                        >
+                            <MenuItem value=""><em>Select a database</em></MenuItem>
+                            {availableDatabases.map((database) => (
+                                <MenuItem key={database.id} value={database.databaseName}>
+                                    {database.databaseName}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Stack>
 
                 {selectedDatabase && selectedSubordinate && (
-                    <div>
+                    <Box>
                         <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
                             Selected Subordinate: <span style={{ color: '#3f51b5' }}>{selectedSubordinate}</span>
                         </Typography>
                         <Typography variant="body1" style={{ fontWeight: 'bold', marginBottom: '16px' }}>
                             Selected Database: <span style={{ color: '#3f51b5' }}>{selectedDatabase}</span>
                         </Typography>
-                        <Button variant="contained" color="primary" onClick={DEBUG} style={{ margin: '10px 0' }}>
-                            Commit Changes
+                        <Button variant="contained" color="primary" onClick={DEBUG} disabled={loading} style={{ margin: '10px 0' }}>
+                            {loading ? <CircularProgress size={24} /> : 'Commit Changes'}
                         </Button>
                         <Grid2 container spacing={2} justifyContent="center" alignItems="center">
                             <Grid2 item xs={5}>
-                                <Typography variant="subtitle1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                                    Tables Unassigned to {selectedSubordinate}:
-                                </Typography>
-                                {customList(availableTables)}
+                                {customList(availableTables, `Tables Unassigned to ${selectedSubordinate}`)}
                             </Grid2>
                             <Grid2 item xs={2}>
                                 <Grid2 container direction="column" alignItems="center">
@@ -367,15 +329,12 @@ const AdminPanel = ({setOccupiedAdmin}) => {
                                 </Grid2>
                             </Grid2>
                             <Grid2 item xs={5}>
-                                <Typography variant="subtitle1" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
-                                    Tables Assigned to {selectedSubordinate}:
-                                </Typography>
-                                {customList(allowedTables)}
+                                {customList(allowedTables, `Tables Assigned to ${selectedSubordinate}`)}
                             </Grid2>
                         </Grid2>
-                    </div>
+                    </Box>
                 )}
-            </div>
+            </Box>
 
             <Snackbar
                 open={openSnackbar}

@@ -49,6 +49,7 @@ const DatabaseContent = () => {
                 setPendingButtonIndex(buttonIndex);
                 setOpenDialog(true);
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
+                console.log(dataQueryTool);
                 return;
             }
         }

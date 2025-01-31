@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import InvalidDataLabel from "./InvalidDataLabel";
 import { FaUser , FaLock } from 'react-icons/fa';
-import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
+import {IconButton, Paper, Snackbar, SnackbarContent} from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
 import {InfoIcon} from "lucide-react";
@@ -34,30 +34,7 @@ function LoginPage() {
         setOpenSnackbarOk(false);
     };
 
-    const checkCookieAndRedirect = () => {
-        const getCookie = (name) => {
-            const cookies = document.cookie.split("; ");
-            for (const cookie of cookies) {
-                const [key, value] = cookie.split("=");
-                if (key === name) {
-                    return value;
-                }
-            }
-            return null;
-        };
-
-        const userName = getCookie("isExp");
-        if (!userName) {
-            window.location.href = "/login";
-            document.cookie = "userName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "isAdmin=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        }
-    };
-
-    // setInterval(checkCookieAndRedirect, 5000);
-
     const Login = async () => {
-        console.log("Login button clicked");
         if (username.length === 0) {
             setMessage("Enter username");
             setOpenSnackbar(true);
@@ -74,10 +51,10 @@ function LoginPage() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
                 },
                 body: JSON.stringify({ username, password }),
             });
+            console.log("Login button clicked");
 
             if (!response.ok) {
                 console.error('Fetch error:', response.status, response.statusText);
@@ -85,28 +62,33 @@ function LoginPage() {
             }
 
             const token = await response.text();
+            console.log(token);
 
             if (token) {
+                console.log("Login button clicked");
                 localStorage.setItem("jwtToken", token);
                 setOpenSnackbarOk(true);
 
                 const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
                         method: 'GET'
                     },
                 );
                 const isAdmin = await adminResponse.json();
 
                 const expirationTime = new Date();
-                expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1000);
+                expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1100);
 
                 const expirationTimeInfo = new Date();
-                expirationTimeInfo.setTime(expirationTime.getTime() + 60 * 180 * 900);
+                expirationTimeInfo.setTime(Date.now() + 60 * 180 * 1000);
+
                 document.cookie = `userName=${username}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
                 document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
                 document.cookie = `isExp=true; expires=${expirationTimeInfo.toUTCString()}; secure; samesite=strict`;
+                document.cookie = `isExpTimestamp=${expirationTimeInfo.getTime()}; expires=${expirationTimeInfo.toUTCString()}; secure; samesite=strict`;
+                console.log("token");
 
                 window.location.href = 'http://localhost:3000';
             } else {
@@ -123,7 +105,7 @@ function LoginPage() {
     }
 
     return (
-        <div>
+        <Paper sx={{ width: '100vw', height: '100vh', boxSizing: 'border-box', overflow: 'hidden' }}>
             <div align="center" className="mb-2">
                 <h3>Database Viewer App</h3>
             </div>
@@ -216,7 +198,7 @@ function LoginPage() {
                     </Snackbar>
                 </div>
             </div>
-        </div>
+        </Paper>
     );
 }
 

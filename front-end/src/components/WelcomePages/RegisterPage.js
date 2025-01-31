@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import BackGroundStyle from './BackGroundStyle'
 import {Link} from "react-router-dom";
+import {Paper} from "@mui/material";
 
 function RegisterPage() {
     const [username, setUsername] = useState('');
@@ -100,7 +101,6 @@ function RegisterPage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(userPayload),
         })
@@ -126,7 +126,7 @@ function RegisterPage() {
     }
 
     return (
-        <div>
+        <Paper sx={{ width: '100vw', height: '100vh', boxSizing: 'border-box', overflow: 'hidden' }}>
             <div align="center" className="mb-2">
                 <h3>Database Viewer App</h3>
             </div>
@@ -179,7 +179,7 @@ function RegisterPage() {
                     {isVisible && <label>{caption}</label>}
                 </div>
             </div>
-        </div>
+        </Paper>
     )
 }
 

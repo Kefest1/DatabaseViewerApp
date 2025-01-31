@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,11 +18,10 @@ import {
     GridToolbar,
     GridToolbarContainer,
 } from '@mui/x-data-grid';
-import {getCookie} from "../../../getCookie";
-import {IconButton, Snackbar, SnackbarContent} from "@mui/material";
-import ErrorIcon from "@mui/icons-material/Error";
+import { getCookie } from "../../../getCookie";
+import {CircularProgress, IconButton, Snackbar, SnackbarContent} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {InfoIcon} from "lucide-react";
+import { InfoIcon } from "lucide-react";
 
 function getColumnTypeByName(cols, columnName) {
     let type = null;
@@ -74,6 +73,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
+    const [deletedRows, setDeletedRows] = useState([]);
 
     const [fieldsToUpdate, setFieldsToUpdate] = useState([]);
     const [newRows, setNewRows] = useState([]);
@@ -83,6 +83,10 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     const [test, setTest] = useState(0);
     const testRef = useRef(test);
+
+    const [updatedRows, setUpdatedRows] = useState([]);
+
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         testRef.current = test;
@@ -102,20 +106,26 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     }
                 });
             }
+            setData(prevData => ({
+                insert: [],
+                update: []
+            }));
         };
     }, [test]);
 
     const logUpdatable = async () => {
+        setLoading(true);
+        console.log(fieldsToUpdate);
         try {
             if (fieldsToUpdate.length === 0) {
                 setMessage("No fields to update");
                 setOpenSnackbar(true);
+                setLoading(false);
                 return;
             }
 
             const token = localStorage.getItem("jwtToken");
             const response = await fetch('http://localhost:8080/api/fieldinfo/update', {
-
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,6 +136,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             QueryLogger.addLog(`Updated table ${tableName}\'s ${fieldsToUpdate.length} rows`, logging_level.UPDATE);
 
             if (!response.ok) {
+                setLoading(false);
                 throw new Error('Network response was not ok');
             }
 
@@ -136,12 +147,15 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             }));
             console.log(result);
 
+            setUpdatedRows([]);
+
             setMessage("Fields updated successfully");
             setOpenSnackbar(true);
+            setLoading(false);
         } catch (error) {
             setMessage("Failed to update fields");
-            setOpenSnackbar(true);
-            console.error('Error:', error);
+            setOpenSnackbar(true)
+            setLoading(false);
         }
     };
 
@@ -155,6 +169,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             cellClassName: 'actions',
             getActions: ({ id }) => {
                 const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+                const isMarkedForDeletion = deletedRows.includes(id);
 
                 if (isInEditMode) {
                     return [
@@ -183,6 +198,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                         className="textPrimary"
                         onClick={handleEditClick(id)}
                         color="inherit"
+                        disabled={isMarkedForDeletion}
                     />,
                     <GridActionsCellItem
                         icon={<DeleteIcon />}
@@ -229,8 +245,13 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     };
 
     const handleDeleteClick = (id) => () => {
-        setRows(rows.filter((row) => row.id !== id));
-        setSelectedRowsIndex([...selectedRowsIndex, id]);
+        if (deletedRows.includes(id)) {
+            setDeletedRows(deletedRows.filter(rowId => rowId !== id));
+            setSelectedRowsIndex(selectedRowsIndex.filter(rowId => rowId !== id));
+        } else {
+            setDeletedRows([...deletedRows, id]);
+            setSelectedRowsIndex([...selectedRowsIndex, id]);
+        }
     };
 
     const handleCancelClick = (id) => () => {
@@ -271,10 +292,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     update: [...prevData.update, request]
                 }));
             }
+
+            setUpdatedRows(prevUpdatedRows => [...prevUpdatedRows, originalRow.id]);
+
             return updatedRow;
         }
     };
-
     const handleRowModesModelChange = (newRowModesModel) => {
         setRowModesModel(newRowModesModel);
     };
@@ -302,11 +325,32 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     };
 
     const commitDeleteManyRows = () => {
+        setLoading(true);
         const userName = getCookie("userName");
         const selectedCount = selectedRowsIndex.length;
+        console.log(selectedRowsIndex);
+        const localRows = [...selectedRowsIndex]
+
         if (selectedCount === 0) {
             setMessage("No rows selected!");
             setOpenSnackbar(true);
+            setLoading(false);
+            return;
+        }
+        console.log(selectedRowsIndex);
+
+        const filteredDataArray = fieldsToUpdate.filter(item => !selectedRowsIndex.includes(item.rowIndex));
+        setFieldsToUpdate(filteredDataArray);
+
+        if (fieldsToUpdate.length === 0) {
+            setMessage("All selected rows deleted successfully");
+            setOpenSnackbar(true);
+            setLoading(false);
+            setRows(prevRows => prevRows.filter(row => !localRows.includes(row.id)));
+            setData(prevData => ({
+                ...prevData,
+                insert: prevData.insert.filter(item => !localRows.includes(item.id))
+            }));
             return;
         }
 
@@ -320,9 +364,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         })
             .then(async response => {
                 const res = await response.json();
-                res.forEach((num) => {
-                    setRows(rows.filter((row) => row.id !== num));
-                });
+                if (res.length > 0) {
+                    setRows(prevRows => prevRows.filter(row => !selectedRowsIndex.includes(row.id)));
+                    setDeletedRows(prevDeletedRows => prevDeletedRows.filter(id => !selectedRowsIndex.includes(id)));
+                    setSelectedRowsIndex([]);
+                }
 
                 QueryLogger.addLog(`Deleted from table ${tableName} ${res.length} rows`, logging_level.DELETE);
 
@@ -337,18 +383,22 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 }
 
                 setOpenSnackbar(true);
+                setLoading(false);
             })
             .catch(error => {
                 setMessage("An error has occured while deleting rows");
                 setOpenSnackbar(true);
+                setLoading(false);
             });
     };
 
-    const commitInsertNewRows = () => {
-        const filteredData = newRows.map(({ id, isNew, ...rest }) => rest);
+    const commitInsertNewRows = async () => {
+        setLoading(true);
+        console.log(newRows);
+        const filteredData = newRows.map(({isNew, ...rest }) => rest);
+        console.log(filteredData);
         let finalList = [];
         filteredData.forEach(innerArray => {
-            console.log(innerArray);
             let nodeList = [];
 
             for (let key in innerArray) {
@@ -360,17 +410,18 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     })
                 }
             }
-
             finalList.push(nodeList);
         });
 
         if (finalList.length === 0) {
             setMessage("No rows awaiting to be sent!");
             setOpenSnackbar(true);
+            setLoading(false);
             return;
         }
+        console.log(finalList);
 
-        fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`,  {
+        fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -378,20 +429,39 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             },
             body: JSON.stringify(finalList)
         })
-            .then(response => {
+            .then(async response => {
                 setData(prevData => ({
                     ...prevData,
                     insert: []
                 }));
                 QueryLogger.addLog(`Inserted to table ${tableName} ${finalList.length} rows`, logging_level.INSERT);
-                const res = response.text();
+                const res = await response.json();
+                console.log(res);
                 setMessage("New rows inserted successfully");
                 setOpenSnackbar(true);
+                setLoading(false);
+                const updatedRows = rows.map(row => {
+                    const match = res.find(r => r.previousColumnID === row.id);
+                    if (match) {
+                        return {
+                            ...row,
+                            id: `${match.newColumnID}`,
+                            [primaryKey]: `${match.newPrimaryKeyID}`
+                        };
+                    }
+                    return row;
+                });
+
+                setRows(updatedRows);
+
+                setNewRows([]);
             })
             .catch(error => {
                 console.error('Error:', error);
                 setMessage("Failed to insert new rows updated successfully");
                 setOpenSnackbar(true);
+                setLoading(false);
+
             });
     }
 
@@ -406,7 +476,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     const CustomToolbar = ({ setRows, setRowModesModel }) => {
         return (
             <GridToolbarContainer>
-                <EditToolbar props={{setRows, setRowModesModel}} />
+                <EditToolbar props={{ setRows, setRowModesModel }} />
                 <GridToolbar />
                 <ImportDataToolbar />
             </GridToolbarContainer>
@@ -416,13 +486,63 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     function handleRowSelectionChange(e) {
         setSelectedRowsIndex(e);
     }
+    const getRowClassName = (params) => {
+        let className = '';
+        if (deletedRows.includes(params.id)) {
+            className += 'deleted-row ';
+        }
+        if (updatedRows.includes(params.id)) {
+            className += 'updated-row ';
+        }
+        return className.trim();
+    };
+
+    function Debug() {
+        console.log(rows);
+    }
 
     return (
         <Box sx={{ height: 600, width: 1200 }}>
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Button className="button button-update" size="small" color="primary" variant={"contained"} onClick={() => logUpdatable()}>Update Altered Fields</Button>
-                <Button className="button button-delete" size="small" color="secondary" variant={"contained"} onClick={commitDeleteManyRows}>Delete Selected Rows</Button>
-                <Button className="button button-insert" size="small" color="warning" variant={"contained"} onClick={commitInsertNewRows}>Commit Insertion</Button>
+                <Button
+                    className="button button-update"
+                    size="small"
+                    color="primary"
+                    variant={"contained"}
+                    onClick={() => logUpdatable()}
+                    disabled={loading}
+                >
+                    {loading ? <CircularProgress size={24} /> : 'Update Altered Fields'}
+                </Button>
+                <Button
+                    className="button button-delete"
+                    size="small"
+                    color="secondary"
+                    variant={"contained"}
+                    onClick={commitDeleteManyRows}
+                    disabled={loading}
+                >
+                    {loading ? <CircularProgress size={24} /> : 'Delete Selected Rows'}</Button>
+                <Button
+                    className="button button-insert"
+                    size="small"
+                    color="warning"
+                    variant={"contained"}
+                    onClick={commitInsertNewRows}
+                    disabled={loading}
+                >
+                    {loading ? <CircularProgress size={24} /> : 'Commit Insertion'}
+                </Button>
+                <Button
+                    className="button button-insert"
+                    size="small"
+                    color="warning"
+                    variant={"contained"}
+                    onClick={Debug}
+                    disabled={loading}
+                >
+                    {loading ? <CircularProgress size={24} /> : 'Debug'}
+                </Button>
             </Box>
             <DataGrid
                 rows={rows}
@@ -435,6 +555,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 onRowSelectionModelChange={handleRowSelectionChange}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={processError}
+                getRowClassName={getRowClassName}
                 slots={{
                     toolbar: CustomToolbar,
                 }}
@@ -527,7 +648,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             const file = event.target.files[0];
             if (file) {
                 const fileType = file.type;
-                const validTypes = ['application/json', 'text/csv', 'application/xml', 'text/xml'];
+                const validTypes = ['application/json'];
 
                 if (!validTypes.includes(fileType)) {
                     console.error('Invalid file type. Please upload a JSON, CSV, or XML file.');
@@ -541,11 +662,29 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     console.log(fileType);
                     if (fileType === 'application/json') {
                         console.log('JSON File content:\n', content);
-                        // Further process the JSON content here
+
                     } else if (fileType === 'text/csv') {
                         console.log('CSV File content:\n', content);
                         const payloadList = transformCSVToInsertPayload(content);
-                        console.log(payloadList);
+                        const oldList = [...payloadList];
+                        for (let i = 0; i < payloadList.length; i++) {
+                            const row = payloadList[i];
+                            row.unshift({
+                                columnName: "id",
+                                dataValue: newId,
+                                tableName: tableName
+                            })
+                            newId--;
+                        }
+                        let newRows = [];
+                        let newRow = {};
+                        for (let i = 0; i < oldList.length; i++) {
+                            for (let j = 0; j < oldList[i].length; j++) {
+                                newRow[oldList[i][j]["columnName"]] = oldList[i][j]["dataValue"];
+                            }
+                            newRows.push(newRow);
+                            newRow = {};
+                        }
 
                         const token = localStorage.getItem("jwtToken");
                         const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
@@ -561,9 +700,19 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                             throw new Error('Network response was not ok ' + response.statusText);
                         }
 
-                        const result = await response.text();
-                        console.log(result);
+                        const result = await response.json();
+                        console.log(newRows);
+                        for (let i = 0; i < newRows.length; i++) {
+                            const match = result.find(r => r.previousColumnID === newRows[i].id);
 
+                            newRows[i]["id"] = `${match.newColumnID}`;
+                            newRows[i][primaryKey] = `${match.newPrimaryKeyID}`;
+                        }
+                        console.log(newRows);
+                        setRows((oldRows) => [
+                            ...newRows,
+                            ...oldRows,
+                        ]);
                     } else if (fileType === 'application/xml' || fileType === 'text/xml') {
                         console.log('XML File content:\n', content);
                     }
@@ -595,7 +744,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             const id = newId;
             newId--;
 
-            const newRow = {id};
+            const newRow = { id };
 
             selectedColumns.forEach(
                 (column) => {
@@ -649,8 +798,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
         return differences;
     }
-
-
 }
 
 export default TableBrowserNew;

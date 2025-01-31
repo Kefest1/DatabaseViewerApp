@@ -68,7 +68,7 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
             field: 'primaryKey',
             headerName: 'Primary key name',
             width: 150,
-            editable: true,
+            editable: false,
         },
         {
             field: 'actions',
@@ -232,7 +232,10 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
 
                 fetch(`http://localhost:8080/api/tableinfo/addenhanced`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                    },
                     body: JSON.stringify(payload)
                 })
                     .then(response => response.text())
@@ -278,7 +281,6 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
                 <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
                     Add record
                 </Button>
-                {/*<Button color="primary" startIcon={<AddIcon />} onClick={commitChanges}>*/}
                 <Button color="primary"  onClick={commitChanges}>
                     Commit changes
                 </Button>

@@ -27,3 +27,7 @@
 .button:hover {
     transform: scale(1.05);
 }
+
+.updated-row {
+    font-weight: bold;
+}

@@ -1,5 +1,7 @@
 package project.BackEnd.FieldInfo;
 
+import lombok.*;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +41,6 @@ public class FieldInfoController {
     public List<String> getSingleColumnData(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
 
         List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
-        rows.forEach(System.out::println);
 
         return rows.stream()
                 .map(s -> s.split(",", 2)[0])
@@ -97,17 +98,23 @@ public class FieldInfoController {
 
 
     @PostMapping("/insertvalues/{databasename}")
-    public String insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
-
+    public List<insertResultDTO>  insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
+        System.out.println("fieldInfos");
+        System.out.println(fieldInfos);
+        List<insertResultDTO> insertResultDTOArrayList = new ArrayList<>();
 
         for (List<InsertPayload> fieldInfoList : fieldInfos) {
-            insertValuesBuff(databasename, fieldInfoList);
+            Long locFieldID = Long.valueOf(fieldInfoList.get(0).getDataValue());
+            List<InsertPayload> correct = fieldInfoList.subList(1, fieldInfoList.size());
+            insertResultDTOArrayList.add(insertValuesBuff(databasename, correct, locFieldID));
         }
-        return "OK";
+        System.out.println("insertResultDTOArrayList");
+        System.out.println(insertResultDTOArrayList);
+        return insertResultDTOArrayList;
     }
 
 
-    public String insertValuesBuff(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos) {
+    public insertResultDTO insertValuesBuff(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos, Long fieldID) {
 
         Long newID = getFreeColumnID();
 
@@ -122,15 +129,16 @@ public class FieldInfoController {
         insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
         insertPayloadPrimaryKey.setColumnId(newID);
         fieldInfoRepository.save(insertPayloadPrimaryKey);
-
+        Long newColumnID = 0L;
         for (InsertPayload fieldInfo : fieldInfos) {
-            if (!Objects.equals(fieldInfo.columnName, primaryKey))
-                insertValueHelper(fieldInfo, newID);
+            if (!Objects.equals(fieldInfo.columnName, primaryKey)) {
+                newColumnID = insertValueHelper(fieldInfo, newID);
+            }
         }
-        return "OK";
+        return new insertResultDTO(newColumnID, fieldID, Long.valueOf(smallestKey));
     }
 
-    private FieldInfo insertValueHelper(InsertPayload fieldInfo, Long newID) {
+    private Long insertValueHelper(InsertPayload fieldInfo, Long newID) {
         String datatype = fieldInfoRepository.findDatatype(fieldInfo.columnName, fieldInfo.tableName).get(0);
         FieldInfo fieldInfoToSave = new FieldInfo();
         fieldInfoToSave.setDataType(datatype);
@@ -138,7 +146,19 @@ public class FieldInfoController {
         fieldInfoToSave.setDataValue(fieldInfo.dataValue);
         fieldInfoToSave.setColumnId(newID);
         fieldInfoToSave.setTableInfo(tableInfoRepository.findByTableName(fieldInfo.tableName));
-        return fieldInfoRepository.save(fieldInfoToSave);
+        FieldInfo newFieldInfo = fieldInfoRepository.save(fieldInfoToSave);
+        return newFieldInfo.getColumnId();
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @ToString
+    @NoArgsConstructor
+    static class insertResultDTO {
+        Long newColumnID;
+        Long previousColumnID;
+        Long newPrimaryKeyID;
     }
 
     private Long getFreeColumnID() {
@@ -149,7 +169,6 @@ public class FieldInfoController {
     public String updateFieldInfo(@RequestBody List<UpdatePayload> updatePayloads) {
         try {
             for (UpdatePayload updatePayload : updatePayloads) {
-                System.out.println(updatePayload);
                 Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
             }
             return "Success";
@@ -188,7 +207,6 @@ public class FieldInfoController {
 
         for (Long columnId : columnIds) {
             Boolean isRemovable = checkIfRemoveAble(columnId, databaseName, tableName, primaryKey);
-            System.out.println(isRemovable);
             if (isRemovable) {
                 isSomethingRemoved = true;
                 removed.add(columnId);

@@ -115,15 +115,6 @@ function DataGridTable({ databaseName, selectedTable }) {
         );
     }
 
-    function EditToolbarEmpty() {
-        return (
-            <GridToolbarContainer>
-                <Button color="primary" startIcon={<AddIcon />} onClick={handleCommit}>
-                    Commit changes
-                </Button>
-            </GridToolbarContainer>
-        );
-    }
 
     useEffect(() => {
         const loadTableStructure = async () => {
@@ -172,32 +163,6 @@ function DataGridTable({ databaseName, selectedTable }) {
         setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     };
 
-    function commitDelete(tablesToDelete) {
-        const url = `http://localhost:8080/api/tableinfo/deleteFieldInfo`
-        console.log(rows);
-        fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`,
-            },
-            body: JSON.stringify(tablesToDelete),
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                } else {
-                    throw new Error('Failed to delete. Status: ' + response.status);
-                }
-            })
-            .then(result => {
-                setTablesToDelete([]);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-
     function handleCommit() {
         let rowsDTO = [];
 
@@ -237,10 +202,7 @@ function DataGridTable({ databaseName, selectedTable }) {
 
     const handleDeleteClick = (id) => () => {
         const result = rows.find(item => item.id === id)["columnName"];
-        console.log(result);
-        console.log(primaryKey);
         if (result === primaryKey) {
-            console.log("Cannot delete primary key");
             setSnackbarMessage("Cannot delete primary key");
             setSnackbarOpen(true);
             return;
@@ -264,6 +226,11 @@ function DataGridTable({ databaseName, selectedTable }) {
     const handleTypeChange = (id, newType) => {
         const updatedRows = rows.map((row) => {
             if (row.id === id) {
+                if (row.columnName === primaryKey) {
+                    setSnackbarMessage(`Cannot modify primary key ${row.columnName}-${primaryKey}`);
+                    setSnackbarOpen(true);
+                    return row;
+                }
                 return { ...row, columnType: newType };
             }
             return row;
@@ -271,40 +238,61 @@ function DataGridTable({ databaseName, selectedTable }) {
         setRows(updatedRows);
     };
 
+    const isCellEditable = (params) => {
+        // Disable editing for the primary key row
+        return params.row.columnName !== primaryKey;
+    };
+
     const columns = [
-        { field: 'columnName', headerName: 'columnName', width: 180, editable: true },
+        {
+            field: 'columnName',
+            headerName: 'columnName',
+            width: 180,
+            editable: true,
+            renderCell: (params) => {
+                const isPrimaryKey = params.row.columnName === primaryKey;
+                return (
+                    <div style={{ fontWeight: isPrimaryKey ? 'bold' : 'normal', color: isPrimaryKey ? '#1976d2' : 'inherit' }}>
+                        {params.value}
+                        {isPrimaryKey && (
+                            <span style={{ marginLeft: '8px', color: '#1976d2' }}>🔑</span>
+                        )}
+                    </div>
+                );
+            },
+        },
         {
             field: 'columnType',
             headerName: 'columnType',
-            // type: 'number',
             width: 150,
-            // align: 'left',
-            // headerAlign: 'left',
-            // editable: true,
-            renderCell: (params) => (
-                <FormControl fullWidth>
-                    <InputLabel
-                        id={`select-label-${params.id}`}
-                        style={{ marginTop: '10px' }}
-                    >
-                        Type
-                    </InputLabel>
-                    <Select
-                        labelId={`select-label-${params.id}`}
-                        value={params.value}
-                        style={{ height: '30px', marginTop: '15px' }}
-                        onChange={(event) => handleTypeChange(params.id, event.target.value)}
-                        variant={"outlined"}
-                    >
-                        <MenuItem value="Long">Long</MenuItem>
-                        <MenuItem value="Integer">Integer</MenuItem>
-                        <MenuItem value="Double">Double</MenuItem>
-                        <MenuItem value="Number">Number</MenuItem>
-                        <MenuItem value="Boolean">Boolean</MenuItem>
-                        <MenuItem value="String">String</MenuItem>
-                    </Select>
-                </FormControl>
-            ),
+            renderCell: (params) => {
+                const isPrimaryKey = params.row.columnName === primaryKey;
+                return (
+                    <FormControl fullWidth>
+                        <InputLabel
+                            id={`select-label-${params.id}`}
+                            style={{marginTop: '10px'}}
+                        >
+                            Type
+                        </InputLabel>
+                        <Select
+                            labelId={`select-label-${params.id}`}
+                            value={params.value}
+                            style={{height: '30px', marginTop: '15px'}}
+                            onChange={(event) => handleTypeChange(params.id, event.target.value)}
+                            variant={"outlined"}
+                            disabled={isPrimaryKey}
+                        >
+                            <MenuItem value="Long">Long</MenuItem>
+                            <MenuItem value="Integer">Integer</MenuItem>
+                            <MenuItem value="Double">Double</MenuItem>
+                            <MenuItem value="Number">Number</MenuItem>
+                            <MenuItem value="Boolean">Boolean</MenuItem>
+                            <MenuItem value="String">String</MenuItem>
+                        </Select>
+                    </FormControl>
+                )
+            },
         },
         {
             field: 'actions',
@@ -359,54 +347,9 @@ function DataGridTable({ databaseName, selectedTable }) {
         {
             field: 'columnType',
             headerName: 'columnType',
-            // type: 'number',
             width: 150,
-            // align: 'left',
-            // headerAlign: 'left',
             editable: false
         },
-        /*
-        {
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                ];
-            },
-        },
-        */
     ];
 
     const processRowUpdate = (newRow) => {
@@ -449,6 +392,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                             onRowModesModelChange={handleRowModesModelChange}
                             onRowEditStop={handleRowEditStop}
                             processRowUpdate={processRowUpdate}
+                            isCellEditable={isCellEditable}
                             slots={{toolbar: EditToolbar}}
                             slotProps={{
                                 toolbar: {setRows, setRowModesModel},
@@ -482,7 +426,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                             onRowModesModelChange={handleRowModesModelChange}
                             onRowEditStop={handleRowEditStop}
                             processRowUpdate={processRowUpdate}
-                            // slots={{toolbar: EditToolbarEmpty}}
+                            isCellEditable={isCellEditable}
                             slotProps={{
                                 toolbar: {setRows, setRowModesModel},
                             }}

@@ -50,7 +50,6 @@ public class TableInfoController {
 
     @GetMapping("/getall")
     public List<TableInfo> getAllTableInfos() {
-        System.out.println();
         return tableInfoService.getAllTableInfo();
     }
 
@@ -126,7 +125,6 @@ public class TableInfoController {
 
     @DeleteMapping("/deletetableindexes")
     public ResponseEntity<String> deleteTable(@RequestBody Long[] id) {
-        System.out.println(Arrays.toString(id));
         try {
             tableInfoRepository.deleteTableInfoByIds(Arrays.asList(id));
         }
@@ -141,7 +139,6 @@ public class TableInfoController {
 
     @PutMapping("/updateTable")
     public String updateTable(@RequestBody UpdateTableRequest tableRequest) {
-        System.out.println(tableRequest);
         TableInfo tableInfo = tableInfoRepository.findTableInstanceByTableNameAndDatabaseName(tableRequest.getTableName(), tableRequest.getDatabaseName());
         tableInfo.setPrimary_key(tableRequest.getPrimaryKey());
         tableInfo.setTableName(tableRequest.getNewTableName());
@@ -279,7 +276,6 @@ public class TableInfoController {
         tableStructureRepository.save(tableStructure);
 
         tableInfoRepository.save(tableInfoInstance);
-        System.out.println("Field information received successfully");
 
         return "Field information received successfully";
     }
@@ -436,7 +432,6 @@ public class TableInfoController {
     @GetMapping("/checkIfTableEmpty/{databaseName}/{tableName}")
     public ResponseEntity<Boolean> checkIfTableEmpty(@PathVariable("databaseName") String databaseName, @PathVariable("tableName") String tableName) {
         Long fieldCount = tableInfoRepository.getFieldCount(databaseName, tableName);
-        System.out.println(fieldCount);
         boolean isEmpty = (fieldCount == null || fieldCount == 0);
         return ResponseEntity.ok(isEmpty);
     }
@@ -491,7 +486,6 @@ public class TableInfoController {
                                     String.valueOf(field.getColumnId())))
                             .collect(Collectors.toList()))
                     .collect(Collectors.toList());
-            System.out.println(response);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
