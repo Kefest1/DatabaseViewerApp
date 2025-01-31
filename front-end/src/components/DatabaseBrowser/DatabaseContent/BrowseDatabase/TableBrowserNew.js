@@ -113,6 +113,22 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         };
     }, [test]);
 
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${getCookie("userName")}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
     const logUpdatable = async () => {
         setLoading(true);
         console.log(fieldsToUpdate);
@@ -267,6 +283,19 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     };
 
     const processRowUpdate = (newRow, originalRow) => {
+        console.log(newRow);
+        console.log(originalRow);
+        let differences = {};
+        for (const key in newRow) {
+            if (newRow[key] !== originalRow[key]) {
+                differences[key] = { newRow: newRow[key], originalRow: originalRow[key] };
+            }
+        }
+
+        if (Object.keys(differences).length === 0) {
+            return { ...newRow}
+        }
+
         const updatedRow = { ...newRow, isNew: false };
         const contains = newRows.some(row => row.id === newRow.id);
 
@@ -298,6 +327,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             return updatedRow;
         }
     };
+
     const handleRowModesModelChange = (newRowModesModel) => {
         setRowModesModel(newRowModesModel);
     };
