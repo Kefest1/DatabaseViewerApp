@@ -108,8 +108,7 @@ public class FieldInfoController {
             List<InsertPayload> correct = fieldInfoList.subList(1, fieldInfoList.size());
             insertResultDTOArrayList.add(insertValuesBuff(databasename, correct, locFieldID));
         }
-        System.out.println("insertResultDTOArrayList");
-        System.out.println(insertResultDTOArrayList);
+
         return insertResultDTOArrayList;
     }
 

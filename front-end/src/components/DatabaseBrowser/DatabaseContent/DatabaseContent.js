@@ -44,6 +44,9 @@ const DatabaseContent = () => {
     const [canSwitchFromAdmin, setCanSwitchFromAdmin] = useState(true);
 
     const handleButtonClick = (buttonIndex) => {
+        if (buttonIndex === activeButton) {
+            return;
+        }
         if (activeButton === 2) {
             if (dataQueryTool.update.length > 0 || dataQueryTool.insert.length > 0) {
                 setPendingButtonIndex(buttonIndex);
@@ -58,11 +61,19 @@ const DatabaseContent = () => {
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
                 setPendingButtonIndex(buttonIndex);
                 setOpenDialog(true);
-                setCanSwitchFromAdmin(true);
                 return;
             }
         }
         setActiveButton(buttonIndex);
+    };
+
+    const confirmLeave = () => {
+        setOpenDialog(false);
+        setMessage("Changes were not saved!");
+        setOpenSnackbar(true);
+        setActiveButton(pendingButtonIndex);
+        setCanSwitchFromAdmin(true);
+        setDataQueryTool({"update" : [], "insert" : []})
     };
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -99,15 +110,7 @@ const DatabaseContent = () => {
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
-    };
-
-    const confirmLeave = () => {
-        setOpenDialog(false);
-        setMessage("Changes were not saved!");
-        setOpenSnackbar(true);
-        setActiveButton(pendingButtonIndex);
-    };
-
+    }
 
     return (
         <div>

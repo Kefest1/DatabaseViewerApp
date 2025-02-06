@@ -58,7 +58,7 @@ const fetchJoinTable = async (databaseName, tableName) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userName}`
+                'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             },
             body: JSON.stringify(requestBody)
         });

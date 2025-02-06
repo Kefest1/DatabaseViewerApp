@@ -26,6 +26,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { ArrowBack, ArrowForward, ArrowLeft, ArrowRight } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneOutline from '@mui/icons-material/DoneOutline';
+import ErrorIcon from "@mui/icons-material/Error";
 
 const AdminPanel = ({ setOccupiedAdmin }) => {
     const [selectedSubordinate, setSelectedSubordinate] = useState("");
@@ -40,6 +41,11 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
     const [message, setMessage] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState("");
+
+
     const intersection = (a, b) => a.filter((value) => b.includes(value));
 
     const leftChecked = intersection(checked, availableTables);
@@ -62,29 +68,41 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
     const not = (a, b) => a.filter((value) => !b.includes(value));
 
     const getSubordinates = async () => {
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                `http://localhost:8080/api/userinfo/getsubordinates/${adminName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setSubordinates(data);
+            );
+            const data = await response.json();
+            setSubordinates(data);
+        } catch (error) {
+            setErrorMessage("Failed to get subordinates!");
+            setOpenErrorSnackbar(true);
+            return [];
+        }
     };
 
     const getDatabase = async () => {
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getAvailableDatabasesObject/${adminName}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                `http://localhost:8080/api/tableinfo/getAvailableDatabasesObject/${adminName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setAvailableDatabases(data);
+            );
+            const data = await response.json();
+            setAvailableDatabases(data);
+        } catch (error) {
+            setErrorMessage("Failed to get subordinates!");
+            setOpenErrorSnackbar(true);
+            return [];
+        }
     };
 
     useEffect(() => {
@@ -93,30 +111,47 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
     }, []);
 
     const handleSelect = async () => {
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getAvailableTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                `http://localhost:8080/api/tableinfo/getAvailableTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const availableTables = await response.json();
+            );
 
-        const response2 = await fetch(
-            `http://localhost:8080/api/tableinfo/getAllowedTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            if (!response.ok) {
+                setMessage("Failed to get subordinates!");
+                setOpenSnackbar(true);
+                return [];
+            }
+            const availableTables = await response.json();
+
+            const response2 = await fetch(
+                `http://localhost:8080/api/tableinfo/getAllowedTablesAndDatabases/${adminName}/${selectedSubordinate}/${selectedDatabase}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
+            );
+
+            if (!response2.ok) {
+                setMessage("Failed to get subordinates!");
+                setOpenSnackbar(true);
+                return [];
             }
-        );
 
-        const allowedTables = await response2.json();
+            const allowedTables = await response2.json();
 
-        setAvailableTables(availableTables);
-        setAllowedTables(allowedTables);
-        setInitialAvailableTables(availableTables);
-        setInitialAllowedTables(allowedTables);
+            setAvailableTables(availableTables);
+            setAllowedTables(allowedTables);
+            setInitialAvailableTables(availableTables);
+            setInitialAllowedTables(allowedTables);
+        } catch (error) {
+            setOpenErrorSnackbar(true);
+            setErrorMessage("Failed to fetch data");
+        }
     };
 
     useEffect(() => {
@@ -128,31 +163,35 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
     const handleAllRight = () => {
         setAllowedTables(allowedTables.concat(availableTables));
         setAvailableTables([]);
-        setOccupiedAdmin(true);
+        setOccupiedAdmin(false);
     };
 
     const handleCheckedRight = () => {
         setAllowedTables(allowedTables.concat(leftChecked));
         setAvailableTables(not(availableTables, leftChecked));
         setChecked(not(checked, leftChecked));
-        setOccupiedAdmin(true);
+        setOccupiedAdmin(false);
     };
 
     const handleCheckedLeft = () => {
         setAvailableTables(availableTables.concat(rightChecked));
         setAllowedTables(not(allowedTables, rightChecked));
         setChecked(not(checked, rightChecked));
-        setOccupiedAdmin(true);
+        setOccupiedAdmin(false);
     };
 
     const handleAllLeft = () => {
         setAvailableTables(availableTables.concat(allowedTables));
         setAllowedTables([]);
-        setOccupiedAdmin(true);
+        setOccupiedAdmin(false);
     };
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+    };
+
+    const handleCloseErrorSnackbar = () => {
+        setOpenErrorSnackbar(false);
     };
 
     const DEBUG = async () => {
@@ -185,11 +224,12 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
                 }
             });
 
-            setMessage('Database ownership has been updated!');
+            setMessage('Ownership has been updated!');
             setOpenSnackbar(true);
+            setOccupiedAdmin(true);
         } catch (error) {
-            setMessage('An error occurred!');
-            setOpenSnackbar(true);
+            setErrorMessage('An error occurred when updating ownership!');
+            setOpenErrorSnackbar(true);
         } finally {
             setLoading(false);
         }
@@ -355,6 +395,32 @@ const AdminPanel = ({ setOccupiedAdmin }) => {
                             aria-label="close"
                             color="inherit"
                             onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
+
+            <Snackbar
+                open={openErrorSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseErrorSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#ff0000' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {errorMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseErrorSnackbar}
                         >
                             <CloseIcon />
                         </IconButton>,

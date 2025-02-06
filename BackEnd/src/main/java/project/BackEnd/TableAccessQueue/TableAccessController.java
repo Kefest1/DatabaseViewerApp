@@ -22,7 +22,6 @@ public class TableAccessController {
     @GetMapping("/addAndCheck/{databaseName}/{tableName}/{username}")
     public boolean addAndCheck(@PathVariable String databaseName, @PathVariable String tableName, @PathVariable String username) {
         Long tableID = tableInfoRepository.getTableInfoID(databaseName, "user1", tableName);
-        System.out.println("Adding user " + username + " to table " + tableName);
         return tableAccessQueue.addAndCheckIfCanBeAccessed(new TableAccessData(tableID, username, -1));
     }
 
@@ -36,8 +35,6 @@ public class TableAccessController {
     @GetMapping("/popPosition/{databaseName}/{tableName}/{username}")
     public boolean popPosition(@PathVariable String databaseName, @PathVariable String tableName, @PathVariable String username) {
         Long tableID = tableInfoRepository.getTableInfoID(databaseName, "user1", tableName);
-        System.out.println("Popping user " + username + " to table " + tableName);
-
         return tableAccessQueue.popPosition(new TableAccessData(tableID, username, -1));
     }
 

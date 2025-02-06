@@ -11,9 +11,13 @@ import {
 import {DatabaseSchemaNode} from "../components/database-schema-node";
 import React, {useEffect, useState} from "react";
 import Select from "@mui/material/Select";
-import {MenuItem, Paper} from "@mui/material";
+import {IconButton, MenuItem, Paper, SnackbarContent} from "@mui/material";
 import {getCookie} from "../../../getCookie";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
+import {InfoIcon} from "lucide-react";
 
 const defaultNodes = [
     {
@@ -133,7 +137,7 @@ async function fetchConnection(databaseName, selectedTableOne, selectedTableMany
         return data;
     } catch (error) {
         console.log('Empty message:');
-        return null; // Return null or a default value to handle this case gracefully
+        return null;
     }
 }
 
@@ -188,7 +192,6 @@ function ConnectionsCreator() {
     const [tableOneContent, setTableOneContent] = useState([]);
     const [tableManyContent, setTableManyContent] = useState([]);
 
-    const [initialConnection, setInitialConnection] = useState([]);
     const [isEdgesSet, setIsEdgesSet] = useState(false);
 
     const [connectionID, setConnectionID] = useState(-1);
@@ -196,11 +199,31 @@ function ConnectionsCreator() {
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState("");
+
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const handleCloseErrorSnackbar = () => {
+        setOpenErrorSnackbar(false);
+    };
+
+    function handleCloseSnackbar() {
+        setOpenSnackbar(false);
+    }
+
     useEffect(() => {
         fetchAvailableDatabases(userName)
             .then(data => {
                 setAvailableDatabases(data);
-            });
+            })
+            .catch(e => {
+                setErrorMessage("Error loading databases.");
+                setOpenErrorSnackbar(true);
+                setAvailableDatabases([]);
+            })
+        ;
     }, [userName]);
 
     useEffect(() => {
@@ -212,22 +235,17 @@ function ConnectionsCreator() {
                 setAvailableTables([]);
             }
         };
-
-        loadTables();
+        try {
+            loadTables();
+        } catch (e) {
+            setErrorMessage("Error loading tables.");
+            setOpenErrorSnackbar(true);
+            setAvailableDatabases([])
+        }
     }, [selectedDatabase]);
 
     useEffect(() => {
         if (selectedTableOne !== "") {
-            console.log(selectedTableOne);
-            const filtered = availableTables.filter(table => table !== selectedTableOne);
-            setFilteredTables(filtered);
-        }
-
-    }, [selectedTableOne]);
-
-    useEffect(() => {
-        if (selectedTableOne !== "") {
-            console.log(selectedTableOne);
             const filtered = availableTables.filter(table => table !== selectedTableOne);
             setFilteredTables(filtered);
         }
@@ -238,12 +256,10 @@ function ConnectionsCreator() {
         if (selectedTableMany !== "" && selectedTableOne !== "") {
             fetchStructure(selectedDatabase, selectedTableOne)
                 .then(data => {
-                    console.log(data);
                     setTableOneContent(data);
                 });
             fetchStructure(selectedDatabase, selectedTableMany)
                 .then(data => {
-                    console.log(data);
                     setTableManyContent(data);
                 });
         }
@@ -259,7 +275,6 @@ function ConnectionsCreator() {
     useEffect(() => {
         setSelectedTableOne("");
         setSelectedTableMany("");
-
     }, [selectedDatabase]);
 
     useEffect(() => {
@@ -271,100 +286,246 @@ function ConnectionsCreator() {
                         setIsEdgesSet(true);
                     }
                     else {
-                        setInitialConnection(data);
-                        console.log(data);
                         setConnectionID(data.id);
                         const edge = [
                             {
                                 id: "e1-2",
                                 source: "1",
                                 target: "2",
-                                sourceHandle: data.manyColumnName,
-                                targetHandle: data.oneColumnName,
+                                sourceHandle: data.oneColumnName,
+                                targetHandle: data.manyColumnName,
                             }
                         ];
                         setEdges(edge);
+                        setIsEdgesSet(true);
                     }
                 });
         }
     }, [selectedDatabase, selectedTableOne, selectedTableMany]);
 
 
-    useEffect(() => {
-        if (edges.length > 0) {
-            setIsEdgesSet(true);
-            console.log("Edges have been updated:", edges);
-        }
-    }, [edges]);
-
     return (
-        <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
-                <Select
-                    labelId="demo-simple-select-database"
-                    id="demo-simple-database"
-                    value={selectedDatabase}
-                    label="Select Database"
-                    onChange={(event) => setSelectedDatabase(event.target.value)}
-                    variant={"outlined"}
+        <div>
+            <Paper sx={{ width: 'calc(80vw)', height: 'calc(86vh)', overflow: 'auto' }} elevation={3} style={{ padding: '10px', margin: '10px', borderRadius: '8px' }}>
+                    <Select
+                        labelId="demo-simple-select-database"
+                        id="demo-simple-database"
+                        value={selectedDatabase}
+                        label="Select Database"
+                        onChange={(event) => setSelectedDatabase(event.target.value)}
+                        variant={"outlined"}
+                    >
+                        {availableDatabases.map((option, index) => (
+                            <MenuItem key={index} value={option}>
+                                {option}
+                            </MenuItem>
+                        ))}
+                    </Select>
+
+                    {selectedDatabase && (
+                        <Select
+                            labelId="demo-simple-select-table-one"
+                            id="demo-simple-table-one"
+                            value={selectedTableOne}
+                            label="Select First Table"
+                            onChange={(event) => setSelectedTableOne(event.target.value)}
+                            variant={"outlined"}
+                        >
+                            {availableTables.map((option, index) => (
+                                <MenuItem key={index} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    )}
+
+                    {selectedDatabase && selectedTableOne && (
+                        <Select
+                            labelId="demo-simple-select-table-many"
+                            id="demo-simple-table-many"
+                            value={selectedTableMany}
+                            label="Select Second Table"
+                            onChange={(event) => setSelectedTableMany(event.target.value)}
+                            variant={"outlined"}
+                        >
+                            {filteredTables.map((option, index) => (
+                                <MenuItem key={index} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    )}
+
+                    {
+                        selectedDatabase !== "" &&
+                        selectedTableOne !== "" &&
+                        selectedTableMany !== "" &&
+                        isEdgesSet === true &&
+                        tableManyContent.length > 0 &&
+                        tableOneContent.length > 0 &&
+                        nodes.length > 0 && (
+                            <ReactFlowProvider>
+                                <LayoutFlow
+                                    selectedDatabase={selectedDatabase}
+                                    initialNodes={nodes}
+                                    initialEdges={edges}
+                                    selectedTableOne={selectedTableOne}
+                                    selectedTableMany={selectedTableMany}
+                                    id={connectionID}
+                                    setOpenSnackbar={setOpenSnackbar}
+                                    setMessage={setMessage}
+                                    setErrorMessage={setErrorMessage}
+                                    setOpenErrorSnackbar={setOpenErrorSnackbar}
+                                />
+                            </ReactFlowProvider>
+                        )
+                    }
+
+                <Snackbar
+                    open={openErrorSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseErrorSnackbar}
                 >
-                    {availableDatabases.map((option, index) => (
-                        <MenuItem key={index} value={option}>
-                            {option}
-                        </MenuItem>
-                    ))}
-                </Select>
+                    <SnackbarContent
+                        style={{ backgroundColor: '#ff0000' }}
+                        message={
+                            <span style={{ display: 'flex', alignItems: 'center' }}>
+                                <ErrorIcon style={{ marginRight: 8 }} />
+                                {errorMessage}
+                            </span>
+                        }
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="close"
+                                color="inherit"
+                                onClick={handleCloseErrorSnackbar}
+                            >
+                                <CloseIcon />
+                            </IconButton>,
+                        ]}
+                    />
+                </Snackbar>
 
-                {selectedDatabase && (
-                    <Select
-                        labelId="demo-simple-select-table-one"
-                        id="demo-simple-table-one"
-                        value={selectedTableOne}
-                        label="Select First Table"
-                        onChange={(event) => setSelectedTableOne(event.target.value)}
-                        variant={"outlined"}
-                    >
-                        {availableTables.map((option, index) => (
-                            <MenuItem key={index} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                )}
-
-                {selectedDatabase && selectedTableOne && (
-                    <Select
-                        labelId="demo-simple-select-table-many"
-                        id="demo-simple-table-many"
-                        value={selectedTableMany}
-                        label="Select Second Table"
-                        onChange={(event) => setSelectedTableMany(event.target.value)}
-                        variant={"outlined"}
-                    >
-                        {filteredTables.map((option, index) => (
-                            <MenuItem key={index} value={option}>
-                                {option}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                )}
-
-                {
-                    selectedDatabase !== "" && selectedTableOne !== "" && setSelectedTableMany !== "" && isEdgesSet === true && (
-                        <ReactFlowProvider>
-                            <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} selectedTableOne={selectedTableOne} selectedTableMany={selectedTableMany} id={connectionID}/>
-                        </ReactFlowProvider>
-                    )
-                }
-        </Paper>
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <SnackbarContent
+                        style={{ backgroundColor: '#4365da' }}
+                        message={
+                            <span style={{ display: 'flex', alignItems: 'center' }}>
+                                <InfoIcon style={{ marginRight: 8 }} />
+                                {message}
+                            </span>
+                        }
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="close"
+                                color="inherit"
+                                onClick={handleCloseSnackbar}
+                            >
+                                <CloseIcon />
+                            </IconButton>,
+                        ]}
+                    />
+                </Snackbar>
+            </Paper>
+        </div>
     );
 
 }
 
-const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTableOne, selectedTableMany, id }) => {
+const LayoutFlow = ({ selectedDatabase,
+                      initialNodes,
+                      initialEdges,
+                      selectedTableOne,
+                      selectedTableMany,
+                      id,
+                      setMessage,
+                      setOpenSnackbar,
+                      setErrorMessage,
+                      setOpenErrorSnackbar }) => {
+
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 
-    const onConnect = (params) => {
+    const [isReady, setIsReady] = useState(false);
+
+    function swapNodes(nodes, setNodes) {
+        if (nodes.length !== 2) {
+            console.error("There must be exactly two nodes to swap IDs and positions.");
+            return;
+        }
+
+        const updatedNodes = [...nodes];
+
+        const [node1, node2] = updatedNodes;
+        const tempId = node1.id;
+        const tempPosition = node1.position;
+
+        node1.id = node2.id;
+        node1.position = node2.position;
+
+        node2.id = tempId;
+        node2.position = tempPosition;
+
+        setNodes(updatedNodes);
+    }
+
+    useEffect(() => {
+
+        const isValid = validateEdges(edges, nodes);
+        console.log(isValid);
+        console.log(nodes);
+        if (isValid !== true) {
+            swapNodes(nodes, setNodes);
+        }
+        setIsReady(true);
+
+        console.log(nodes);
+    }, []);
+
+    function validateEdges(edges, nodes) {
+        for (const edge of edges) {
+            const sourceNode = nodes.find(node => node.id === edge.source);
+            const targetNode = nodes.find(node => node.id === edge.target);
+
+            if (!sourceNode) {
+                return false;
+            }
+            if (!targetNode) {
+                return false;
+            }
+
+            const sourceColumn = sourceNode.data.schema.find(column => column.title === edge.sourceHandle);
+            if (!sourceColumn) {
+                return false;
+            }
+
+            const targetColumn = targetNode.data.schema.find(column => column.title === edge.targetHandle);
+            if (!targetColumn) {
+                return false;
+            }
+
+            const validSourceTypes = ['long', 'integer'];
+            const validTargetTypes = ['long', 'integer'];
+
+            if (
+                !validSourceTypes.includes(sourceColumn.type) ||
+                !validTargetTypes.includes(targetColumn.type)
+            ) {
+                console.error(`Invalid data types in edge "${edge.id}": Source (${sourceColumn.type}) and Target (${targetColumn.type}) must be "long" or "integer".`);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function onConnect(params) {
         const sourceNode = nodes.find(node => node.id === params.source);
         const targetNode = nodes.find(node => node.id === params.target);
 
@@ -381,27 +542,74 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
                 setEdges([]);
 
                 setEdges((eds) => addEdge(params, eds));
-                console.log(`Connection made from ${sourceNode.data.label}.${sourceColumn} to ${targetNode.data.label}.${targetColumn}`);
             }
         }
 
-    };
-    const handleEdgesChange = (changes) => {
-        setEdges([]);
-    };
+    }
+
+    function handleEdgesChange(changes) {
+
+    }
 
     async function addEdges() {
-        console.log(edges);
-        console.log(nodes);
-        console.log(id);
-        if (id < 0) {
-            const payload = {
-                oneTableName: selectedTableOne,
-                manyTableName: selectedTableMany,
-                oneColumnName: edges[0].sourceHandle,
-                manyColumnName: edges[0].targetHandle,
-            }
+        let payload = {};
 
+        if (edges.length === 0) {
+            const token = localStorage.getItem("jwtToken");
+            try {
+                const response = await fetch(`http://localhost:8080/api/tableconnection/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                });
+
+                if (response.ok) {
+                    const message = await response.text();
+                    console.log("Success:", message);
+                } else {
+                    const errorMessage = await response.text();
+                    console.error("Error:", errorMessage);
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+            }
+            return;
+        }
+
+        const sourceNode = nodes[0];
+        const targetNode = nodes[1];
+        let primaryKeyTable;
+
+        if ((edges[0].sourceHandle === sourceNode.data.schema[0]['title']) && (edges[0].targetHandle === targetNode.data.schema[0]['title'])) {
+            console.log("Only one table with primary key");
+            return;
+        }
+
+        if (edges[0].sourceHandle === sourceNode.data.schema[0]['title']) {
+            console.log(sourceNode.data['label'] + " is a primary key");
+
+            payload["manyTableName"] = targetNode.data['label'];
+            payload["manyColumnName"] = edges[0].targetHandle;
+
+            payload["oneTableName"] = sourceNode.data['label'];
+            payload["oneColumnName"] = edges[0].sourceHandle;
+        }
+        else if (edges[0].targetHandle === targetNode.data.schema[0]['title']) {
+            console.log(targetNode.data['label'] + " is a primary key");
+            payload["manyTableName"] = sourceNode.data['label'];
+            payload["manyColumnName"] = edges[0].sourceHandle;
+
+            payload["oneTableName"] = targetNode.data['label'];
+            payload["oneColumnName"] = edges[0].targetHandle;
+        }
+        else {
+            console.log("No primary key is not a primary key");
+            return;
+        }
+
+        if (id < 0) {
             try {
                 const token = localStorage.getItem("jwtToken");
                 const response = await fetch(`http://localhost:8080/api/tableconnection/addconnection`, {
@@ -423,81 +631,65 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges, selectedTabl
             } catch (error) {
                 console.error("Network error:", error);
             }
-        }
-        else {
+
+        } else {
+            const userName = getCookie("userName");
             const token = localStorage.getItem("jwtToken");
-            if (edges.length === 0) {
-                try {
-                    const response = await fetch(`http://localhost:8080/api/tableconnection/delete/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                    });
 
-                    if (response.ok) {
-                        const message = await response.text();
-                        console.log("Success:", message);
-                    } else {
-                        const errorMessage = await response.text();
-                        console.error("Error:", errorMessage);
-                    }
-                } catch (error) {
-                    console.error("Network error:", error);
+            try {
+                const response = await fetch(`http://localhost:8080/api/tableconnection/update/${id}/${userName}/${selectedDatabase}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (response.ok) {
+                    const message = await response.text();
+                    console.log("Success:", message);
+                } else {
+                    const errorMessage = await response.text();
+                    console.error("Error:", errorMessage);
                 }
+            } catch (error) {
+                console.error("Network error:", error);
             }
-            else {
-                const userName = getCookie("userName");
-                const updatedTableConnection = {
-                    oneTableName: selectedTableOne,
-                    manyTableName: selectedTableMany,
-                    oneColumnName: edges[0].sourceHandle,
-                    manyColumnName: edges[0].targetHandle,
-                };
 
-                try {
-                    const response = await fetch(`http://localhost:8080/api/tableconnection/update/${id}/${userName}/${selectedDatabase}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(updatedTableConnection),
-                    });
-
-                    if (response.ok) {
-                        const message = await response.text();
-                        console.log("Success:", message);
-                    } else {
-                        const errorMessage = await response.text();
-                        console.error("Error:", errorMessage);
-                    }
-                } catch (error) {
-                    console.error("Network error:", error);
-                }
-            }
         }
+        console.log(payload);
     }
 
+    const handleEdgeClick = (event, edge) => {
+        setEdges([]);
+    };
+
+
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={handleEdgesChange}
-            fitView
-            onConnect={onConnect}
-            nodeTypes={nodeTypes}
-        >
-            <Panel position="top-left">
-                <h4 style={{ marginBottom: '10px' }}>Selected database: {selectedDatabase}</h4>
-                <Button onClick={addEdges} variant={"contained"} color={"primary"}>
-                    Commit changes
-                </Button>
-            </Panel>
-            <Background />
-        </ReactFlow>
+        <div style={{ width: '100%', height: '95%' }}>
+            {isReady === true && (
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={handleEdgesChange}
+                fitView
+                onEdgeClick={handleEdgeClick}
+                onConnect={onConnect}
+                nodeTypes={nodeTypes}
+
+            >
+                <Panel position="top-left">
+                    <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
+                    <Button onClick={addEdges} variant={"contained"} color={"primary"}>
+                        Commit changes
+                    </Button>
+                </Panel>
+                <Background/>
+            </ReactFlow>
+            )}
+        </div>
     );
 };
 

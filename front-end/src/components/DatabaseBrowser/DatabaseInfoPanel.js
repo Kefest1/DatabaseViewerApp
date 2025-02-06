@@ -3,23 +3,11 @@ import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
 import Box from "@mui/material/Box";
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import {Button, IconButton, Snackbar, SnackbarContent, Stack} from "@mui/material";
+import {Button, IconButton, Snackbar, SnackbarContent, Stack, Typography} from "@mui/material";
 import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
 
-async function fetchAvailableDatabases(userName) {
-    const token = localStorage.getItem("jwtToken");
 
-    console.log(token);
-    const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    return await tables.json();
-}
 
 const organizeData = (data) => {
     const result = [];
@@ -52,6 +40,25 @@ const DatabaseInfoPanel = ({ handleChange }) => {
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
+
+    async function fetchAvailableDatabases(userName) {
+        const token = localStorage.getItem("jwtToken");
+
+        console.log(token);
+        const tables = await fetch("http://localhost:8080/api/databaseinfo/getfoldermap/" + userName, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!tables.ok) {
+            setMessage(true);
+            setOpenSnackbar(true);
+            return [];
+        }
+        return await tables.json();
+    }
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
@@ -124,33 +131,52 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 </Button>
             </div>
 
-            <Box
-                sx={{
-                    height: 770,
-                    minWidth: 250,
-                    overflowY: "scroll",
-                    '&::-webkit-scrollbar': {
-                        width: '8px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                        background: '#f1f1f1',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                        background: '#888',
-                        borderRadius: '4px',
-                    },
-                    '&::-webkit-scrollbar-thumb:hover': {
-                        background: '#555',
-                    },
-                }}
-            >
-                <RichTreeView
-                    items={tablesData}
-                    expandedItems={expandedItems}
-                    onExpandedItemsChange={handleExpandedItemsChange}
-                    onItemClick={handleNodeClick}
-                />
-            </Box>
+            {tablesData.length === 0 ? (
+                <h4 style={{
+                    fontSize: '1.5rem',
+                    color: '#333',
+                    marginBottom: '15px',
+                    fontFamily: 'Arial, sans-serif',
+                    textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+                    letterSpacing: '0.5px',
+                    padding: '10px 0',
+                    borderBottom: '2px solid #2A70C6FF',
+                    backgroundColor: '#d1d1d1',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                }}>
+                    No tables assigned to you
+                </h4>
+            ) : (
+                <Box
+                    sx={{
+                        height: 770,
+                        minWidth: 250,
+                        overflowY: "scroll",
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: '#f1f1f1',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            background: '#888',
+                            borderRadius: '4px',
+                        },
+                        '&::-webkit-scrollbar-thumb:hover': {
+                            background: '#555',
+                        },
+                    }}
+                >
+                    <RichTreeView
+                        items={tablesData}
+                        expandedItems={expandedItems}
+                        onExpandedItemsChange={handleExpandedItemsChange}
+                        onItemClick={handleNodeClick}
+                    />
+                </Box>
+            )}
+
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

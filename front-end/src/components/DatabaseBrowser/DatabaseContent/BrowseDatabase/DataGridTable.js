@@ -21,52 +21,65 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import './DataGridTable.css';
 
-async function fetchStructure(databaseName, selectedTable) {
-    const userName = getCookie("userName");
-    console.log(`http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`);
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch(
-        `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`,{
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-        }
-    );
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return await response.json();
-}
-
-async function checkIfTableIsEmpty(selectedTable, selectedDatabase) {
-    const userName = getCookie("userName");
-    const token = localStorage.getItem("jwtToken");
-    const url = "http://localhost:8080/api/tableinfo/checkIfTableEmpty/" + selectedDatabase + "/" + selectedTable;
-    console.log(url);
-    const tables = await fetch(url,{
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-    return await tables.json();
-}
-
-async function fetchPrimaryKeyName(databaseName, tableName) {
-    const userName = getCookie("userName");
-    const token = localStorage.getItem("jwtToken");
-    const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-    return await response.text();
-}
-
 
 let idBuf = -1;
 
 function DataGridTable({ databaseName, selectedTable }) {
+
+    async function fetchStructure(databaseName, selectedTable) {
+        const userName = getCookie("userName");
+        console.log(`http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`);
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(
+            `http://localhost:8080/api/tableinfo/getTableStructure/${userName}/${databaseName}/${selectedTable}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            }
+        );
+        if (!response.ok) {
+            setSnackbarMessage("Could not fetch table structure");
+            setSnackbarOpen(true);
+            return [];
+        }
+        return await response.json();
+    }
+
+    async function checkIfTableIsEmpty(selectedTable, selectedDatabase) {
+        const userName = getCookie("userName");
+        const token = localStorage.getItem("jwtToken");
+        const url = "http://localhost:8080/api/tableinfo/checkIfTableEmpty/" + selectedDatabase + "/" + selectedTable;
+        console.log(url);
+        const tables = await fetch(url,{
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!tables.ok) {
+            setSnackbarMessage("Could not fetch information");
+            setSnackbarOpen(true);
+            return [];
+        }
+        return await tables.json();
+    }
+
+    async function fetchPrimaryKeyName(databaseName, tableName) {
+        const userName = getCookie("userName");
+        const token = localStorage.getItem("jwtToken");
+        const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        if (!response.ok) {
+            setSnackbarMessage("Could not fetch primary key name");
+            setSnackbarOpen(true);
+            return [];
+        }
+        return await response.text();
+    }
 
     const [rows, setRows] = useState([])
     const [rowModesModel, setRowModesModel] = useState({});
@@ -239,7 +252,6 @@ function DataGridTable({ databaseName, selectedTable }) {
     };
 
     const isCellEditable = (params) => {
-        // Disable editing for the primary key row
         return params.row.columnName !== primaryKey;
     };
 

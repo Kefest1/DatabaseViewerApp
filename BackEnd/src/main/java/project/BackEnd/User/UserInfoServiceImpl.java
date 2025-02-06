@@ -3,6 +3,7 @@ package project.BackEnd.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +14,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Autowired
     private UserInfoRepository userInfoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserInfo saveUsers(UserInfo userInfo) {
+        userInfo.setPassword_hash(passwordEncoder.encode(userInfo.getPassword_hash()));
         return userInfoRepository.save(userInfo);
     }
 
@@ -51,4 +56,6 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfo.isAdmin() ? List.of(() -> "ROLE_ADMIN") : List.of(() -> "ROLE_USER")
         );
     }
+
+
 }

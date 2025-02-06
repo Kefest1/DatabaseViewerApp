@@ -15,16 +15,18 @@ import React, {useCallback, useEffect, useState} from "react";
 import '@xyflow/react/dist/style.css';
 import Dagre from '@dagrejs/dagre';
 import {getCookie} from "../../../getCookie";
-import {MenuItem, Paper} from "@mui/material";
+import {IconButton, MenuItem, Paper, SnackbarContent} from "@mui/material";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import html2canvas from 'html2canvas';
+import Snackbar from "@mui/material/Snackbar";
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
 
 async function fetchAvailableDatabases() {
     const userName = getCookie("userName");
 
     const token = localStorage.getItem("jwtToken");
-    console.log(token);
     const tables = await fetch("http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -232,13 +234,6 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
                         </Button>
                         <Button
                             variant="contained"
-                            style={{ backgroundColor: '#2196F3', color: 'white', width: '200px', height: '35px' }}
-                            onClick={downloadSchemaAsImage}
-                        >
-                            Download as Image
-                        </Button>
-                        <Button
-                            variant="contained"
                             style={{ backgroundColor: '#FF9800', color: 'white', width: '200px', height: '35px' }}
                             onClick={downloadSchemaAsJson}
                         >
@@ -251,7 +246,8 @@ const LayoutFlow = ({ selectedDatabase, initialNodes, initialEdges }) => {
             </ReactFlow>
         </div>
     );
-};
+}
+
 function DatabaseScheme() {
     const [availableDatabases, setAvailableDatabases] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
@@ -260,10 +256,23 @@ function DatabaseScheme() {
     const [nodes, setNodes] = useState([]);
     const [edges, setEdges] = useState([]);
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState("");
+
+    const handleCloseErrorSnackbar = () => {
+        setOpenErrorSnackbar(false);
+    };
+
     useEffect(() => {
         const loadDatabases = async () => {
-            const availableDBs = await fetchAvailableDatabases();
-            setAvailableDatabases(availableDBs);
+            try {
+                const availableDBs = await fetchAvailableDatabases();
+                setAvailableDatabases(availableDBs);
+            } catch (error) {
+                setErrorMessage("Error fetching available databases. Please try again later.");
+                setOpenErrorSnackbar(true);
+                setAvailableDatabases([]);
+            }
         };
         loadDatabases();
     }, []);
@@ -275,7 +284,13 @@ function DatabaseScheme() {
         };
 
         if (selectedDatabase !== "") {
-            loadConnections();
+            try {
+                loadConnections();
+            } catch (e) {
+                setErrorMessage("Error fetching connections for the selected database. Please try again later.");
+                setOpenErrorSnackbar(true);
+                setConnections([]);
+            }
         }
     }, [selectedDatabase]);
 
@@ -286,7 +301,13 @@ function DatabaseScheme() {
         };
 
         if (selectedDatabase !== "") {
-            loadDatabaseStructure();
+            try {
+                loadDatabaseStructure();
+            } catch (e) {
+                setErrorMessage("Error fetching database structure. Please try again later.");
+                setOpenErrorSnackbar(true);
+                setDatabaseStructure([]);
+            }
         }
     }, [selectedDatabase]);
 
@@ -352,6 +373,33 @@ function DatabaseScheme() {
                         <LayoutFlow selectedDatabase={selectedDatabase} initialNodes={nodes} initialEdges={edges} />
                     </ReactFlowProvider>
                 )}
+
+                <Snackbar
+                    open={openErrorSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseErrorSnackbar}
+                >
+                    <SnackbarContent
+                        style={{ backgroundColor: '#ff0000' }}
+                        message={
+                            <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                                {errorMessage}
+                        </span>
+                        }
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="close"
+                                color="inherit"
+                                onClick={handleCloseErrorSnackbar}
+                            >
+                                <CloseIcon />
+                            </IconButton>,
+                        ]}
+                    />
+                </Snackbar>
+
             </div>
         </Paper>
     );

@@ -19,6 +19,7 @@ import TableBrowserNew from "./TableBrowserNew";
 import { useTransition, animated } from 'react-spring';
 import ErrorIcon from "@mui/icons-material/Error";
 import CloseIcon from "@mui/icons-material/Close";
+import './QueryTool.css';
 
 async function fetchAvailableDatabases(userName) {
 
@@ -134,7 +135,6 @@ async function runQuery(database, table, columns, setErrorMessage, setOpenSnackb
 
 const QueryTool = ({setData, setOccupiedTableInfo}) => {
     const [availableDatabases, setAvailableDatabases] = useState([]);
-    const [columnsByDatabase, setColumnsByDatabase] = useState([]);
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [selectedTable, setSelectedTable] = useState("");
     const [tablesForSelectedDatabase, setTablesForSelectedDatabase] = useState([]);
@@ -146,13 +146,15 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     const [primaryKeyName, setPrimaryKeyName] = useState("");
     const [tableStructure, setTableStructure] = useState([]);
 
-    const [tableBrowserKey, setTableBrowserKey] = useState(0);
 
     const [isAvailable, setIsAvailable] = useState(false);
     const [occ, setIsOcc] = useState(false);
 
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+
+    const [isAwaiting, setIsAwaiting] = useState(false);
+    const [position, setPosition] = useState(1);
 
     const userName = getCookie("userName");
 
@@ -163,6 +165,17 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     function handleSelectOne(event) {
         setSelectedDatabase(event.target.value);
     }
+
+    useEffect(() => {
+        if (isAwaiting === true) {
+            fetch(`http://localhost:8080/api/accesscontroller/popPosition/${selectedDatabase}/${selectedTable}/${getCookie("userName")}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+                }
+            });
+            setIsAwaiting(false);
+        }
+    }, [selectedDatabase, selectedTable])
 
     function handleSelectTwo(event) {
         setSelectedTable(event.target.value);
@@ -182,6 +195,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
             .then((data) => {
                 setIsAvailable(data === "true");
                 setIsOcc(true);
+                setIsAwaiting(data === "false")
                 return data === "true";
             })
             .catch((error) => {
@@ -198,7 +212,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
         })
             .then((response) => response.text())
             .then((data) => {
-                console.log(data);
+                setPosition(data);
                 return data;
             })
             .catch((error) => {
@@ -225,12 +239,16 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                         .then(result => {
                             setQueryResult(result);
                             setIsButtonPressed(true);
-                            // setTableBrowserKey(prevKey => prevKey + 1);
+                            setIsAwaiting(false);
                         })
                         .catch(error => {
-                            console.error(error);
+                            setErrorMessage("Failed to fetch data from the table!");
+                            setOpenSnackbar(true);
                         });
                     setIsOcc(true);
+                }
+                else {
+                    setIsAwaiting(true);
                 }
             }, 1000);
 
@@ -265,9 +283,10 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 .then((response) => {
                     setAvailableColumns(response);
                 })
-                .catch((error) =>
-                    console.error("Error fetching columns for the selected table:", error)
-                );
+                .catch((error) => {
+                    setErrorMessage("Failed to fetch columns for the selected table!");
+                    setOpenSnackbar(true);
+                });
         }
     }, [selectedDatabase, selectedTable, userName]);
 
@@ -286,8 +305,11 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 .then((response) => {
                     setPrimaryKeyName(response);
                 })
-                .catch((error) =>
-                    console.error("Error fetching columns for the selected table:", error)
+                .catch((error) => {
+                        console.error("Error fetching columns for the selected table:", error);
+                        setErrorMessage("Error fetching columns for the selected table:");
+                        setOpenSnackbar(true);
+                    }
                 );
         }
     }, [selectedDatabase, selectedTable]);
@@ -299,19 +321,28 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 .then((response) => {
                     setTableStructure(response);
                 })
-                .catch((error) =>
-                    console.error("Error fetching columns for the selected table:", error)
+                .catch((error) => {
+                        console.error("Error fetching columns for the selected table:", error)
+                        setErrorMessage("Error fetching columns for the selected table:");
+                        setOpenSnackbar(true);
+                    }
                 );
         }
     }, [selectedDatabase, selectedTable]);
 
     useEffect(() => {
-        fetchAvailableDatabases(userName)
-            .then(({databases, columnsByDatabase}) => {
+        const fetchData = async () => {
+            try {
+                const { databases, columnsByDatabase } = await fetchAvailableDatabases(userName);
                 setAvailableDatabases(databases);
-                setColumnsByDatabase(columnsByDatabase);
-            })
-            .catch((error) => console.error("Error fetching databases:", error));
+            } catch (e) {
+                setErrorMessage("Failed to fetch databases!");
+                setOpenSnackbar(true);
+                setAvailableDatabases([]);
+            }
+        };
+
+        fetchData();
     }, [userName]);
 
     const transitions = useTransition(selectedDatabase, {
@@ -423,8 +454,8 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                                 runQuery(selectedDatabase, selectedTable, selectedColumns, setErrorMessage, setOpenSnackbar)
                                                     .then(result => {
                                                         setQueryResult(result);
-                                                        // setTableBrowserKey(prevKey => prevKey + 1);
                                                         setIsButtonPressed(true);
+                                                        setIsAwaiting(false);
                                                     })
                                                     .catch(error => {
                                                         console.error(error);
@@ -445,7 +476,6 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
 
                         <Grid2 style={{marginTop: '16px'}}>
                             <TableBrowserNew
-                                key={tableBrowserKey}
                                 data={queryResult.result}
                                 fetchTime={-1}
                                 tableName={selectedTable}
@@ -458,6 +488,18 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                         </Grid2>
                 )}
 
+                {isAwaiting === true && (
+                    <div className="status-container">
+                        <div className="loading-spinner"></div>
+                        <h3 className="status-message">Table {selectedTable} is currently occupied, please wait</h3>
+                        {position === '0' ? (
+                            <h3 className="position-message">Your table will be ready shortly!</h3>
+                        ) : (
+                            <h3 className="position-message">Your current position in the queue is {position}</h3>
+                        )}
+                    </div>
+                )}
+
             </Grid2>
 
             <Snackbar
@@ -466,7 +508,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 onClose={handleCloseSnackbar}
             >
                 <SnackbarContent
-                    style={{ backgroundColor: '#f44336' }}
+                    style={{backgroundColor: '#f44336'}}
                     message={
                         <span style={{ display: 'flex', alignItems: 'center' }}>
                             <ErrorIcon style={{ marginRight: 8 }} />

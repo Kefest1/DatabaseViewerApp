@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/api/userinfo/add").permitAll()
+                .requestMatchers("/api/auth/**", "/api/userinfo/add", "/api/accesscontroller/debug").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
@@ -52,7 +52,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 
@@ -62,12 +62,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("test")
-    public PasswordEncoder passwordEncoder() {
-        return new NoOpPasswordEncoder();
-    }
-
-    @Bean(name = "customJwtAuthenticationFilter")
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtUtil(), userDetailsService);
     }
@@ -80,18 +74,5 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
-}
-
-@Component
-class NoOpPasswordEncoder implements PasswordEncoder {
-    @Override
-    public String encode(CharSequence rawPassword) {
-        return rawPassword.toString();
-    }
-
-    @Override
-    public boolean matches(CharSequence rawPassword, String encodedPassword) {
-        return true;
     }
 }

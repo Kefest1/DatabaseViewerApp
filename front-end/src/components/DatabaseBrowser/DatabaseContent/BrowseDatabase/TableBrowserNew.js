@@ -358,29 +358,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         setLoading(true);
         const userName = getCookie("userName");
         const selectedCount = selectedRowsIndex.length;
-        console.log(selectedRowsIndex);
-        const localRows = [...selectedRowsIndex]
 
         if (selectedCount === 0) {
             setMessage("No rows selected!");
             setOpenSnackbar(true);
             setLoading(false);
-            return;
-        }
-        console.log(selectedRowsIndex);
-
-        const filteredDataArray = fieldsToUpdate.filter(item => !selectedRowsIndex.includes(item.rowIndex));
-        setFieldsToUpdate(filteredDataArray);
-
-        if (fieldsToUpdate.length === 0) {
-            setMessage("All selected rows deleted successfully");
-            setOpenSnackbar(true);
-            setLoading(false);
-            setRows(prevRows => prevRows.filter(row => !localRows.includes(row.id)));
-            setData(prevData => ({
-                ...prevData,
-                insert: prevData.insert.filter(item => !localRows.includes(item.id))
-            }));
             return;
         }
 
@@ -394,21 +376,35 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         })
             .then(async response => {
                 const res = await response.json();
+                console.log(res);
+                console.log(rows);
                 if (res.length > 0) {
-                    setRows(prevRows => prevRows.filter(row => !selectedRowsIndex.includes(row.id)));
-                    setDeletedRows(prevDeletedRows => prevDeletedRows.filter(id => !selectedRowsIndex.includes(id)));
-                    setSelectedRowsIndex([]);
+                    if (res.length > 0) {
+                        setRows(prevRows => prevRows.filter(row => !res.includes(Number(row.id))));
+                        setDeletedRows(prevDeletedRows => prevDeletedRows.filter(id => !res.includes(id)));
+                        setSelectedRowsIndex([]);
+                    }
+                }
+
+                if (res.length > 0) {
+                    setData(prevData => ({
+                        ...prevData,
+                        update: prevData.update.filter(updateRow => !res.includes(Number(updateRow.rowIndex)))
+                    }));
                 }
 
                 QueryLogger.addLog(`Deleted from table ${tableName} ${res.length} rows`, logging_level.DELETE);
 
                 if (res.length === 0) {
+                    console.log("No rows were deleted");
                     setMessage("No rows were deleted");
                 }
                 else if (selectedCount === res.length) {
+                    console.log("All selected rows deleted successfully");
                     setMessage("All selected rows deleted successfully");
                 }
                 else if (selectedCount > res.length) {
+                    console.log("Some rows were not deleted");
                     setMessage("Some rows were not deleted");
                 }
 
@@ -465,11 +461,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     insert: []
                 }));
                 QueryLogger.addLog(`Inserted to table ${tableName} ${finalList.length} rows`, logging_level.INSERT);
+
                 const res = await response.json();
-                console.log(res);
                 setMessage("New rows inserted successfully");
                 setOpenSnackbar(true);
                 setLoading(false);
+
                 const updatedRows = rows.map(row => {
                     const match = res.find(r => r.previousColumnID === row.id);
                     if (match) {
@@ -533,6 +530,33 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     return (
         <Box sx={{ height: 600, width: 1200 }}>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#4365da' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <InfoIcon style={{ marginRight: 8 }} />
+                            {message}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
+
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                 <Button
                     className="button button-update"
@@ -593,31 +617,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     toolbar: { setRows, setRowModesModel },
                 }}
             />
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-            >
-                <SnackbarContent
-                    style={{ backgroundColor: '#4365da' }}
-                    message={
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                            <InfoIcon style={{ marginRight: 8 }} />
-                            {message}
-                        </span>
-                    }
-                    action={[
-                        <IconButton
-                            key="close"
-                            aria-label="close"
-                            color="inherit"
-                            onClick={handleCloseSnackbar}
-                        >
-                            <CloseIcon />
-                        </IconButton>,
-                    ]}
-                />
-            </Snackbar>
         </Box>
     );
 
@@ -630,6 +629,43 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             }
         };
 
+        function transformJSONToInsertPayload(jsonDataString, primaryKey, tableName) {
+            const jsonData = JSON.parse(jsonDataString);
+            const payloadList = [];
+
+            jsonData.forEach((row) => {
+                const rowPayload = [];
+
+                if (!row.hasOwnProperty(primaryKey)) {
+                    rowPayload.push({
+                        columnName: primaryKey,
+                        dataValue: '1',
+                        tableName: tableName
+                    });
+                } else {
+                    rowPayload.push({
+                        columnName: primaryKey,
+                        dataValue: row[primaryKey].toString().trim(),
+                        tableName: tableName
+                    });
+                }
+
+                for (const [key, value] of Object.entries(row)) {
+                    if (key !== primaryKey) {
+                        rowPayload.push({
+                            columnName: key.trim(),
+                            dataValue: value ? value.toString().trim() : '',
+                            tableName: tableName
+                        });
+                    }
+                }
+
+                payloadList.push(rowPayload);
+            });
+
+            return payloadList;
+        }
+
         function transformCSVToInsertPayload(csvContent) {
             const lines = csvContent.split('\n');
             let header = lines[0].split(',');
@@ -640,7 +676,6 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             }
             header = header.map(item => item.replace(/\r/g, ''));
 
-            console.log(header);
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -678,10 +713,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             const file = event.target.files[0];
             if (file) {
                 const fileType = file.type;
-                const validTypes = ['application/json'];
+                console.log(fileType);
+                const validTypes = ['text/csv', 'application/json'];
 
                 if (!validTypes.includes(fileType)) {
-                    console.error('Invalid file type. Please upload a JSON, CSV, or XML file.');
+                    console.error('Invalid file type. Please upload a CSV file.');
                     return;
                 }
 
@@ -692,10 +728,9 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                     console.log(fileType);
                     if (fileType === 'application/json') {
                         console.log('JSON File content:\n', content);
+                        const payloadList = transformJSONToInsertPayload(content, primaryKey, tableName);
+                        console.log(payloadList);
 
-                    } else if (fileType === 'text/csv') {
-                        console.log('CSV File content:\n', content);
-                        const payloadList = transformCSVToInsertPayload(content);
                         const oldList = [...payloadList];
                         for (let i = 0; i < payloadList.length; i++) {
                             const row = payloadList[i];
@@ -743,8 +778,59 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                             ...newRows,
                             ...oldRows,
                         ]);
-                    } else if (fileType === 'application/xml' || fileType === 'text/xml') {
-                        console.log('XML File content:\n', content);
+
+                    } else if (fileType === 'text/csv') {
+                        console.log('CSV File content:\n', content);
+                        const payloadList = transformCSVToInsertPayload(content);
+                        console.log(payloadList);
+
+                        const oldList = [...payloadList];
+                        for (let i = 0; i < payloadList.length; i++) {
+                            const row = payloadList[i];
+                            row.unshift({
+                                columnName: "id",
+                                dataValue: newId,
+                                tableName: tableName
+                            })
+                            newId--;
+                        }
+                        let newRows = [];
+                        let newRow = {};
+                        for (let i = 0; i < oldList.length; i++) {
+                            for (let j = 0; j < oldList[i].length; j++) {
+                                newRow[oldList[i][j]["columnName"]] = oldList[i][j]["dataValue"];
+                            }
+                            newRows.push(newRow);
+                            newRow = {};
+                        }
+
+                        const token = localStorage.getItem("jwtToken");
+                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(payloadList),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok ' + response.statusText);
+                        }
+
+                        const result = await response.json();
+                        console.log(newRows);
+                        for (let i = 0; i < newRows.length; i++) {
+                            const match = result.find(r => r.previousColumnID === newRows[i].id);
+
+                            newRows[i]["id"] = `${match.newColumnID}`;
+                            newRows[i][primaryKey] = `${match.newPrimaryKeyID}`;
+                        }
+                        console.log(newRows);
+                        setRows((oldRows) => [
+                            ...newRows,
+                            ...oldRows,
+                        ]);
                     }
                 };
 

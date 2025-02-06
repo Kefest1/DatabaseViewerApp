@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import "./Statictics.css";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import {Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
 import {
     Container,
     Dialog, DialogActions,
@@ -27,6 +27,9 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import {InfoIcon} from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
+import ErrorIcon from "@mui/icons-material/Error";
+import { Brush } from 'recharts';
+import html2canvas from 'html2canvas';
 
 const Statistics = () => {
     const [databases, setDatabases] = useState([]);
@@ -50,9 +53,17 @@ const Statistics = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
 
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState("");
+
+    const handleCloseErrorSnackbar = () => {
+        setOpenErrorSnackbar(false);
+    };
+
     function handleCloseSnackbar() {
         setOpenSnackbar(false);
     }
+
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
@@ -60,46 +71,62 @@ const Statistics = () => {
     async function GetDatabases() {
         const userName = getCookie("userName");
         const token = localStorage.getItem("jwtToken");
-
-        const response = await fetch(
-            "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const response = await fetch(
+                "http://localhost:8080/api/tableinfo/getAvailableDatabases/" + userName, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setDatabases(data);
+            );
+            const data = await response.json();
+            setDatabases(data);
+        } catch (e) {
+            setDatabases([]);
+            setErrorMessage("Failed to fetch available databases");
+            setOpenErrorSnackbar(true);
+        }
+
     }
 
     async function GetXPlot() {
-
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn1, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn1, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setXPlot(data);
-        console.log(data);
+            );
+            const data = await response.json();
+            setXPlot(data);
+            console.log(data);
+        } catch (e) {
+            setXPlot([]);
+            setErrorMessage("Failed to fetch columns for selected table");
+            setOpenErrorSnackbar(true);
+        }
     }
 
     async function GetYPlot() {
-
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn2, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+        try {
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                "http://localhost:8080/api/fieldinfo/getColumns/" + selectedDatabase + '/' + selectedTable + '/' + selectedColumn2, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setYPlot(data);
-        console.log(data);
+            );
+            const data = await response.json();
+            setYPlot(data);
+            console.log(data);
+        } catch (e) {
+            setYPlot([]);
+            setErrorMessage("Failed to fetch columns for selected table");
+            setOpenErrorSnackbar(true);
+        }
     }
 
     useEffect(() => {
@@ -129,35 +156,47 @@ const Statistics = () => {
     };
 
     async function getTables(databaseName) {
-        const userName = getCookie("userName");
+        try {
+            const userName = getCookie("userName");
+            const token = localStorage.getItem("jwtToken");
 
-        const token = localStorage.getItem("jwtToken");
-
-        const response = await fetch(
-            `http://localhost:8080/api/tableinfo/getTables/${userName}/${databaseName}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            const response = await fetch(
+                `http://localhost:8080/api/tableinfo/getTables/${userName}/${databaseName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setTables(data);
+            );
+            const data = await response.json();
+            setTables(data);
+        } catch (e) {
+            setTables([]);
+            setErrorMessage("Failed to fetch tables for selected database");
+            setOpenErrorSnackbar(true);
+        }
     }
 
     async function getDatabaseStatistics(databaseName) {
-        const userName = getCookie("userName");
+        try {
+            const userName = getCookie("userName");
 
-        const token = localStorage.getItem("jwtToken");
-        const response = await fetch(
-            `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
+            const token = localStorage.getItem("jwtToken");
+            const response = await fetch(
+                `http://localhost:8080/api/databaseinfo/getStatistics/${databaseName}/${userName}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        );
-        const data = await response.json();
-        setDatabaseStatistics(data);
-        setDescription(data.databaseDescription);
+            );
+            const data = await response.json();
+            setDatabaseStatistics(data);
+            setDescription(data.databaseDescription);
+        } catch (e) {
+            setErrorMessage("Failed to fetch database statistics");
+            setOpenErrorSnackbar(true);
+            setDatabases([]);
+            setDescription("");
+        }
     }
 
     function isValidInput(input) {
@@ -402,7 +441,14 @@ const Statistics = () => {
 
                                     {selectedColumn1 && selectedColumn2 && (
                                         <Box sx={{ marginTop: 1 }}>
-                                            {MyPlot(xPlot, yPlot, selectedColumn1, selectedColumn2, selectedTable, selectedDatabase)}
+                                           < MyPlot
+                                                xPlot={xPlot}
+                                                yPlot={yPlot}
+                                                xPlotName={selectedColumn1}
+                                                yPlotName={selectedColumn2}
+                                                selectedTable={selectedTable}
+                                                selectedDatabase={selectedDatabase}
+                                            />
                                         </Box>
                                     )}
                                 </Box>
@@ -496,6 +542,32 @@ const Statistics = () => {
                     ]}
                 />
             </Snackbar>
+
+            <Snackbar
+                open={openErrorSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseErrorSnackbar}
+            >
+                <SnackbarContent
+                    style={{ backgroundColor: '#ff0000' }}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {errorMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseErrorSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
         </Paper>
     );
 };
@@ -559,30 +631,59 @@ const MyHistogram = (xPlot, xPlotName, selectedTable, selectedDatabase) => {
         </div>
     );
 }
-const MyPlot = (xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatabase) => {
 
-    let finalData = [];
-    if (xPlot.length > 0 && yPlot.length > 0) {
-        for (let i = 0; i < xPlot.length; i++) {
-            finalData.push({name: xPlot[i], value1: yPlot[i]});
+const MyPlot = ({xPlot, yPlot, xPlotName, yPlotName, selectedTable, selectedDatabase}) => {
+        let finalData = [];
+        if (xPlot.length > 0 && yPlot.length > 0) {
+            for (let i = 0; i < xPlot.length; i++) {
+                finalData.push({ name: xPlot[i], value1: yPlot[i] });
+            }
         }
-    }
-    finalData.sort((a, b) => a.value1 - b.value1);
-    console.log(finalData);
-    const text = `Plotting ${xPlotName} with ${yPlotName} for ${selectedTable} in ${selectedDatabase}`;
+
+        const sortedData = finalData.sort((a, b) => Number(a.name) - Number(b.name));
+        const text = `Plotting ${xPlotName} with ${yPlotName} for ${selectedTable} in ${selectedDatabase}`;
+        console.log(sortedData);
+
+        const minValue = Math.min(...sortedData.map(item => item.value1));
+        const maxValue = Math.max(...sortedData.map(item => item.value1));
+
+        const handleExport = () => {
+            const chartElement = document.querySelector('.chart-container');
+            if (chartElement) {
+                html2canvas(chartElement).then((canvas) => {
+                    const link = document.createElement('a');
+                    link.href = canvas.toDataURL('image/png');
+                    link.download = 'chart.png';
+                    link.click();
+                });
+            } else {
+                console.error('Chart element not found');
+            }
+        };
 
     return (
         <div>
             <Container>
-                <LineChart width={1100} height={300} data={finalData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="value1" stroke="#8884d8" name={text}/>
-                </LineChart>
+                <div className="chart-container">
+                    <LineChart width={1100} height={400} data={sortedData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis domain={[minValue, maxValue]} />
+                        <Tooltip />
+                        <Legend
+                            align="right"
+                            verticalAlign="top"
+                            height={36}
+                            wrapperStyle={{ paddingBottom: '20px' }}
+                        />
+                        <Line type="monotone" dataKey="value1" stroke="#8884d8" name={text} />
+                        <Brush dataKey="name" height={30} stroke="#8884d8" />
+                    </LineChart>
+                </div>
             </Container>
+            <Button onClick={handleExport} style={{ marginBottom: '20px' }} variant={"contained"}>
+                Export as Image
+            </Button>
         </div>
-    )
+    );
 };

@@ -55,14 +55,14 @@ public class TableAccessQueue {
 
         while (iterator.hasNext()) {
             TableAccessData t = iterator.next();
-            if (t.getTableID().equals(table.getTableID()) && t.getUserName().equals(table.getUserName())) {
+            if (t.getTableID().equals(table.getTableID()) || t.getUserName().equals(table.getUserName())) {
                 position = t.getPosition();
                 iterator.remove();
             }
         }
 
         for (TableAccessData t : this.queue) {
-            if (t.getTableID().equals(table.getTableID()) && t.getPosition() > position) {
+            if (t.getTableID().equals(table.getTableID()) || t.getPosition() > position) {
                 t.setPosition(t.getPosition() - 1);
             }
         }

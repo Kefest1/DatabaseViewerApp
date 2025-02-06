@@ -90,13 +90,31 @@ class UserRegistrationAndLogin(HttpUser):
         if response.status_code != 200:
             logger.error(f"Failed to fetch profile for {self.username}: {response.status_code} - {response.text}")
 
-"""
+
 class Testing_data_fetching(HttpUser):
     host = api_host
     wait_time = between(1, 3)
+    token = None
 
     @task(1)
     def simulate_getting_table_content(self):
+        self.username = "user1"
+        self.password = "authenticated"
+
+        response = self.client.post(
+            f"/auth/login",
+            name="/auth/login",
+            json={
+                "username": "user1",
+                "password": "authenticated"
+            }
+        )
+
+        if response.status_code == 200:
+            self.token = response.text.strip()
+        else:
+            logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
+            self.token = None
 
         request_body = {
             "database": "northwind",
@@ -105,16 +123,54 @@ class Testing_data_fetching(HttpUser):
 
         self.client.post(
             "/tableinfo/getAllFieldsAllColumns",
-            json=request_body
+            json=request_body,
+            headers={"Authorization": f"Bearer {self.token}"}
         )
 
     @task(2)
     def simulate_getting_subordinates(self):
-        self.client.get("/userinfo/getsubordinates/user1")
+        self.username = "user1"
+        self.password = "authenticated"
+
+        response = self.client.post(
+            f"/auth/login",
+            name="/auth/login",
+            json={
+                "username": "user1",
+                "password": "authenticated"
+            }
+        )
+
+        if response.status_code == 200:
+            self.token = response.text.strip()
+        else:
+            logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
+            self.token = None
+
+
+        self.client.get("/userinfo/getsubordinates/user1", headers = {"Authorization": f"Bearer {self.token}"})
 
     @task(3)
     def simulate_getting_table_folder_map(self):
-        self.client.get(f"/databaseinfo/getfoldermap/user1")
+        self.username = "user1"
+        self.password = "authenticated"
+
+        response = self.client.post(
+            f"/auth/login",
+            name="/auth/login",
+            json={
+                "username": "user1",
+                "password": "authenticated"
+            }
+        )
+
+        if response.status_code == 200:
+            self.token = response.text.strip()
+        else:
+            logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
+            self.token = None
+
+        self.client.get(f"/databaseinfo/getfoldermap/user1", headers = {"Authorization": f"Bearer {self.token}"})
 
 
 class DefiningNewDatabase(HttpUser ):
@@ -123,6 +179,25 @@ class DefiningNewDatabase(HttpUser ):
 
     @task(1)
     def simulate_create_database(self):
+        self.username = "user1"
+        self.password = "authenticated"
+
+        response = self.client.post(
+            f"/auth/login",
+            name="/auth/login",
+            json={
+                "username": "user1",
+                "password": "authenticated"
+            }
+        )
+
+        if response.status_code == 200:
+            self.token = response.text.strip()
+        else:
+            logger.error(f"Login failed for {self.username}: {response.status_code} - {response.text}")
+            self.token = None
+
+
         code = generate_unique_code()
         database_name = f"database_{code}"
         table_name = f"table_{code}"
@@ -130,13 +205,17 @@ class DefiningNewDatabase(HttpUser ):
         userName = "test_user"
         databaseDescription = f"database_description_{code}"
 
-        response = self.client.post("/databaseinfo/add", json={
-            "databaseName": database_name,
-            "tableName": table_name,
-            "columnName": column_name,
-            "userName": userName,
-            "databaseDescription": databaseDescription
-        })
+        response = self.client.post(
+            "/databaseinfo/add",
+            json={
+                "databaseName": database_name,
+                "tableName": table_name,
+                "columnName": column_name,
+                "userName": userName,
+                "databaseDescription": databaseDescription
+            },
+            headers={"Authorization": f"Bearer {self.token}"}
+        )
 
         if response.status_code == 201:
             print(f"Database '{database_name}' created successfully.")
@@ -152,12 +231,16 @@ class DefiningNewDatabase(HttpUser ):
             primary_key = f"primary_key_{code}"
             username = "test_user"
 
-            response = self.client.post("/tableinfo/addenhanced", json={
-                "databaseName": database_name,
-                "tableName": table_name,
-                "primaryKey": primary_key,
-                "username": username,
-            })
+            response = self.client.post(
+                "/tableinfo/addenhanced",
+                json={
+                    "databaseName": database_name,
+                    "tableName": table_name,
+                    "primaryKey": primary_key,
+                    "username": username,
+                },
+                headers={"Authorization": f"Bearer {self.token}"}
+            )
 
             if response.status_code == 201:
                 print(f"Table '{table_name}' added successfully to database '{database_name}'.")
@@ -174,6 +257,7 @@ class DefiningNewDatabase(HttpUser ):
                 response = self.client.post(
                     f"/tableinfo/addTableStructure/{table_name}/{username}/{database_name}",
                     json=field_info_array,
+                    headers={"Authorization": f"Bearer {self.token}"},
                     name="/tableinfo/addTableStructure"
                 )
 
@@ -182,18 +266,27 @@ class DefiningNewDatabase(HttpUser ):
 
                 finalList = []
                 for j in range(6):
-                    innerList = []
+                    innerList = [{
+                            "columnName": "delete_column1",
+                            "dataValue": f"-1",
+                            "tableName": f"delete_{table_name}"
+                        }]
                     for k in range(6):
                         insertPayload = {
                             "columnName": f"delete_column{k + 1}",
                             "dataValue": f"delete_{generate_unique_code()}",
-                            "tableName": f"{table_name}"
+                            "tableName": {table_name}
                         }
                         innerList.append(insertPayload)
 
                     finalList.append(innerList)
 
-                response = self.client.post(f"/fieldinfo/insertvalues/{database_name}", json=finalList, name="/fieldinfo/insertvalues/")
+                response = self.client.post(
+                    f"/fieldinfo/insertvalues/{database_name}",
+                    json=finalList,
+                    headers={"Authorization": f"Bearer {self.token}"},
+                    name="/fieldinfo/insertvalues/"
+                )
 
                 # if response.status_code != 201:
                 #     print(f"Failed to add fields to table '{table_name}': {response.text}")
@@ -209,6 +302,7 @@ class DefiningNewDatabase(HttpUser ):
                     res = self.client.post(
                         "/tableinfo/getAllFieldsAllColumns",
                         json=request_body,
+                        headers={"Authorization": f"Bearer {self.token}"},
                         name="/tableinfo/getAllFieldsAllColumns"
                     )
                     response_data = res.json()
@@ -219,8 +313,8 @@ class DefiningNewDatabase(HttpUser ):
                             res = self.client.delete(
                                 f"/fieldinfo/delete/{database_name}/{table_name}/{primary_key}",
                                 json=delete_request_body,
+                                headers={"Authorization": f"Bearer {self.token}"},
                                 name="/fieldinfo/delete"
                             )
             else:
                 print(f"Failed to add table '{table_name}': {response.text}. Response code : {response.status_code}")
-"""

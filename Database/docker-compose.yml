@@ -55,6 +55,8 @@ services:
       - "3000:3000"
     networks:
       - my-network
+    environment:
+      FRONT_END_ORIGIN: http://localhost:3000
     depends_on:
       - app
     restart: unless-stopped

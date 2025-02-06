@@ -65,9 +65,7 @@ function LoginPage() {
             console.log(token);
 
             if (token) {
-                console.log("Login button clicked");
                 localStorage.setItem("jwtToken", token);
-                setOpenSnackbarOk(true);
 
                 const adminResponse = await fetch(`http://localhost:8080/api/userinfo/checkifadmin/${username}`, {
                         headers: {
@@ -76,7 +74,13 @@ function LoginPage() {
                         method: 'GET'
                     },
                 );
+                if (!adminResponse.ok) {
+                    setOpenSnackbar(true);
+                    setMessage("There was a problem with the fetch operation. Please try again later");
+                    return;
+                }
                 const isAdmin = await adminResponse.json();
+                setOpenSnackbarOk(true);
 
                 const expirationTime = new Date();
                 expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1100);
