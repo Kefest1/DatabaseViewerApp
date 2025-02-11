@@ -37,7 +37,6 @@ public class OwnershipDetailsController {
 
     @PostMapping("/add")
     public String addUser(@RequestBody OwnershipDetailsPayload ownershipDetailsPayload) {
-        System.out.println(ownershipDetailsPayload);
         ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         return "OK";
     }
@@ -45,7 +44,6 @@ public class OwnershipDetailsController {
     @PostMapping("/addbyusername/{tableid}/{username}")
     public String addUserByName(@PathVariable("tableid") Long tableid, @PathVariable("username") String username) {
         Long userID = userInfoRepository.findUserIDByUsername(username);
-        System.out.println(userID);
 
         ownershipDetailsService.addOwnershipDetails(new OwnershipDetailsPayload(userID, tableid));
 
@@ -58,19 +56,12 @@ public class OwnershipDetailsController {
                                  @PathVariable("adminName") String adminName,
                                  @PathVariable("databaseName") String databaseName,
                                  @RequestParam("tableNames") String[] tableNames) {
-        System.out.println(userName);
-        System.out.println(adminName);
-        System.out.println(databaseName);
-        System.out.println(tableNames);
 
         UserInfo userInfo = userInfoRepository.findByUsername(userName);
         Long userID = userInfo.getId();
-        System.out.println(userID);
         for (String tableName : tableNames) {
-            System.out.println(databaseName + " " + userName + " " + tableName);
             Long tableID = tableInfoRepository.getTableInfoID(databaseName, adminName, tableName);
             OwnershipDetailsPayload ownershipDetailsPayload = new OwnershipDetailsPayload(userID, tableID);
-            System.out.println(tableID);
             ownershipDetailsService.addOwnershipDetails(ownershipDetailsPayload);
         }
         return "OK";
@@ -85,10 +76,7 @@ public class OwnershipDetailsController {
         UserInfo userInfo = userInfoRepository.findByUsername(userName);
         Long userID = userInfo.getId();
         for (String tableName : tableNames) {
-            System.out.println(databaseName + " " + userName + " " + tableName);
             Long tableID = tableInfoRepository.getTableInfoID(databaseName, adminName, tableName);
-            System.out.println(tableID);
-            System.out.println(new OwnershipDetailsPayload(userID, tableID));
             // TODO Debug
             ownershipDetailsRepository.deleteOwnershipDetailsByUserInfoIdAndTableInfoId(userID, tableID);
         }

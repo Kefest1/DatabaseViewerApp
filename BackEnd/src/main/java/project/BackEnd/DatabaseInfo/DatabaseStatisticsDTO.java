@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-class DatabaseStatisticsDTO {
+public class DatabaseStatisticsDTO {
     Long tableCount;
     String databaseDescription;
     List<TableStatisticsDTO> tableStatistics;

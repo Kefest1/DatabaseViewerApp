@@ -30,7 +30,6 @@ public class TableConnectionController {
     public String addConnection(@RequestBody TableInfoPayload tableInfoPayload) {
         TableInfo tableInfoOne = tableInfoRepository.getTableInfoByTableName(tableInfoPayload.oneTableName);
         TableInfo tableInfoMany = tableInfoRepository.getTableInfoByTableName(tableInfoPayload.manyTableName);
-        System.out.println(tableInfoPayload);
         TableConnection tableConnection = new TableConnection(tableInfoOne, tableInfoMany, tableInfoPayload.oneColumnName, tableInfoPayload.manyColumnName);
         tableConnectionRepository.save(tableConnection);
         return "OK";
@@ -45,22 +44,15 @@ public class TableConnectionController {
         Optional<Long> oneID = tableInfoRepository.findWithUsersAndTables(username, tableNameOne, databaseName);
         Optional<Long> manyID = tableInfoRepository.findWithUsersAndTables(username, tableNameMany, databaseName);
         if (manyID.isEmpty() || oneID.isEmpty()) {
-            System.out.println("Empty");
             return null;
         }
         TableConnection tableConnectionOne = tableConnectionRepository.getTableConnectionByParams(databaseName, username, oneID.get(), manyID.get());
 
-        System.out.println("tableConnectionOne");
-        System.out.println(tableConnectionOne);
         if (tableConnectionOne != null)
             return tableConnectionOne;
 
 
         TableConnection tableConnectionMany = tableConnectionRepository.getTableConnectionByParams(databaseName, username, manyID.get(), oneID.get());
-        System.out.println("tableConnectionMany");
-        System.out.println(tableConnectionMany);
-        System.out.println("");
-        System.out.println("");
 
         return tableConnectionMany;
     }
@@ -78,7 +70,6 @@ public class TableConnectionController {
         for (Long availableId : availableTables) {
             for (TableConnection tableConnectionOne : listOne) {
                 if (Objects.equals(tableConnectionOne.many.getId(), availableId)) {
-                    System.out.println(tableConnectionOne);
                     retlist.add(
                             new TableInfoPayload(
                                     tableConnectionOne.getOneColumnName(),
@@ -132,9 +123,6 @@ public class TableConnectionController {
         Long id = tableInfoRepository.getTableIdByTableName(tablename);
 
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
-
-        System.out.println(id + " " + tablename);
-
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);
 
         List<TableConnection> retlist = new LinkedList<>();
@@ -166,7 +154,6 @@ public class TableConnectionController {
                 updatedTableConnection.getOneColumnName(),
                 updatedTableConnection.getManyColumnName()
         );
-        System.out.println(tableConnection);
 
         int rowsAffected = tableConnectionRepository.updateTableConnection(id, tableConnection);
 

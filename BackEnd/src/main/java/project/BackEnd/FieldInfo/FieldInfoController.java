@@ -86,21 +86,9 @@ public class FieldInfoController {
         return smallestMissing;
     }
 
-//    @GetMapping("/bycolumnnames")
-//    public List<FieldInfo> getFieldInfosByColumnNames(@RequestParam Collection<String> columnNames, @RequestParam String tablename) {
-//        return fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(columnNames, tablename);
-//    }
-
-//    @GetMapping("/getcolumns/{username}")
-//    public List<String> getAllByFieldName(@PathVariable String username) {
-//        return fieldInfoRepository.findWithUsersAndTables(username);
-//    }
-
 
     @PostMapping("/insertvalues/{databasename}")
     public List<insertResultDTO>  insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
-        System.out.println("fieldInfos");
-        System.out.println(fieldInfos);
         List<insertResultDTO> insertResultDTOArrayList = new ArrayList<>();
 
         for (List<InsertPayload> fieldInfoList : fieldInfos) {

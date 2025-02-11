@@ -8,7 +8,6 @@ import project.BackEnd.OwnershipDetails.OwnershipDetails;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import project.BackEnd.TableVisitHistory.TableVisitHistory;
 
 @Entity
 @Table(name = "UserInfo")
@@ -90,7 +89,4 @@ public class UserInfo {
     @JsonIgnore
     private List<UserInfo> subordinates;
 
-    @OneToMany(mappedBy = "userInfo", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<TableVisitHistory> visitHistory;
 }

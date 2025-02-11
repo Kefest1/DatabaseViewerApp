@@ -78,7 +78,7 @@ public class TableInfoController {
         }
 
         TableInfo tableInfo = new TableInfo();
-        tableInfo.setDatabaseInfo(databaseInfoRepository.getDatabaseInfoByDatabaseName(databaseName));
+        tableInfo.setDatabaseInfo(databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databaseName).get(0));
         tableInfo.setTableName(tableName);
         tableInfo.setPrimary_key(primaryKey);
 
@@ -165,7 +165,7 @@ public class TableInfoController {
     @PostMapping("/addtable/{username}/{databasename}/{tableName}")
     public String addTable(@PathVariable("username") String username, @PathVariable("databasename") String databasename, @PathVariable("tableName") String tableName) {
         Long userID = userInfoRepository.findByUsername(username).getId();
-        DatabaseInfo databaseInfo = databaseInfoRepository.getDatabaseInfoByDatabaseName(databasename);
+        DatabaseInfo databaseInfo = databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databasename).get(0);
 
         TableInfo tableInfo = new TableInfo(databaseInfo, tableName, "primaryKey");
         Long tableID = tableInfoService.saveTableInfo(tableInfo).getId();
@@ -264,7 +264,6 @@ public class TableInfoController {
         TableStructure ts = tableStructureRepository.findTableStructuresByColumnNameAndTableName(columnName, tableName, userName);
 
         if (ts == null) {
-            System.out.println("Table already exists");
             return "Table already exists";
         }
 

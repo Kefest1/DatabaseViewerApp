@@ -21,20 +21,20 @@ public class TableAccessController {
 
     @GetMapping("/addAndCheck/{databaseName}/{tableName}/{username}")
     public boolean addAndCheck(@PathVariable String databaseName, @PathVariable String tableName, @PathVariable String username) {
-        Long tableID = tableInfoRepository.getTableInfoID(databaseName, "user1", tableName);
+        Long tableID = tableInfoRepository.getTableInfoID(databaseName, username, tableName);
         return tableAccessQueue.addAndCheckIfCanBeAccessed(new TableAccessData(tableID, username, -1));
     }
 
     @GetMapping("/checkPosition/{databaseName}/{tableName}/{username}")
     public int checkPosition(@PathVariable String databaseName, @PathVariable String tableName, @PathVariable String username) {
-        Long tableID = tableInfoRepository.getTableInfoID(databaseName, "user1", tableName);
+        Long tableID = tableInfoRepository.getTableInfoID(databaseName, username, tableName);
 
         return tableAccessQueue.getPosition(new TableAccessData(tableID, username, -1));
     }
 
     @GetMapping("/popPosition/{databaseName}/{tableName}/{username}")
     public boolean popPosition(@PathVariable String databaseName, @PathVariable String tableName, @PathVariable String username) {
-        Long tableID = tableInfoRepository.getTableInfoID(databaseName, "user1", tableName);
+        Long tableID = tableInfoRepository.getTableInfoID(databaseName, username, tableName);
         return tableAccessQueue.popPosition(new TableAccessData(tableID, username, -1));
     }
 

@@ -27,7 +27,7 @@ public class DatabaseInfo {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     private String description;
 
     @OneToMany(mappedBy = "databaseInfo", cascade = CascadeType.ALL, orphanRemoval = true)

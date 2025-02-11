@@ -5,16 +5,12 @@ import java.util.*;
 public class TableAccessQueue {
     List<TableAccessData> queue;
 
-    public static void main(String[] args) {
-
-    }
 
     public void log() {
+        System.out.println("------------------------------------------");
         for (TableAccessData t : queue) {
             System.out.println(t);
         }
-        System.out.println();
-        System.out.println();
     }
 
     public void clear() {
@@ -44,6 +40,13 @@ public class TableAccessQueue {
                 position++;
             }
         }
+
+        for (TableAccessData t : this.queue) {
+            if (t.getTableID().equals(table.getTableID()) && t.getUserName().equals(table.getUserName())) {
+                return t.getPosition() == 0;
+            }
+        }
+
         table.setPosition(position);
         this.queue.add(table);
         return position == 0;
@@ -55,14 +58,14 @@ public class TableAccessQueue {
 
         while (iterator.hasNext()) {
             TableAccessData t = iterator.next();
-            if (t.getTableID().equals(table.getTableID()) || t.getUserName().equals(table.getUserName())) {
+            if (t.getUserName().equals(table.getUserName())) {
                 position = t.getPosition();
                 iterator.remove();
             }
         }
 
         for (TableAccessData t : this.queue) {
-            if (t.getTableID().equals(table.getTableID()) || t.getPosition() > position) {
+            if (t.getTableID().equals(table.getTableID()) && t.getPosition() > position) {
                 t.setPosition(t.getPosition() - 1);
             }
         }

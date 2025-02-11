@@ -13,9 +13,6 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
 
     long count();
 
-    @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName FROM UserInfo ui JOIN ui.ownershipDetails od JOIN od.tableInfo ti WHERE ui.username = :name ORDER BY 1, 2")
-    List<String> findAllUsersTable(@Param("name") String name);
-
     @Query("SELECT DISTINCT ti.databaseInfo.databaseName, ti.tableName, ts.columnName FROM UserInfo ui " +
             "JOIN ui.ownershipDetails od JOIN od.tableInfo ti  JOIN ti.tableStructure ts WHERE ui.username = :name" +
             " ORDER BY 1, 2")
@@ -44,10 +41,6 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
             "WHERE ui.username = :userName AND db.databaseName = :databaseName")
     List<Long> findTablesIdsForDatabase(@Param("databaseName") String databaseName, @Param("userName") String userName);
 
-    @Modifying
-    @Query("DELETE FROM DatabaseInfo db WHERE db.id = :databaseID")
-    @Transactional
-    void deleteDatabaseInfoById(@Param("databaseID") Long databaseID);
-
-    DatabaseInfo getDatabaseInfoByDatabaseName(String databaseName);
+    @Query("SELECT DISTINCT db FROM DatabaseInfo db WHERE db.databaseName = :databaseName")
+    List<DatabaseInfo> getDistinctDatabaseInfoByDatabaseName(String databaseName);
 }

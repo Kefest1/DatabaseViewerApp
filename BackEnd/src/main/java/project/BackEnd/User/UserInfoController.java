@@ -26,13 +26,10 @@ public class UserInfoController {
 
     @PostMapping("/add")
     public ResponseEntity<Object> add(@RequestBody UserPayload userPayload) {
-        System.out.println("add");
         if (userInfoRepository.findByUsername(userPayload.getUsername()) != null) {
-            System.out.println("Username is already taken");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username is already taken");
         }
         if (userInfoRepository.findByEmail(userPayload.getEmail()) != null) {
-            System.out.println("Email is already in use");
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email is already in use");
         }
         try {
@@ -41,7 +38,6 @@ public class UserInfoController {
 
             if (isAdmin) {
                 if (!Arrays.asList(availableHashes).contains(userPayload.getHash())) {
-                    System.out.println("BadHash");
                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Hash incorrect");
                 }
 
@@ -49,18 +45,14 @@ public class UserInfoController {
             } else {
                 UserInfo admin = userInfoRepository.findByUsername(userPayload.getAdminName());
                 if (admin == null) {
-                    System.out.println("Incorrect admin");
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Incorrect admin");
                 }
                 userInfo = new UserInfo(userPayload.getUsername(), userPayload.getEmail(), userPayload.getPassword_hash(), false, admin);
             }
-            System.out.println("Saves");
             usersService.saveUsers(userInfo);
         } catch (DataIntegrityViolationException e) {
-            System.out.println("Data integrity violation: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Data integrity violation: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("An error has occurred: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error has occurred: " + e.getMessage());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("New user is added");

@@ -152,19 +152,19 @@ public class DatabaseInfoController {
 
         List<String> tableNames = tableInfoRepository.findTableInfoAndByUserName(userName, databaseName);
         for (String tableName : tableNames) {
-            databaseStatistics.tableStatistics.add(getTableStatistic(tableName, databaseName));
+            databaseStatistics.tableStatistics.add(getTableStatistic(tableName, databaseName, userName));
         }
 
         return databaseStatistics;
     }
 
-    private TableStatisticsDTO getTableStatistic(String tableName, String databaseName) {
+    private TableStatisticsDTO getTableStatistic(String tableName, String databaseName, String userName) {
         TableStatisticsDTO tableStatistics = new TableStatisticsDTO();
 
         tableStatistics.tableName = tableName;
         tableStatistics.rowCount = fieldInfoRepository.countDistinctColumnNamesByTableName(tableName);
         tableStatistics.columnCounts = fieldInfoRepository.countDistinctColumnIDByColumnId(tableName);
-        List<TableStructure> tableStructures = tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, "user1", tableName);
+        List<TableStructure> tableStructures = tableInfoRepository.findColumnNamesByUserAndDatabaseAndTablenameFromStructure(databaseName, userName, tableName);
         tableStatistics.rowNames = tableStructures.stream()
                 .map(ts -> new ColumnsDTO(ts.getColumnName(), ts.getColumnType()))
                 .toList();
