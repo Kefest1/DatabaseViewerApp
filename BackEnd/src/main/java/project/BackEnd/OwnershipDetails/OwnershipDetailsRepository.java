@@ -3,14 +3,7 @@ package project.BackEnd.OwnershipDetails;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import project.BackEnd.Table.TableInfo;
-import project.BackEnd.User.UserInfo;
-
-import java.util.List;
 
 @Repository
 public interface OwnershipDetailsRepository extends JpaRepository<OwnershipDetails, Long> {

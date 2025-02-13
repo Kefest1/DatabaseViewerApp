@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.ToString;
 import project.BackEnd.Table.TableInfo;
 
-import java.util.List;
 
 @Entity
 @Table(name = "field_info")

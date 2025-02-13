@@ -1,7 +1,6 @@
 package project.BackEnd.FieldInfo;
 
 import lombok.*;
-import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +49,7 @@ public class FieldInfoController {
     @GetMapping("/getColumnsForPlot/{databasename}/{tablename}/{columnname}")
     public List<String> getSingleColumnDataForPlot(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename, @PathVariable("columnname") String columnname) {
 
-        List<String> rows = fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
-        return rows;
+        return fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
     }
 
     @GetMapping("/getsmallestfreekey/{databasename}/{tablename}")
@@ -156,7 +154,7 @@ public class FieldInfoController {
     public String updateFieldInfo(@RequestBody List<UpdatePayload> updatePayloads) {
         try {
             for (UpdatePayload updatePayload : updatePayloads) {
-                Integer i = fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
+                fieldInfoRepository.updateFieldInfoByColumnIdAndColumnName(updatePayload.newDataValue, updatePayload.rowIndex, updatePayload.columnName);
             }
             return "Success";
         } catch (Exception e) {

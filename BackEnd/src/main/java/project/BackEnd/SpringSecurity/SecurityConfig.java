@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/api/userinfo/add", "/api/accesscontroller/debug").permitAll()
+                .requestMatchers("/api/auth/**", "/api/userinfo/add").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

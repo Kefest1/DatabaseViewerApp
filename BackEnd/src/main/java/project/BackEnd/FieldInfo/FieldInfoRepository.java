@@ -17,21 +17,6 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("SELECT DISTINCT fi.dataValue, fi.id FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db WHERE ti.tableName = :tableName AND fi.columnName = :columnName AND db.databaseName = :databaseName ORDER BY fi.id")
     List<String> getSingleRow(@Param("tableName") String tableName, @Param("columnName") String columnName, @Param("databaseName") String databaseName);
 
-    @Query("SELECT DISTINCT fi.dataValue FROM FieldInfo fi " +
-            "JOIN fi.tableInfo ti " +
-            "JOIN ti.databaseInfo db " +
-            "JOIN ti.tableStructure ts " +
-            "WHERE ti.tableName = :tableName " +
-            "AND fi.columnName = :columnName " +
-            "AND db.databaseName = :databaseName " +
-            "AND (ts.columnType = 'Long' OR ts.columnType = 'Numeric' OR ts.columnType = 'Integer')")
-    List<String> getSingleRowForNumeric(@Param("tableName") String tableName,
-                                        @Param("columnName") String columnName,
-                                        @Param("databaseName") String databaseName);
-
-    @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us WHERE us.username = :username AND db.databaseName = :databasename AND ti.tableName = :tablename")
-    List<FieldInfo> getFields(@Param("databasename") String databasename, @Param("username") String username, @Param("tablename") String tablename);
-
     @Query("SELECT fi FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo us " +
            "WHERE us.username = :username AND db.databaseName = :databaseName AND ti.tableName = :tableName AND fi.columnName = :columnName AND fi.dataValue = :dataValue")
     List<FieldInfo> getFieldsByColumnName(
@@ -56,8 +41,6 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
 
     @Query("SELECT MAX(fi.columnId) + 1 FROM FieldInfo fi")
     Long findMaxColumnID();
-
-    FieldInfo findByColumnNameAndTableInfo_TableNameAndDataValue(String columnName, String tableName, String dataValue);
 
     FieldInfo findDistinctFieldInfoByTableInfo_TableNameAndColumnNameAndTableInfo_DatabaseInfo_DatabaseNameAndColumnId(@Param("tableName") String tableName,
                                         @Param("columnName") String columnName,
@@ -86,10 +69,5 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("DELETE FROM FieldInfo f WHERE f.columnId = :columnId")
     @Transactional
     void deleteByColumnId(@Param("columnId") Long columnId);
-
-    @Modifying
-    @Query("DELETE FROM FieldInfo f WHERE f.columnId IN (:columnIds)")
-    @Transactional
-    void deleteByColumnIds(@Param("columnIds") List<Long> columnIds);
 
 }

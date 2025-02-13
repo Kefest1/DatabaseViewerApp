@@ -38,16 +38,16 @@ public class TableAccessController {
         return tableAccessQueue.popPosition(new TableAccessData(tableID, username, -1));
     }
 
-    @GetMapping("/debug")
-    public boolean debug() {
-        tableAccessQueue.log();
-        return true;
-    }
-
-    @GetMapping("/clear")
-    public boolean clear() {
-        tableAccessQueue.clear();
-        return true;
-    }
+//    @GetMapping("/debug")
+//    public boolean debug() {
+//        tableAccessQueue.log();
+//        return true;
+//    }
+//
+//    @GetMapping("/clear")
+//    public boolean clear() {
+//        tableAccessQueue.clear();
+//        return true;
+//    }
 
 }
