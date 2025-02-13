@@ -8,6 +8,7 @@ import project.BackEnd.FieldInfo.FieldInfo;
 import project.BackEnd.OwnershipDetails.OwnershipDetails;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -63,5 +64,10 @@ public class TableInfo {
 
     @Column(name = "created_at")
     private Timestamp createdAt;
+
+    @PrePersist
+    public void setDefaultCreatedAt() {
+        this.createdAt = new Timestamp(new Date().getTime());
+    }
 
 }

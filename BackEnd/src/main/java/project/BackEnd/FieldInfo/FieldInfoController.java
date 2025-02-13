@@ -88,7 +88,6 @@ public class FieldInfoController {
     @PostMapping("/insertvalues/{databasename}")
     public List<insertResultDTO>  insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
         List<insertResultDTO> insertResultDTOArrayList = new ArrayList<>();
-
         for (List<InsertPayload> fieldInfoList : fieldInfos) {
             Long locFieldID = Long.valueOf(fieldInfoList.get(0).getDataValue());
             List<InsertPayload> correct = fieldInfoList.subList(1, fieldInfoList.size());
