@@ -10,15 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 def generate_unique_email():
-    return f"delete_{random.randint(1000, 999999)}@example.com"
+    return f"delete_{random.randint(1000, 2 * 999999)}@example.com"
 
 
 def generate_unique_password():
-    return f"delete_{random.randint(1000, 999999)}"
+    return f"delete_{random.randint(1000, 2 * 999999)}"
 
 
 def generate_unique_code():
-    return f"{random.randint(1000, 999999)}"
+    return f"{random.randint(999999, 2 * 999999)}"
 
 
 def generate_random_tablename():
@@ -275,7 +275,7 @@ class DefiningNewDatabase(HttpUser ):
                         insertPayload = {
                             "columnName": f"delete_column{k + 1}",
                             "dataValue": f"delete_{generate_unique_code()}",
-                            "tableName": {table_name}
+                            "tableName": table_name
                         }
                         innerList.append(insertPayload)
 
@@ -288,8 +288,8 @@ class DefiningNewDatabase(HttpUser ):
                     name="/fieldinfo/insertvalues/"
                 )
 
-                # if response.status_code != 201:
-                #     print(f"Failed to add fields to table '{table_name}': {response.text}")
+                if response.status_code != 201:
+                    print(f"Failed to add fields to table '{table_name}': {response.text}")
 
                 rand = random.randint(0, 10)
                 if rand != 0:

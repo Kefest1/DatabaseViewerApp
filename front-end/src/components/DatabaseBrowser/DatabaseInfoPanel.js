@@ -3,11 +3,9 @@ import './DatabaseInfoPanel.css';
 import { getCookie } from "../getCookie";
 import Box from "@mui/material/Box";
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import {Button, IconButton, Snackbar, SnackbarContent, Stack, Typography} from "@mui/material";
-import {InfoIcon} from "lucide-react";
+import { Button, IconButton, Snackbar, SnackbarContent, Stack, Typography, CircularProgress } from "@mui/material";
+import { InfoIcon } from "lucide-react";
 import CloseIcon from "@mui/icons-material/Close";
-
-
 
 const organizeData = (data) => {
     const result = [];
@@ -37,9 +35,9 @@ const DatabaseInfoPanel = ({ handleChange }) => {
     const userName = getCookie("userName");
     const [tablesData, setTablesData] = useState([]);
     const [expandedItems, setExpandedItems] = React.useState([]);
-
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(true); // Loading state
 
     async function fetchAvailableDatabases(userName) {
         const token = localStorage.getItem("jwtToken");
@@ -53,7 +51,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
             }
         });
         if (!tables.ok) {
-            setMessage(true);
+            setMessage("Failed to fetch data");
             setOpenSnackbar(true);
             return [];
         }
@@ -89,6 +87,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
     };
 
     const fetchAndSetTablesData = () => {
+        setLoading(true); // Set loading to true when fetching starts
         fetchAvailableDatabases(userName)
             .then((data) => {
                 const organizedData = organizeData(data);
@@ -96,6 +95,11 @@ const DatabaseInfoPanel = ({ handleChange }) => {
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
+                setMessage("Error fetching data");
+                setOpenSnackbar(true);
+            })
+            .finally(() => {
+                setLoading(false); // Set loading to false when fetching is done
             });
     };
 
@@ -131,7 +135,18 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 </Button>
             </div>
 
-            {tablesData.length === 0 ? (
+            {loading ? ( // Show loading spinner if loading is true
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: 770,
+                    }}
+                >
+                    <CircularProgress />
+                </Box>
+            ) : tablesData.length === 0 ? ( // Show "No tables" message if no data
                 <h4 style={{
                     fontSize: '1.5rem',
                     color: '#333',
@@ -147,7 +162,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 }}>
                     No tables assigned to you
                 </h4>
-            ) : (
+            ) : ( // Show the actual content if data is available
                 <Box
                     sx={{
                         height: 770,

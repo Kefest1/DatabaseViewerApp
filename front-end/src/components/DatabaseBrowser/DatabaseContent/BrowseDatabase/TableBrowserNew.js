@@ -69,7 +69,7 @@ function prepareColumns(selectedColumns, primaryKey, tableStructure) {
 
 let newId = -1;
 
-function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData }) {
+function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedColumns, primaryKey, tableStructure, setData, setIsOcc }) {
     const [rows, setRows] = useState([]);
     const [rowModesModel, setRowModesModel] = useState({});
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
@@ -100,11 +100,13 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
             clearInterval(intervalId);
             const userName = getCookie("userName");
             if (testRef.current === 1) {
+                console.log("Pop position");
                 fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${userName}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
                     }
                 });
+                setIsOcc(false);
             }
             setData(() => ({
                 insert: [],
@@ -115,11 +117,14 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
+            console.log("Pop position");
+
             fetch(`http://localhost:8080/api/accesscontroller/popPosition/${databaseName}/${tableName}/${getCookie("userName")}`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
                 }
             });
+            setIsOcc(false);
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
@@ -261,6 +266,11 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     };
 
     const handleDeleteClick = (id) => () => {
+        if (id < 0) {
+            setRows(rows.filter((row) => row.id !== id));
+            setNewRows(newRows.filter((row) => row.id !== id));
+            return;
+        }
         if (deletedRows.includes(id)) {
             setDeletedRows(deletedRows.filter(rowId => rowId !== id));
             setSelectedRowsIndex(selectedRowsIndex.filter(rowId => rowId !== id));
@@ -357,14 +367,40 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
     const commitDeleteManyRows = () => {
         setLoading(true);
         const userName = getCookie("userName");
-        const selectedCount = selectedRowsIndex.length;
 
-        if (selectedCount === 0) {
+        if (selectedRowsIndex.length === 0) {
             setMessage("No rows selected!");
             setOpenSnackbar(true);
             setLoading(false);
             return;
         }
+
+        selectedRowsIndex.forEach(rowId => {
+            if (rowId < 0) {
+                setRows(rows.filter(row => row.id !== rowId));
+                setNewRows(newRows.filter(row => row.id !== rowId));
+            }
+        });
+        console.log(selectedRowsIndex);
+        const buffer = [];
+        selectedRowsIndex.forEach(rowId => {
+            if (rowId >= 0) {
+                buffer.push(rowId);
+            }
+        });
+        console.log(buffer);
+
+        setSelectedRowsIndex(buffer);
+
+        console.log(selectedRowsIndex);
+        if (buffer.length === 0) {
+            setMessage("Success");
+            setOpenSnackbar(true);
+            setLoading(false);
+            return;
+        }
+
+        const selectedCount = selectedRowsIndex.length;
 
         fetch(`http://localhost:8080/api/fieldinfo/deleteArray/${databaseName}/${tableName}/${primaryKey}/${userName}`, {
             method: 'DELETE',
@@ -396,15 +432,12 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                 QueryLogger.addLog(`Deleted from table ${tableName} ${res.length} rows`, logging_level.DELETE);
 
                 if (res.length === 0) {
-                    console.log("No rows were deleted");
                     setMessage("No rows were deleted");
                 }
                 else if (selectedCount === res.length) {
-                    console.log("All selected rows deleted successfully");
                     setMessage("All selected rows deleted successfully");
                 }
                 else if (selectedCount > res.length) {
-                    console.log("Some rows were not deleted");
                     setMessage("Some rows were not deleted");
                 }
 

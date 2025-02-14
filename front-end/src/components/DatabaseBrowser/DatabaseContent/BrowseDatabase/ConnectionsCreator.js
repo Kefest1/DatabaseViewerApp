@@ -136,7 +136,6 @@ async function fetchConnection(databaseName, selectedTableOne, selectedTableMany
 
         return data;
     } catch (error) {
-        console.log('Empty message:');
         return null;
     }
 }
@@ -205,6 +204,8 @@ function ConnectionsCreator() {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
 
+    const [buttonClicked, setButtonClicked] = useState(false);
+
     const handleCloseErrorSnackbar = () => {
         setOpenErrorSnackbar(false);
     };
@@ -237,6 +238,7 @@ function ConnectionsCreator() {
         };
         try {
             loadTables();
+            setButtonClicked(false);
         } catch (e) {
             setErrorMessage("Error loading tables.");
             setOpenErrorSnackbar(true);
@@ -249,7 +251,7 @@ function ConnectionsCreator() {
             const filtered = availableTables.filter(table => table !== selectedTableOne);
             setFilteredTables(filtered);
         }
-
+        setButtonClicked(false);
     }, [selectedTableOne]);
 
     useEffect(() => {
@@ -271,6 +273,10 @@ function ConnectionsCreator() {
             setNodes(newNodes);
         }
     }, [tableOneContent, tableManyContent]);
+
+    useEffect(() => {
+        setButtonClicked(false);
+    }, [selectedTableMany])
 
     useEffect(() => {
         setSelectedTableOne("");
@@ -314,6 +320,7 @@ function ConnectionsCreator() {
                         label="Select Database"
                         onChange={(event) => setSelectedDatabase(event.target.value)}
                         variant={"outlined"}
+                        style={{marginRight: '10px'}}
                     >
                         {availableDatabases.map((option, index) => (
                             <MenuItem key={index} value={option}>
@@ -330,6 +337,7 @@ function ConnectionsCreator() {
                             label="Select First Table"
                             onChange={(event) => setSelectedTableOne(event.target.value)}
                             variant={"outlined"}
+                            style={{marginRight: '10px'}}
                         >
                             {availableTables.map((option, index) => (
                                 <MenuItem key={index} value={option}>
@@ -347,6 +355,7 @@ function ConnectionsCreator() {
                             label="Select Second Table"
                             onChange={(event) => setSelectedTableMany(event.target.value)}
                             variant={"outlined"}
+                            style={{marginRight: '10px'}}
                         >
                             {filteredTables.map((option, index) => (
                                 <MenuItem key={index} value={option}>
@@ -356,6 +365,12 @@ function ConnectionsCreator() {
                         </Select>
                     )}
 
+                    {selectedDatabase && selectedTableOne && selectedTableMany && (
+                        <Button onClick={() => setButtonClicked(true)} className="button button-update" variant={"contained"}>
+                            Open connection menu
+                        </Button>
+                    )}
+
                     {
                         selectedDatabase !== "" &&
                         selectedTableOne !== "" &&
@@ -363,6 +378,7 @@ function ConnectionsCreator() {
                         isEdgesSet === true &&
                         tableManyContent.length > 0 &&
                         tableOneContent.length > 0 &&
+                        buttonClicked !== false &&
                         nodes.length > 0 && (
                             <ReactFlowProvider>
                                 <LayoutFlow
@@ -478,14 +494,10 @@ const LayoutFlow = ({ selectedDatabase,
     useEffect(() => {
 
         const isValid = validateEdges(edges, nodes);
-        console.log(isValid);
-        console.log(nodes);
         if (isValid !== true) {
             swapNodes(nodes, setNodes);
         }
         setIsReady(true);
-
-        console.log(nodes);
     }, []);
 
     function validateEdges(edges, nodes) {
@@ -565,9 +577,12 @@ const LayoutFlow = ({ selectedDatabase,
                     },
                 });
 
+
+
                 if (response.ok) {
                     const message = await response.text();
-                    console.log("Success:", message);
+                    setMessage("Successfully deleted a connection")
+                    setOpenSnackbar(true);
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -583,12 +598,12 @@ const LayoutFlow = ({ selectedDatabase,
         let primaryKeyTable;
 
         if ((edges[0].sourceHandle === sourceNode.data.schema[0]['title']) && (edges[0].targetHandle === targetNode.data.schema[0]['title'])) {
-            console.log("Only one table with primary key");
+            setErrorMessage("Only one table with primary key");
+            setOpenErrorSnackbar(true);
             return;
         }
 
         if (edges[0].sourceHandle === sourceNode.data.schema[0]['title']) {
-            console.log(sourceNode.data['label'] + " is a primary key");
 
             payload["manyTableName"] = targetNode.data['label'];
             payload["manyColumnName"] = edges[0].targetHandle;
@@ -597,7 +612,6 @@ const LayoutFlow = ({ selectedDatabase,
             payload["oneColumnName"] = edges[0].sourceHandle;
         }
         else if (edges[0].targetHandle === targetNode.data.schema[0]['title']) {
-            console.log(targetNode.data['label'] + " is a primary key");
             payload["manyTableName"] = sourceNode.data['label'];
             payload["manyColumnName"] = edges[0].sourceHandle;
 
@@ -605,7 +619,8 @@ const LayoutFlow = ({ selectedDatabase,
             payload["oneColumnName"] = edges[0].targetHandle;
         }
         else {
-            console.log("No primary key is not a primary key");
+            setErrorMessage("Select one table with primary key");
+            setOpenErrorSnackbar(true);
             return;
         }
 
@@ -623,7 +638,8 @@ const LayoutFlow = ({ selectedDatabase,
 
                 if (response.ok) {
                     const message = await response.text();
-                    console.log("Success:", message);
+                    setMessage("Successfully added a connection")
+                    setOpenSnackbar(true);
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -648,7 +664,8 @@ const LayoutFlow = ({ selectedDatabase,
 
                 if (response.ok) {
                     const message = await response.text();
-                    console.log("Success:", message);
+                    setMessage("Successfully updated a connection")
+                    setOpenSnackbar(true);
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -658,7 +675,6 @@ const LayoutFlow = ({ selectedDatabase,
             }
 
         }
-        console.log(payload);
     }
 
     const handleEdgeClick = (event, edge) => {
@@ -667,7 +683,7 @@ const LayoutFlow = ({ selectedDatabase,
 
 
     return (
-        <div style={{ width: '100%', height: '95%' }}>
+        <div style={{ width: '100%', height: '93%' }}>
             {isReady === true && (
             <ReactFlow
                 nodes={nodes}

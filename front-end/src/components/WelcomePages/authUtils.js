@@ -17,7 +17,8 @@ export const checkCookieAndRedirect = () => {
 
     const userName = getCookie("isExp");
     const expirationTimestamp = getCookie("isExpTimestamp");
-    if (!userName || (expirationTimestamp && Date.now() > parseInt(expirationTimestamp))) {
+
+    if (!userName || (expirationTimestamp && (Date.now() > parseInt(expirationTimestamp)))) {
         document.cookie = "userName=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "isAdmin=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = "isExp=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";

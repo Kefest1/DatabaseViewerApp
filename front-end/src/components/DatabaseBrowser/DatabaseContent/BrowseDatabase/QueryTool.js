@@ -117,8 +117,9 @@ async function runQuery(database, table, columns, setErrorMessage, setOpenSnackb
             body: JSON.stringify(requestBody)
         });
 
-        QueryLogger.addLog(`Selecting from table ${table} from database ${database}`, logging_level.SELECT);
         const fetchTime = performance.now() - startTime;
+        
+        QueryLogger.addLog(`Selecting from table ${table} from database ${database}`, logging_level.SELECT);
 
         if (!response.ok) {
             setErrorMessage("Failed to fetch from table!");
@@ -153,6 +154,9 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
+    const [openInfoSnackbar, setOpenInfoSnackbar] = useState(false);
+    const [infoMessage, setInfoMessage] = useState("");
+
     const [isAwaiting, setIsAwaiting] = useState(false);
     const [position, setPosition] = useState(1);
 
@@ -160,6 +164,10 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+    };
+
+    const handleCloseInfoSnackbar = () => {
+        setOpenInfoSnackbar(false);
     };
 
     function handleSelectOne(event) {
@@ -174,6 +182,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                 }
             });
             setIsAwaiting(false);
+            setIsOcc(false);
         }
     }, [selectedDatabase, selectedTable])
 
@@ -186,7 +195,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
     }
 
     function getTableTakenStatus(selectedDatabase, selectedTable) {
-        return fetch(`http://localhost:8080/api/accesscontroller/addAndCheck/${selectedDatabase}/${selectedTable}/${userName}`, {
+        return fetch(`http://localhost:8080/api/accesscontroller/addAndCheck/${selectedDatabase}/${selectedTable}/${getCookie("userName")}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
             }
@@ -240,6 +249,8 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                             setQueryResult(result);
                             setIsButtonPressed(true);
                             setIsAwaiting(false);
+                            setInfoMessage(`Fetched ${result.result.length} rows from the table in ${result.fetchTime.toFixed(2)} ms!`);
+                            setOpenInfoSnackbar(true);
                         })
                         .catch(error => {
                             setErrorMessage("Failed to fetch data from the table!");
@@ -456,6 +467,8 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                                         setQueryResult(result);
                                                         setIsButtonPressed(true);
                                                         setIsAwaiting(false);
+                                                        setInfoMessage(`Fetched ${result.result.length} rows from the table in ${result.fetchTime.toFixed(2)} ms!`);
+                                                        setOpenInfoSnackbar(true);
                                                     })
                                                     .catch(error => {
                                                         console.error(error);
@@ -472,7 +485,7 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                         </Grid2>
                     </Grid2>
                 )}
-                {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && "result" in queryResult && occ && (
+                {isButtonPressed && selectedTable && selectedColumns.length > 0 && tableStructure.length > 0 && "result" in queryResult && occ && !isAwaiting && (
 
                         <Grid2 style={{marginTop: '16px'}}>
                             <TableBrowserNew
@@ -484,12 +497,13 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                                 primaryKey={primaryKeyName}
                                 tableStructure={tableStructure}
                                 setData={setData}
+                                setIsOcc={setIsOcc}
                             />
                         </Grid2>
                 )}
 
                 {isAwaiting === true && (
-                    <div className="status-container">
+                    <div className="status-container" style={{marginLeft: '2px'}}>
                         <div className="loading-spinner"></div>
                         <h3 className="status-message">Table {selectedTable} is currently occupied, please wait</h3>
                         {position === '0' ? (
@@ -521,6 +535,32 @@ const QueryTool = ({setData, setOccupiedTableInfo}) => {
                             aria-label="close"
                             color="inherit"
                             onClick={handleCloseSnackbar}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
+            </Snackbar>
+
+            <Snackbar
+                open={openInfoSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseInfoSnackbar}
+            >
+                <SnackbarContent
+                    style={{backgroundColor: '#4561d3'}}
+                    message={
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                            <ErrorIcon style={{ marginRight: 8 }} />
+                            {infoMessage}
+                        </span>
+                    }
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            onClick={handleCloseInfoSnackbar}
                         >
                             <CloseIcon />
                         </IconButton>,

@@ -83,21 +83,20 @@ function LoginPage() {
                 setOpenSnackbarOk(true);
 
                 const expirationTime = new Date();
-                expirationTime.setTime(expirationTime.getTime() + 60 * 180 * 1100);
+                expirationTime.setTime(Date.now() + 60 * 60 * 1000);
 
                 const expirationTimeInfo = new Date();
-                expirationTimeInfo.setTime(Date.now() + 60 * 180 * 1000);
+                expirationTimeInfo.setTime(Date.now() + 60 * 55 * 1000);
 
                 document.cookie = `userName=${username}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
                 document.cookie = `isAdmin=${isAdmin}; expires=${expirationTime.toUTCString()}; secure; samesite=strict`;
+
                 document.cookie = `isExp=true; expires=${expirationTimeInfo.toUTCString()}; secure; samesite=strict`;
                 document.cookie = `isExpTimestamp=${expirationTimeInfo.getTime()}; expires=${expirationTimeInfo.toUTCString()}; secure; samesite=strict`;
-                console.log("token");
 
                 window.location.href = 'http://localhost:3000';
             } else {
-                console.log("Invalid user or password");
-                setMessage("User  not found");
+                setMessage("User not found");
                 setOpenSnackbar(true);
                 setPassword("");
             }
