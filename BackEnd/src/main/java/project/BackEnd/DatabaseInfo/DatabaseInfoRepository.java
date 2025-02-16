@@ -43,4 +43,8 @@ public interface DatabaseInfoRepository extends JpaRepository<DatabaseInfo, Long
 
     @Query("SELECT DISTINCT db FROM DatabaseInfo db JOIN db.tables ti JOIN ti.ownershipDetails od JOIN od.userInfo ui WHERE db.databaseName = :databaseName")
     List<DatabaseInfo> getDistinctDatabaseInfoByDatabaseName(String databaseName);
+
+    @Query("SELECT DISTINCT COUNT(db) FROM DatabaseInfo db JOIN db.tables ti JOIN ti.ownershipDetails od JOIN od.userInfo ui JOIN ti.fields " +
+            "WHERE db.databaseName = :databaseName AND ui.username = :userName")
+    Long getFieldInfoCount(String databaseName, String userName);
 }

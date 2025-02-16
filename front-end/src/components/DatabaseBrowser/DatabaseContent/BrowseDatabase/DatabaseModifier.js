@@ -45,18 +45,107 @@ async function fetchDatabaseStructure(selectedDatabase) {
 
 let iter = -1;
 
-function DatabaseModifier({setMessage, setOpenSnackbar}) {
-
+function DatabaseModifier({ setMessage, setOpenSnackbar }) {
     const [selectedDatabase, setSelectedDatabase] = useState("");
     const [availableDatabases, setAvailableDatabases] = useState([]);
-
     const [rowModesModel, setRowModesModel] = useState({});
-
     const [databaseStructure, setDatabaseStructure] = useState([]);
     const [updatedRows, setUpdatedRows] = useState([]);
     const [selectedRowsIndex, setSelectedRowsIndex] = useState([]);
-
     const [rows, setRows] = useState([]);
+    const [isDatabaseEmpty, setIsDatabaseEmpty] = useState(false);
+
+    useEffect(() => {
+        const loadDatabases = async () => {
+            const availableDBs = await fetchAvailableDatabases();
+            setAvailableDatabases(availableDBs);
+        };
+        loadDatabases();
+    }, []);
+
+    useEffect(() => {
+        const loadDatabaseStructure = async () => {
+            if (selectedDatabase !== "") {
+                const dbStructure = await fetchDatabaseStructure(selectedDatabase);
+                const transformedArray = dbStructure.map(item => item.split(','));
+                setDatabaseStructure(transformedArray);
+
+                const finalRows = transformedArray.map((triplet, index) => ({
+                    id: triplet[0],
+                    tableName: triplet[1],
+                    primaryKey: triplet[2],
+                    isEditable: true,
+                }));
+                setRows(finalRows);
+
+                const isEmpty = await checkDatabaseEmpty(selectedDatabase);
+                setIsDatabaseEmpty(isEmpty);
+            }
+        };
+        loadDatabaseStructure();
+    }, [selectedDatabase]);
+
+    const checkDatabaseEmpty = async (databaseName) => {
+        const userName = getCookie("userName");
+        const token = localStorage.getItem("jwtToken");
+        const response = await fetch(
+            `http://localhost:8080/api/databaseinfo/getDatabaseIsEmpty/${userName}/${databaseName}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            }
+        );
+        const data = await response.json();
+        return data;
+    };
+
+
+    const getActions = ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+            return [
+                <GridActionsCellItem
+                    icon={<SaveIcon />}
+                    label="Save"
+                    sx={{ color: 'primary.main' }}
+                    onClick={handleSaveClick(id)}
+                />,
+                <GridActionsCellItem
+                    icon={<CancelIcon />}
+                    label="Cancel"
+                    className="textPrimary"
+                    onClick={handleCancelClick(id)}
+                    color="inherit"
+                />,
+            ];
+        }
+
+        const actions = [
+            <GridActionsCellItem
+                icon={<EditIcon />}
+                label="Edit"
+                className="textPrimary"
+                onClick={handleEditClick(id)}
+                color="inherit"
+            />,
+        ];
+
+        if (isDatabaseEmpty) {
+            actions.push(
+                <GridActionsCellItem
+                    icon={<DeleteIcon />}
+                    label="Delete"
+                    onClick={handleDeleteClick(id)}
+                    color="inherit"
+                />
+            );
+        }
+
+        return actions;
+    };
+
     const columns = [
         {
             field: 'tableName',
@@ -76,47 +165,9 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
             headerName: 'Actions',
             width: 100,
             cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-                if (isInEditMode) {
-                    return [
-                        <GridActionsCellItem
-                            icon={<SaveIcon />}
-                            label="Save"
-                            sx={{
-                                color: 'primary.main',
-                            }}
-                            onClick={handleSaveClick(id)}
-                        />,
-                        <GridActionsCellItem
-                            icon={<CancelIcon />}
-                            label="Cancel"
-                            className="textPrimary"
-                            onClick={handleCancelClick(id)}
-                            color="inherit"
-                        />,
-                    ];
-                }
-
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        className="textPrimary"
-                        onClick={handleEditClick(id)}
-                        color="inherit"
-                    />,
-                    <GridActionsCellItem
-                        icon={<DeleteIcon />}
-                        label="Delete"
-                        onClick={handleDeleteClick(id)}
-                        color="inherit"
-                    />,
-                ];
-            },
+            getActions: getActions,
         },
-    ]
+    ];
 
     useEffect(() => {
         const loadDatabases = async () => {
@@ -159,7 +210,7 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
     }, [selectedDatabase]);
 
     function EditToolbar(props) {
-        const { setRows, setRowModesModel } = props;
+        const { setRows, setRowModesModel, isDatabaseEmpty } = props;
 
         const handleClick = () => {
             const id = iter;
@@ -284,9 +335,11 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
                 <Button color="primary"  onClick={commitChanges}>
                     Commit changes
                 </Button>
-                <Button color="primary"  onClick={handleDelete}>
-                    Commit delete
-                </Button>
+                {isDatabaseEmpty && (
+                    <Button color="primary" onClick={handleDelete}>
+                        Commit delete
+                    </Button>
+                )}
             </GridToolbarContainer>
         );
     }
@@ -402,28 +455,33 @@ function DatabaseModifier({setMessage, setOpenSnackbar}) {
             </FormControl>
 
             {
-                selectedDatabase !== "" &&
-                (
-                    <DataGrid
-                        columns={columns}
-                        rows={rows}
-                        editMode="row"
-                        isCellEditable={(params) => true}
-                        rowModesModel={rowModesModel}
-                        onRowModesModelChange={handleRowModesModelChange}
-                        onRowEditStop={handleRowEditStop}
-                        processRowUpdate={processRowUpdate}
-                        checkboxSelection
-                        onRowSelectionModelChange={(newRowSelectionModel) => {
-                            setSelectedRowsIndex(newRowSelectionModel);
-                        }}
-                        slots={{ toolbar: EditToolbar }}
-                        slotProps={{
-                            toolbar: { setRows, setRowModesModel },
-                        }}
-                    />
+                selectedDatabase !== "" && (
+                    <>
+                        {!isDatabaseEmpty && (
+                            <div className="alert alert-warning">
+                                <strong>Action Not Allowed:</strong> Cannot delete tables in a non-empty database.
+                            </div>
+                        )}
+                        <DataGrid
+                            columns={columns}
+                            rows={rows}
+                            editMode="row"
+                            isCellEditable={(params) => true}
+                            rowModesModel={rowModesModel}
+                            onRowModesModelChange={handleRowModesModelChange}
+                            onRowEditStop={handleRowEditStop}
+                            processRowUpdate={processRowUpdate}
+                            checkboxSelection
+                            onRowSelectionModelChange={(newRowSelectionModel) => {
+                                setSelectedRowsIndex(newRowSelectionModel);
+                            }}
+                            slots={{ toolbar: EditToolbar }}
+                            slotProps={{
+                                toolbar: { setRows, setRowModesModel, isDatabaseEmpty },
+                            }}
+                        />
+                    </>
                 )
-
             }
         </div>
     )

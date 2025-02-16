@@ -51,6 +51,12 @@ public class DatabaseInfoController {
         return databaseInfoRepository.findAllUsersTableAndColumnNames(username);
     }
 
+    @GetMapping("/getDatabaseIsEmpty/{username}/{databaseName}")
+    public ResponseEntity<Boolean> getIsDatabaseEmpty(@PathVariable String username, @PathVariable String databaseName) {
+        Boolean isEmpty = databaseInfoRepository.getFieldInfoCount(databaseName, username) == 0L;
+        return ResponseEntity.status(HttpStatus.OK).body(isEmpty);
+    }
+
     @GetMapping("/getAvailableDatabaseNames/{userName}")
     public List<String> getAvailableDatabases(@PathVariable("userName") String userName) {
         return databaseInfoRepository.findDatabaseNamesByUsername(userName);

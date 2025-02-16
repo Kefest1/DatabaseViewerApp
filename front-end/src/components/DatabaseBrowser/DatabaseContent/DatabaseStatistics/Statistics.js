@@ -56,6 +56,10 @@ const Statistics = () => {
     const [errorMessage, setErrorMessage] = useState("");
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState("");
 
+    const [showPlot, setShowPlot] = useState(false);
+
+    const [isReady, setIsReady] = useState(false);
+
     const handleCloseErrorSnackbar = () => {
         setOpenErrorSnackbar(false);
     };
@@ -130,16 +134,22 @@ const Statistics = () => {
     }
 
     useEffect(() => {
+        setShowPlot(false);
         if (selectedColumn1) {
             GetXPlot();
         }
     }, [selectedColumn1]);
 
     useEffect(() => {
+        setShowPlot(false);
         if (selectedColumn2) {
             GetYPlot();
         }
     }, [selectedColumn2]);
+
+    useEffect(() => {
+        setShowPlot(false);
+    }, [databases]);
 
     useEffect(() => {
         GetDatabases().then(() => {
@@ -196,6 +206,9 @@ const Statistics = () => {
             setOpenErrorSnackbar(true);
             setDatabases([]);
             setDescription("");
+        }
+        finally {
+            setIsReady(true);
         }
     }
 
@@ -302,7 +315,7 @@ const Statistics = () => {
                         </Grid2>
                     </Grid2>
 
-                    {selectedDatabase && (
+                    {selectedDatabase && isReady && (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -437,11 +450,14 @@ const Statistics = () => {
                                                     </MenuItem>
                                                 ))}
                                         </Select>
+                                        <Button onClick={() => setShowPlot(true)}>
+                                            Generate Plot
+                                        </Button>
                                     </Box>
 
-                                    {selectedColumn1 && selectedColumn2 && (
+                                    {selectedColumn1 && selectedColumn2 && showPlot && (
                                         <Box sx={{ marginTop: 1 }}>
-                                           < MyPlot
+                                           <MyPlot
                                                 xPlot={xPlot}
                                                 yPlot={yPlot}
                                                 xPlotName={selectedColumn1}

@@ -122,7 +122,7 @@ function DataGridTable({ databaseName, selectedTable }) {
                     Add record
                 </Button>
                 <Button color="primary" startIcon={<AddIcon />} onClick={handleCommit}>
-                    Debug?
+                    Commit Changes
                 </Button>
             </GridToolbarContainer>
         );

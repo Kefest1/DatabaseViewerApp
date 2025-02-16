@@ -42,6 +42,7 @@ const DatabaseContent = () => {
         "userName": ""
     });
     const [canSwitchFromAdmin, setCanSwitchFromAdmin] = useState(true);
+    const [canSwitchFromConnectionCreator, setCanSwitchFromConnectionCreator] = useState(true);
 
     const handleButtonClick = (buttonIndex) => {
         if (buttonIndex === activeButton) {
@@ -52,12 +53,19 @@ const DatabaseContent = () => {
                 setPendingButtonIndex(buttonIndex);
                 setOpenDialog(true);
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
-                console.log(dataQueryTool);
                 return;
             }
         }
         if (activeButton === 5) {
             if (canSwitchFromAdmin === false) {
+                setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
+                setPendingButtonIndex(buttonIndex);
+                setOpenDialog(true);
+                return;
+            }
+        }
+        if (activeButton === 9) {
+            if (canSwitchFromConnectionCreator === false) {
                 setMessageDialog("You have unsaved changes. Are you sure you want to leave this page?");
                 setPendingButtonIndex(buttonIndex);
                 setOpenDialog(true);
@@ -98,7 +106,7 @@ const DatabaseContent = () => {
             case 8:
                 return <DatabaseScheme />;
             case 9:
-                return <ConnectionsCreator />;
+                return <ConnectionsCreator setCanSwitchFromConnectionCreator={setCanSwitchFromConnectionCreator}/>;
             default:
                 return null;
         }

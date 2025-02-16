@@ -175,7 +175,7 @@ function prepareNodes(tableOne, tableMany, tableNameOne, tableNameMany) {
     return nodes;
 }
 
-function ConnectionsCreator() {
+function ConnectionsCreator({setCanSwitchFromConnectionCreator}) {
     const userName = getCookie("userName");
 
     const [availableDatabases, setAvailableDatabases] = useState([]);
@@ -392,6 +392,7 @@ function ConnectionsCreator() {
                                     setMessage={setMessage}
                                     setErrorMessage={setErrorMessage}
                                     setOpenErrorSnackbar={setOpenErrorSnackbar}
+                                    setCanSwitchFromConnectionCreator={setCanSwitchFromConnectionCreator}
                                 />
                             </ReactFlowProvider>
                         )
@@ -463,7 +464,8 @@ const LayoutFlow = ({ selectedDatabase,
                       setMessage,
                       setOpenSnackbar,
                       setErrorMessage,
-                      setOpenErrorSnackbar }) => {
+                      setOpenErrorSnackbar,
+                      setCanSwitchFromConnectionCreator}) => {
 
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -554,6 +556,7 @@ const LayoutFlow = ({ selectedDatabase,
                 setEdges([]);
 
                 setEdges((eds) => addEdge(params, eds));
+                setCanSwitchFromConnectionCreator(false);
             }
         }
 
@@ -563,7 +566,7 @@ const LayoutFlow = ({ selectedDatabase,
 
     }
 
-    async function addEdges() {
+    async function addEdges(setCanSwitchFromConnectionCreator) {
         let payload = {};
 
         if (edges.length === 0) {
@@ -577,12 +580,12 @@ const LayoutFlow = ({ selectedDatabase,
                     },
                 });
 
-
-
                 if (response.ok) {
                     const message = await response.text();
                     setMessage("Successfully deleted a connection")
                     setOpenSnackbar(true);
+                    setCanSwitchFromConnectionCreator(true);
+                    console.log("7777");
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -640,6 +643,7 @@ const LayoutFlow = ({ selectedDatabase,
                     const message = await response.text();
                     setMessage("Successfully added a connection")
                     setOpenSnackbar(true);
+                    setCanSwitchFromConnectionCreator(true);
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -666,6 +670,8 @@ const LayoutFlow = ({ selectedDatabase,
                     const message = await response.text();
                     setMessage("Successfully updated a connection")
                     setOpenSnackbar(true);
+                    setCanSwitchFromConnectionCreator(true);
+
                 } else {
                     const errorMessage = await response.text();
                     console.error("Error:", errorMessage);
@@ -680,7 +686,6 @@ const LayoutFlow = ({ selectedDatabase,
     const handleEdgeClick = (event, edge) => {
         setEdges([]);
     };
-
 
     return (
         <div style={{ width: '100%', height: '93%' }}>
@@ -698,7 +703,7 @@ const LayoutFlow = ({ selectedDatabase,
             >
                 <Panel position="top-left">
                     <h4 style={{marginBottom: '10px'}}>Selected database: {selectedDatabase}</h4>
-                    <Button onClick={addEdges} variant={"contained"} color={"primary"}>
+                    <Button onClick={() => addEdges(setCanSwitchFromConnectionCreator)} variant={"contained"} color={"primary"}>
                         Commit changes
                     </Button>
                 </Panel>
