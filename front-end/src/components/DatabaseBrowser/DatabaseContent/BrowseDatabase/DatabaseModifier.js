@@ -195,7 +195,7 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
                     node["tableName"] = triplet[1];
                     node["primaryKey"] = triplet[2];
 
-                    node["isEditable"] = true;
+                    node["isEditable"] = false;
 
                     iter += 1
 
@@ -216,7 +216,7 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
             const id = iter;
             iter--;
             setRows((oldRows) => [
-                { id, tableName: '', primaryKey: '', isNew: true, isEditable: 'true' },
+                { id, tableName: '', primaryKey: '', isNew: true, isEditable: true },
                 ...oldRows,
             ]);
             setRowModesModel((oldModel) => ({
@@ -253,9 +253,6 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
         };
 
         const commitChanges = () => {
-            console.log(rows);
-            console.log(updatedRows);
-
             let negative = []
             let positive = []
 
@@ -289,7 +286,11 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
                     },
                     body: JSON.stringify(payload)
                 })
-                    .then(response => response.text())
+                    .then(response => {
+                        setMessage("Changes updated successfully");
+                        setOpenSnackbar(true);
+                        response.text();
+                    })
                     .catch(error => console.error('Error:', error));
             });
 
@@ -320,6 +321,8 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
                     })
                     .then(data => {
                         console.log('Success:', data);
+                        setMessage("Changes updated successfully");
+                        setOpenSnackbar(true);
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -327,19 +330,26 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
             })
         };
 
+        function debugMy() {
+            console.log(rows);
+        }
+
         return (
             <GridToolbarContainer>
-                <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-                    Add record
-                </Button>
-                <Button color="primary"  onClick={commitChanges}>
+                {/*<Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>*/}
+                {/*    Add record*/}
+                {/*</Button>*/}
+                <Button onClick={commitChanges} variant={"outlined"} style={{ backgroundColor: '#2373cc', color: 'white', width: '200px', height: '35px' }}>
                     Commit changes
                 </Button>
                 {isDatabaseEmpty && (
-                    <Button color="primary" onClick={handleDelete}>
+                    <Button color="primary" onClick={handleDelete} variant={"outlined"} style={{ backgroundColor: '#9508d3', color: 'white', width: '200px', height: '35px' }}>
                         Commit delete
                     </Button>
                 )}
+                {/*<Button color="primary"  onClick={debugMy}>*/}
+                {/*    Debug*/}
+                {/*</Button>*/}
             </GridToolbarContainer>
         );
     }
@@ -418,10 +428,9 @@ function DatabaseModifier({ setMessage, setOpenSnackbar }) {
     }
 
     const processRowUpdate = (newRow, oldRow) => {
-        console.log(oldRow);
-        const updatedRow = {...newRow, isNew: false, oldTableName: oldRow["tableName"]};
+        const updatedRow = { ...newRow, isNew: false, oldTableName: oldRow["tableName"] };
         if (!compareObject(oldRow, newRow)) {
-            setUpdatedRows([...updatedRows, updatedRow])
+            setUpdatedRows([...updatedRows, updatedRow]);
             setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
         }
 
