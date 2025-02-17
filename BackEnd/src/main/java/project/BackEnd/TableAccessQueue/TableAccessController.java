@@ -1,3 +1,10 @@
+/**
+ * This class implements a Rest API controller for queue.
+ * This class' purpose is to make a table used only by one user.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableAccessQueue;
 
 

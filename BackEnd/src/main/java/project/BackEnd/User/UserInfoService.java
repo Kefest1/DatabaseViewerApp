@@ -1,3 +1,9 @@
+/**
+ * This interface creates a service for users.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 import org.apache.catalina.User;

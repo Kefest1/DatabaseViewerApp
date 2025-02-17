@@ -1,3 +1,9 @@
+/**
+ * This class creates a payload for a queue.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableAccessQueue;
 
 import lombok.*;

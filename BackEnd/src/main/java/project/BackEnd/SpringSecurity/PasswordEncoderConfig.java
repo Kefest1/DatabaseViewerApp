@@ -1,3 +1,9 @@
+/**
+ * This class implements a method for encoding a password.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import org.springframework.context.annotation.Bean;

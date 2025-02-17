@@ -1,3 +1,9 @@
+/**
+ * This class defines a ownership details service interface.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.OwnershipDetails;
 
 import project.BackEnd.Table.TableInfo;

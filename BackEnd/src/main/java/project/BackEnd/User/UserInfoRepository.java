@@ -1,3 +1,9 @@
+/**
+ * This class creates a repository for users.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;

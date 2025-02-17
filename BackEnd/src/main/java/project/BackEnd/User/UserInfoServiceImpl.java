@@ -1,3 +1,9 @@
+/**
+ * This class implements a service for users.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 import org.springframework.beans.factory.annotation.Autowired;

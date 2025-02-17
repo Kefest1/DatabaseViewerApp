@@ -1,3 +1,9 @@
+/**
+ * This class defines a start point for application.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd;
 
 import org.springframework.boot.SpringApplication;

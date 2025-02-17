@@ -1,3 +1,9 @@
+/**
+ * This class creates a controller for table connection information.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableConnections;
 
 import lombok.*;

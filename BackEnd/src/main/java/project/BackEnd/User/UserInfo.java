@@ -1,3 +1,9 @@
+/**
+ * This class creates a table that contains users' information.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 

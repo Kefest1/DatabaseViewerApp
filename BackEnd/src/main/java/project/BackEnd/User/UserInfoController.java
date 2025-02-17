@@ -1,3 +1,9 @@
+/**
+ * This class creates a Rest API controller for users.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 

@@ -1,3 +1,9 @@
+/**
+ * This class defines security measures.
+ * It allows only specific type of operation and headers to be passed to application from a known origin
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import org.springframework.context.annotation.Bean;
@@ -37,7 +43,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/api/userinfo/add", "/api/databaseinfo/getDatabaseIsEmpty/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/userinfo/add").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

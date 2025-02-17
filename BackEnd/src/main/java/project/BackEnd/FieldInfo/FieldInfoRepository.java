@@ -1,3 +1,9 @@
+/**
+ * This class defines a Rest API field repository.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.FieldInfo;
 
 import org.springframework.transaction.annotation.Transactional;

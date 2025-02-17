@@ -1,3 +1,9 @@
+/**
+ * This class defines a instruction for generating a token.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import io.jsonwebtoken.Claims;

@@ -1,3 +1,9 @@
+/**
+ * This class defines a field update DTO payload.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.FieldInfo;
 
 import lombok.*;

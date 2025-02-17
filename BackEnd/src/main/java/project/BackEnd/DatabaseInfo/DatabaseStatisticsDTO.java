@@ -1,3 +1,9 @@
+/**
+ * This class defines a database information DTO(data transfer object).
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.DatabaseInfo;
 
 import lombok.Getter;

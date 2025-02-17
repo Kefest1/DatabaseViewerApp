@@ -1,3 +1,9 @@
+/**
+ * This class defines a ownership details between users and their tables.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.OwnershipDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,3 +1,9 @@
+/**
+ * This class implements a repository for table structure.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.Table;
 
 import org.springframework.data.jpa.repository.JpaRepository;

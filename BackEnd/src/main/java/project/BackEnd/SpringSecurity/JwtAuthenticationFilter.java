@@ -1,3 +1,9 @@
+/**
+ * This class defines a filter for authentication requests.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

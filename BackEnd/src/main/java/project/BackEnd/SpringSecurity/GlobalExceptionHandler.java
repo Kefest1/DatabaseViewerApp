@@ -1,3 +1,9 @@
+/**
+ * This class defines a method that will be used for handling error, such as JTW expiration.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import io.jsonwebtoken.ExpiredJwtException;

@@ -1,3 +1,9 @@
+/**
+ * This class defines a ownership details Rest API controller.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.OwnershipDetails;
 
 import org.springframework.beans.factory.annotation.Autowired;

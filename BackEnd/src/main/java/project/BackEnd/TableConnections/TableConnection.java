@@ -1,3 +1,9 @@
+/**
+ * This class creates a table that holds connections between tables.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableConnections;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

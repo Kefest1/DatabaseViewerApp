@@ -1,3 +1,9 @@
+/**
+ * This class creates a set of methods for a queue, including those that are used for debugging purposes.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableAccessQueue;
 
 import java.util.*;

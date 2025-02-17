@@ -1,3 +1,9 @@
+/**
+ * This class created a DTO payload for user.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.User;
 
 import lombok.*;

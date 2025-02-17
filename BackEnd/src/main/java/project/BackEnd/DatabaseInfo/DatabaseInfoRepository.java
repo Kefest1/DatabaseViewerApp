@@ -1,3 +1,9 @@
+/**
+ * This class created a database information repository.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.DatabaseInfo;
 
 import org.springframework.data.jpa.repository.JpaRepository;

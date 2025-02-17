@@ -1,3 +1,9 @@
+/**
+ * This class implements a field information service.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.FieldInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,3 +1,9 @@
+/**
+ * This class defines a service interface for table information.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.Table;
 
 import java.util.List;

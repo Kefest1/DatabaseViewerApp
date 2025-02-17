@@ -1,3 +1,9 @@
+/**
+ * This class creates an endpoint to authorise user.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import org.springframework.security.authentication.AuthenticationManager;

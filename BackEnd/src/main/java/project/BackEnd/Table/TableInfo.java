@@ -1,3 +1,9 @@
+/**
+ * This class defines a table in a database.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -1,3 +1,9 @@
+/**
+ * This class creates a payload for user's authentication.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.SpringSecurity;
 
 import lombok.*;

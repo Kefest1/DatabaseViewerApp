@@ -1,3 +1,9 @@
+/**
+ * This class implements a service for table informations.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.Table;
 
 import org.springframework.beans.factory.annotation.Autowired;

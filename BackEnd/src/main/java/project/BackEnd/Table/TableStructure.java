@@ -1,3 +1,9 @@
+/**
+ * This class implements a table that holds table structure.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

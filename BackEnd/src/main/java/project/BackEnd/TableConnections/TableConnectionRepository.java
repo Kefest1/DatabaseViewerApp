@@ -1,3 +1,9 @@
+/**
+ * This class creates a repository for table connections.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.TableConnections;
 
 import org.springframework.data.jpa.repository.JpaRepository;

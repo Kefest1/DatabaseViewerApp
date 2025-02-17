@@ -1,3 +1,9 @@
+/**
+ * This class created a database information table.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.DatabaseInfo;
 import jakarta.persistence.*;
 import lombok.*;

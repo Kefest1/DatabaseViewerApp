@@ -1,3 +1,9 @@
+/**
+ * This class created a Rest API for databaseInfo class.
+ *
+ * @author Szymon Bigoszewski
+ * @version 1.0
+ */
 package project.BackEnd.DatabaseInfo;
 
 import lombok.*;
