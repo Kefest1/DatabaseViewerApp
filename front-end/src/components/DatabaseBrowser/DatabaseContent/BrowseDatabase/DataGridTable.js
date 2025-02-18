@@ -67,7 +67,7 @@ function DataGridTable({ databaseName, selectedTable }) {
     async function fetchPrimaryKeyName(databaseName, tableName) {
         const userName = getCookie("userName");
         const token = localStorage.getItem("jwtToken");
-        const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}`
+        const url = `http://localhost:8080/api/tableinfo/getKey/${databaseName}/${tableName}/${getCookie("userName")}`
         const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${token}`,

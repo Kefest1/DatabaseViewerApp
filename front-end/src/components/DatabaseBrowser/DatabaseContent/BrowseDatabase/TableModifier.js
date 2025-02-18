@@ -34,7 +34,7 @@ async function fetchAvailableTables(selectedDatabase) {
 
 
 async function fetchPrimaryKeyName(database, table) {
-    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
+    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}/${getCookie("userName")}`
 
     const token = localStorage.getItem("jwtToken");
     const response = await fetch(url, {

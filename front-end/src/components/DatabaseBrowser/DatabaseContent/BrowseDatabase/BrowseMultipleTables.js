@@ -62,7 +62,7 @@ async function fetchColumnsForTable(userName, database, table) {
 }
 
 async function fetchPrimaryKeyName(database, table) {
-    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}`
+    const url = `http://localhost:8080/api/tableinfo/getKey/${database}/${table}/${getCookie("userName")}`
 
     const token = localStorage.getItem("jwtToken");
     const response = await fetch(url, {
@@ -78,7 +78,7 @@ async function runQuery(database, table, columns) {
         const requestBody = { database, table, columns: [...columns] };
         const token = localStorage.getItem("jwtToken");
 
-        const url = 'http://localhost:8080/api/tableinfo/getAllFields';
+        const url = `http://localhost:8080/api/tableinfo/getAllFields/${getCookie("userName")}`;
         const startTime = performance.now();
         const response = await fetch(url, {
             method: 'POST',

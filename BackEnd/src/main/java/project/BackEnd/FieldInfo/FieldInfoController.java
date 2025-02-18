@@ -58,13 +58,12 @@ public class FieldInfoController {
         return fieldInfoRepository.getSingleRow(tablename, columnname, databasename);
     }
 
-    @GetMapping("/getsmallestfreekey/{databasename}/{tablename}")
-    public Integer getSmallestFreeKey(@PathVariable("databasename") String databasename, @PathVariable("tablename") String tablename) {
+    public Integer getSmallestFreeKey(String databasename, String tablename, String userName) {
 
-        String primaryKeyName = tableInfoRepository.findKeyNameByTable(tablename, databasename);
+        String primaryKeyName = tableInfoRepository.findKeyNameByTable(tablename, databasename, userName);
         List<Integer> numbers = new ArrayList<>();
 
-        List<String> keys = fieldInfoRepository.findFirstFreeKeyFieldWithUsersAndTables(tablename, primaryKeyName);
+        List<String> keys = fieldInfoRepository.findFirstFreeKeyFieldWithUsersAndTables(tablename, primaryKeyName, userName);
 
         for (String key : keys) {
             try {
@@ -91,30 +90,32 @@ public class FieldInfoController {
     }
 
 
-    @PostMapping("/insertvalues/{databasename}")
-    public List<insertResultDTO>  insertValues(@PathVariable("databasename") String databasename, @RequestBody List<List<InsertPayload>> fieldInfos) {
+    @PostMapping("/insertvalues/{databasename}/{userName}")
+    public List<insertResultDTO>  insertValues(@PathVariable("databasename") String databasename,
+                                               @PathVariable("userName") String userName,
+                                               @RequestBody List<List<InsertPayload>> fieldInfos) {
         List<insertResultDTO> insertResultDTOArrayList = new ArrayList<>();
         for (List<InsertPayload> fieldInfoList : fieldInfos) {
             Long locFieldID = Long.valueOf(fieldInfoList.get(0).getDataValue());
             List<InsertPayload> correct = fieldInfoList.subList(1, fieldInfoList.size());
-            insertResultDTOArrayList.add(insertValuesBuff(databasename, correct, locFieldID));
+            insertResultDTOArrayList.add(insertValuesBuff(databasename, correct, locFieldID, userName));
         }
 
         return insertResultDTOArrayList;
     }
 
 
-    public insertResultDTO insertValuesBuff(@PathVariable("databasename") String databasename, @RequestBody List<InsertPayload> fieldInfos, Long fieldID) {
+    public insertResultDTO insertValuesBuff(String databasename, List<InsertPayload> fieldInfos, Long fieldID, String username) {
 
         Long newID = getFreeColumnID();
 
-        Integer smallestKey = getSmallestFreeKey(databasename, fieldInfos.get(0).getTableName());
-        String primaryKey = tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename);
+        Integer smallestKey = getSmallestFreeKey(databasename, fieldInfos.get(0).getTableName(), username);
+        String primaryKey = tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename, username);
 
         FieldInfo insertPayloadPrimaryKey = new FieldInfo();
         String datatype = fieldInfoRepository.findDatatype(fieldInfos.get(0).columnName, fieldInfos.get(0).tableName).get(0);
         insertPayloadPrimaryKey.setDataType(datatype);
-        insertPayloadPrimaryKey.setColumnName(tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename));
+        insertPayloadPrimaryKey.setColumnName(tableInfoRepository.findKeyNameByTable(fieldInfos.get(0).tableName, databasename, username));
         insertPayloadPrimaryKey.setDataValue(String.valueOf(smallestKey));
         insertPayloadPrimaryKey.setTableInfo(tableInfoRepository.findByTableName(fieldInfos.get(0).tableName));
         insertPayloadPrimaryKey.setColumnId(newID);

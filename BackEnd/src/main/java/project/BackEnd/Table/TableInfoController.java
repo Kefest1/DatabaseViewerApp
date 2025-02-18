@@ -7,9 +7,7 @@
 package project.BackEnd.Table;
 
 import lombok.*;
-import org.hibernate.id.enhanced.DatabaseStructure;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +75,7 @@ public class TableInfoController {
         String primaryKey = payload.getPrimaryKey();
         String username = payload.getUsername();
 
+        System.out.println(username);
         boolean isPresent = tableInfoRepository.checkIfTableExists(databaseName, username, tableName).isPresent();
         if (isPresent) {
             return ResponseEntity.status(HttpStatus.OK)
@@ -84,7 +83,7 @@ public class TableInfoController {
         }
 
         TableInfo tableInfo = new TableInfo();
-        tableInfo.setDatabaseInfo(databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databaseName).get(0));
+        tableInfo.setDatabaseInfo(databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databaseName, username).get(0));
         tableInfo.setTableName(tableName);
         tableInfo.setPrimary_key(primaryKey);
 
@@ -171,7 +170,7 @@ public class TableInfoController {
     @PostMapping("/addtable/{username}/{databasename}/{tableName}")
     public String addTable(@PathVariable("username") String username, @PathVariable("databasename") String databasename, @PathVariable("tableName") String tableName) {
         Long userID = userInfoRepository.findByUsername(username).getId();
-        DatabaseInfo databaseInfo = databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databasename).get(0);
+        DatabaseInfo databaseInfo = databaseInfoRepository.getDistinctDatabaseInfoByDatabaseName(databasename, username).get(0);
 
         TableInfo tableInfo = new TableInfo(databaseInfo, tableName, "primaryKey");
         Long tableID = tableInfoService.saveTableInfo(tableInfo).getId();
@@ -390,9 +389,11 @@ public class TableInfoController {
         return tableInfoRepository.findDatabasesByUserNameAndUsername(databaseName, userName);
     }
 
-    @GetMapping("/getKey/{databasename}/{tableName}")
-    public String getPrimaryKeyName(@PathVariable("tableName") String tableName, @PathVariable("databasename") String databaseName) {
-        return tableInfoRepository.findKeyNameByTable(tableName, databaseName);
+    @GetMapping("/getKey/{databasename}/{tableName}/{userName}")
+    public String getPrimaryKeyName(@PathVariable("tableName") String tableName,
+                                    @PathVariable("databasename") String databaseName,
+                                    @PathVariable("userName") String userName) {
+        return tableInfoRepository.findKeyNameByTable(tableName, databaseName, userName);
     }
 
     @GetMapping("/getColumns/{user}/{databasename}/{tableName}")
@@ -462,9 +463,9 @@ public class TableInfoController {
         }
     }
 
-    @PostMapping("/getAllFields")
-    public List<List<FieldInfo>> getFields(@RequestBody TableInfoRequest request) {
-        List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableName(request.getColumns(), request.getTable());
+    @PostMapping("/getAllFields/{userName}")
+    public List<List<FieldInfo>> getFields(@RequestBody TableInfoRequest request, @PathVariable("userName") String userName) {
+        List<Object[]> results = fieldInfoRepository.findFieldInfoByColumnNameInAndTableNameByUserName(request.getColumns(), request.getTable(), userName);
 
         Map<Long, List<FieldInfo>> fieldInfoMap = results.stream()
                 .collect(Collectors.groupingBy(o -> (Long) o[0], Collectors.mapping(o -> (FieldInfo) o[1], Collectors.toList())));

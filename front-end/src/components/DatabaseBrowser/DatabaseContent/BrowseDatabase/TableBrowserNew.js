@@ -480,7 +480,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
         }
         console.log(finalList);
 
-        fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
+        fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}/${getCookie("userName")}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -785,7 +785,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                         }
 
                         const token = localStorage.getItem("jwtToken");
-                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
+                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}/${getCookie("userName")}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -838,7 +838,7 @@ function TableBrowserNew({ data, fetchTime, tableName, databaseName, selectedCol
                         }
 
                         const token = localStorage.getItem("jwtToken");
-                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}`, {
+                        const response = await fetch(`http://localhost:8080/api/fieldinfo/insertvalues/${databaseName}/${getCookie("userName")}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

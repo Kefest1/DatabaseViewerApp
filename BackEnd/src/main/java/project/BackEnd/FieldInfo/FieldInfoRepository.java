@@ -42,8 +42,11 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     List<String> findDatatype(@Param("columnName") String columnName, @Param("tableName") String tableName);
 
 
-    @Query("SELECT fi.dataValue FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName = :primaryKeyName")
-    List<String> findFirstFreeKeyFieldWithUsersAndTables(@Param("tableName") String tableName, @Param("primaryKeyName") String primaryKeyName);
+    @Query("SELECT fi.dataValue FROM FieldInfo fi JOIN fi.tableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
+            "WHERE ti.tableName = :tableName AND fi.columnName = :primaryKeyName AND ui.username = :userName")
+    List<String> findFirstFreeKeyFieldWithUsersAndTables(@Param("tableName") String tableName,
+                                                         @Param("primaryKeyName") String primaryKeyName,
+                                                         @Param("userName") String userName);
 
     @Query("SELECT MAX(fi.columnId) + 1 FROM FieldInfo fi")
     Long findMaxColumnID();
@@ -57,9 +60,6 @@ public interface FieldInfoRepository extends JpaRepository<FieldInfo, Long>, Cru
     @Query("UPDATE FieldInfo fi SET fi.dataValue = :dataValue WHERE fi.columnId = :columnId AND fi.columnName = :columnName")
     @Transactional
     Integer updateFieldInfoByColumnIdAndColumnName(@Param("dataValue") String dataValue, @Param("columnId") Long columnId, @Param("columnName") String columnName);
-
-    @Query("SELECT fi.columnId, fi FROM FieldInfo fi JOIN fi.tableInfo ti WHERE ti.tableName = :tableName AND fi.columnName IN :columnNames")
-    List<Object[]> findFieldInfoByColumnNameInAndTableName(@Param("columnNames") Collection<String> columnNames, @Param("tableName") String tableName);
 
     @Query("SELECT fi.columnId, fi FROM FieldInfo fi " +
             "JOIN fi.tableInfo ti JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
