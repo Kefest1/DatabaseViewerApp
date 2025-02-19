@@ -50,7 +50,8 @@ async function fetchAvailableConnections(databaseName) {
 }
 
 async function fetchDatabaseStructure(databaseName) {
-    const url = "http://localhost:8080/api/tableinfo/getDatabaseStructure/" + databaseName;
+    const userName = getCookie("userName");
+    const url = "http://localhost:8080/api/tableinfo/getDatabaseStructure/" + databaseName + "/" + userName;
 
     const token = localStorage.getItem("jwtToken");
     const tables = await fetch(

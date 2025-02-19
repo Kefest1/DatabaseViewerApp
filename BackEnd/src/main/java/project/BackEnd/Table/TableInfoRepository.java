@@ -26,13 +26,15 @@ public interface TableInfoRepository extends JpaRepository<TableInfo, Long>, Cru
 
     TableInfo getTableInfoByTableName(String tableName);
 
-    @Query("SELECT ti.id FROM TableInfo ti WHERE ti.tableName = :tableName")
-    Long getTableIdByTableName(@Param("tableName") String tableName);
+    @Query("SELECT ti.id FROM TableInfo ti JOIN ti.databaseInfo db JOIN ti.ownershipDetails od JOIN od.userInfo ui " +
+            "WHERE ti.tableName = :tableName AND db.databaseName = :databaseName AND ui.username = :userName")
+    Long getTableIdByTableName(@Param("tableName") String tableName, @Param("userName") String userName, @Param("databaseName") String databaseName);
 
     TableInfo findByTableName(String tableName);
 
-    @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db WHERE db.databaseName = :databaseName")
-    List<TableInfo> getTableStructure(@Param("databaseName") String databaseName);
+    @Query("SELECT t FROM TableInfo t JOIN t.databaseInfo db JOIN t.ownershipDetails od JOIN od.userInfo ui WHERE" +
+            " db.databaseName = :databaseName AND ui.username = :userName")
+    List<TableInfo> getTableStructure(@Param("databaseName") String databaseName, @Param("userName") String userName);
 
     @Query("SELECT DISTINCT t FROM TableInfo t JOIN t.databaseInfo db WHERE t.tableName = :tableName AND db.databaseName = :databaseName")
     TableInfo findTableInstanceByTableNameAndDatabaseName(@Param("tableName") String tableName, @Param("databaseName") String databaseName);

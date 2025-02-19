@@ -65,7 +65,7 @@ public class TableConnectionController {
 
     @GetMapping("/getconnectedtables/{databasename}/{tablename}/{username}")
     public List<TableInfoPayload> getConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
-        Long id = tableInfoRepository.getTableIdByTableName(tablename);
+        Long id = tableInfoRepository.getTableIdByTableName(tablename, username, databasename);
 
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
 
@@ -126,7 +126,7 @@ public class TableConnectionController {
     
     @GetMapping("/checkifhasconnectedtables/{databasename}/{tablename}/{username}")
     public boolean checkIfHasConnectedTables(@PathVariable("tablename") String tablename, @PathVariable("username") String username, @PathVariable("databasename") String databasename) {
-        Long id = tableInfoRepository.getTableIdByTableName(tablename);
+        Long id = tableInfoRepository.getTableIdByTableName(tablename, username, databasename);
 
         List<Long> availableTables = tableInfoRepository.findAvailableTables(databasename, username);
         List<TableConnection> listOne = tableConnectionRepository.getConnectedTablesOne(id);

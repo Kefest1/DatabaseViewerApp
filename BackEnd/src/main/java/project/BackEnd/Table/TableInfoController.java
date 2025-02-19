@@ -442,9 +442,10 @@ public class TableInfoController {
         return ResponseEntity.ok(isEmpty);
     }
 
-    @GetMapping("/getDatabaseStructure/{databaseName}")
-    public List<TableStructureInformationDTO> getDatabaseStructure(@PathVariable("databaseName") String databaseName) {
-        List<TableInfo> list = tableInfoRepository.getTableStructure(databaseName);
+    @GetMapping("/getDatabaseStructure/{databaseName}/{userName}")
+    public List<TableStructureInformationDTO> getDatabaseStructure(@PathVariable("databaseName") String databaseName,
+                                                                   @PathVariable("userName") String userName) {
+        List<TableInfo> list = tableInfoRepository.getTableStructure(databaseName, userName);
 
         return list.stream()
                 .map(node -> new TableStructureInformationDTO(node.getTableStructure(), node.getTableName()))

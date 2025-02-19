@@ -40,7 +40,6 @@ public interface TableConnectionRepository extends JpaRepository<TableConnection
     @Query("SELECT tc FROM TableConnection tc " +
             "JOIN tc.many JOIN tc.one one JOIN one.ownershipDetails od JOIN od.userInfo ui JOIN one.databaseInfo db " +
             "WHERE tc.one.tableName = :tableName AND ui.username = :userName AND db.databaseName = :databaseName AND tc.oneColumnName = :columnNameOne")
-//            "WHERE tc.one.tableName = :tableName AND ui.username = :userName AND db.databaseName = :databaseName AND tc.oneColumnName = :columnNameOne")
     List<TableConnection> getTableConnectionByParamsStrings(
             @Param("databaseName") String databaseName,
             @Param("userName") String userName,
