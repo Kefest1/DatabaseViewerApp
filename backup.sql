@@ -3,9 +3,7 @@
 --
 
 -- Dumped from database version 17.1 (Debian 17.1-1.pgdg120+1)
--- Dumped by pg_dump version 17.0
-
--- Started on 2025-02-17 15:08:45 UTC
+-- Dumped by pg_dump version 17.1 (Debian 17.1-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +18,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 6 (class 2615 OID 83038)
 -- Name: Schema; Type: SCHEMA; Schema: -; Owner: username
 --
 
@@ -34,7 +31,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 226 (class 1259 OID 25339)
 -- Name: database_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -49,7 +45,6 @@ CREATE TABLE public.database_info (
 ALTER TABLE public.database_info OWNER TO username;
 
 --
--- TOC entry 225 (class 1259 OID 25338)
 -- Name: database_info_database_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -64,8 +59,6 @@ CREATE SEQUENCE public.database_info_database_id_seq
 ALTER SEQUENCE public.database_info_database_id_seq OWNER TO username;
 
 --
--- TOC entry 3465 (class 0 OID 0)
--- Dependencies: 225
 -- Name: database_info_database_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73,7 +66,6 @@ ALTER SEQUENCE public.database_info_database_id_seq OWNED BY public.database_inf
 
 
 --
--- TOC entry 228 (class 1259 OID 25348)
 -- Name: field_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -90,7 +82,6 @@ CREATE TABLE public.field_info (
 ALTER TABLE public.field_info OWNER TO username;
 
 --
--- TOC entry 227 (class 1259 OID 25347)
 -- Name: field_info_field_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -105,8 +96,6 @@ CREATE SEQUENCE public.field_info_field_id_seq
 ALTER SEQUENCE public.field_info_field_id_seq OWNER TO username;
 
 --
--- TOC entry 3466 (class 0 OID 0)
--- Dependencies: 227
 -- Name: field_info_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -114,7 +103,6 @@ ALTER SEQUENCE public.field_info_field_id_seq OWNED BY public.field_info.field_i
 
 
 --
--- TOC entry 222 (class 1259 OID 16790)
 -- Name: ownership_details; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -127,7 +115,6 @@ CREATE TABLE public.ownership_details (
 ALTER TABLE public.ownership_details OWNER TO username;
 
 --
--- TOC entry 221 (class 1259 OID 16789)
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -142,8 +129,6 @@ CREATE SEQUENCE public.ownership_details_ownership_details_id_seq
 ALTER SEQUENCE public.ownership_details_ownership_details_id_seq OWNER TO username;
 
 --
--- TOC entry 3467 (class 0 OID 0)
--- Dependencies: 221
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -151,7 +136,6 @@ ALTER SEQUENCE public.ownership_details_ownership_details_id_seq OWNED BY public
 
 
 --
--- TOC entry 223 (class 1259 OID 16796)
 -- Name: ownership_join_table; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -164,7 +148,6 @@ CREATE TABLE public.ownership_join_table (
 ALTER TABLE public.ownership_join_table OWNER TO username;
 
 --
--- TOC entry 230 (class 1259 OID 25357)
 -- Name: table_connection; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -180,7 +163,6 @@ CREATE TABLE public.table_connection (
 ALTER TABLE public.table_connection OWNER TO username;
 
 --
--- TOC entry 229 (class 1259 OID 25356)
 -- Name: table_connection_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -195,8 +177,6 @@ CREATE SEQUENCE public.table_connection_id_seq
 ALTER SEQUENCE public.table_connection_id_seq OWNER TO username;
 
 --
--- TOC entry 3468 (class 0 OID 0)
--- Dependencies: 229
 -- Name: table_connection_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -204,7 +184,6 @@ ALTER SEQUENCE public.table_connection_id_seq OWNED BY public.table_connection.i
 
 
 --
--- TOC entry 232 (class 1259 OID 25366)
 -- Name: table_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -220,7 +199,6 @@ CREATE TABLE public.table_info (
 ALTER TABLE public.table_info OWNER TO username;
 
 --
--- TOC entry 231 (class 1259 OID 25365)
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -235,8 +213,6 @@ CREATE SEQUENCE public.table_info_table_info_id_seq
 ALTER SEQUENCE public.table_info_table_info_id_seq OWNER TO username;
 
 --
--- TOC entry 3469 (class 0 OID 0)
--- Dependencies: 231
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -244,7 +220,6 @@ ALTER SEQUENCE public.table_info_table_info_id_seq OWNED BY public.table_info.ta
 
 
 --
--- TOC entry 234 (class 1259 OID 25375)
 -- Name: table_structure; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -259,7 +234,6 @@ CREATE TABLE public.table_structure (
 ALTER TABLE public.table_structure OWNER TO username;
 
 --
--- TOC entry 233 (class 1259 OID 25374)
 -- Name: table_structure_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -274,8 +248,6 @@ CREATE SEQUENCE public.table_structure_id_seq
 ALTER SEQUENCE public.table_structure_id_seq OWNER TO username;
 
 --
--- TOC entry 3470 (class 0 OID 0)
--- Dependencies: 233
 -- Name: table_structure_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -283,7 +255,6 @@ ALTER SEQUENCE public.table_structure_id_seq OWNED BY public.table_structure.id;
 
 
 --
--- TOC entry 220 (class 1259 OID 16688)
 -- Name: table_visit_history; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -298,7 +269,6 @@ CREATE TABLE public.table_visit_history (
 ALTER TABLE public.table_visit_history OWNER TO username;
 
 --
--- TOC entry 219 (class 1259 OID 16687)
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -313,8 +283,6 @@ CREATE SEQUENCE public.table_visit_history_table_visit_history_id_seq
 ALTER SEQUENCE public.table_visit_history_table_visit_history_id_seq OWNER TO username;
 
 --
--- TOC entry 3471 (class 0 OID 0)
--- Dependencies: 219
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -322,7 +290,6 @@ ALTER SEQUENCE public.table_visit_history_table_visit_history_id_seq OWNED BY pu
 
 
 --
--- TOC entry 224 (class 1259 OID 16824)
 -- Name: user_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -339,7 +306,6 @@ CREATE TABLE public.user_info (
 ALTER TABLE public.user_info OWNER TO username;
 
 --
--- TOC entry 235 (class 1259 OID 25383)
 -- Name: user_table_access; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -352,7 +318,6 @@ CREATE TABLE public.user_table_access (
 ALTER TABLE public.user_table_access OWNER TO username;
 
 --
--- TOC entry 218 (class 1259 OID 16558)
 -- Name: userinfo_sequence; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -367,7 +332,6 @@ CREATE SEQUENCE public.userinfo_sequence
 ALTER SEQUENCE public.userinfo_sequence OWNER TO username;
 
 --
--- TOC entry 3256 (class 2604 OID 25342)
 -- Name: database_info database_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -375,7 +339,6 @@ ALTER TABLE ONLY public.database_info ALTER COLUMN database_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3257 (class 2604 OID 25351)
 -- Name: field_info field_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -383,7 +346,6 @@ ALTER TABLE ONLY public.field_info ALTER COLUMN field_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3255 (class 2604 OID 16793)
 -- Name: ownership_details ownership_details_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -391,7 +353,6 @@ ALTER TABLE ONLY public.ownership_details ALTER COLUMN ownership_details_id SET 
 
 
 --
--- TOC entry 3258 (class 2604 OID 25360)
 -- Name: table_connection id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -399,7 +360,6 @@ ALTER TABLE ONLY public.table_connection ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3259 (class 2604 OID 25369)
 -- Name: table_info table_info_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -407,7 +367,6 @@ ALTER TABLE ONLY public.table_info ALTER COLUMN table_info_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3260 (class 2604 OID 25378)
 -- Name: table_structure id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -415,7 +374,6 @@ ALTER TABLE ONLY public.table_structure ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3254 (class 2604 OID 16691)
 -- Name: table_visit_history table_visit_history_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -423,8 +381,6 @@ ALTER TABLE ONLY public.table_visit_history ALTER COLUMN table_visit_history_id 
 
 
 --
--- TOC entry 3450 (class 0 OID 25339)
--- Dependencies: 226
 -- Data for Name: database_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -462,8 +418,6 @@ COPY public.database_info (database_id, created_at, database_name, description) 
 
 
 --
--- TOC entry 3452 (class 0 OID 25348)
--- Dependencies: 228
 -- Data for Name: field_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -712,6 +666,12 @@ COPY public.field_info (field_id, column_id, column_name, data_type, data_value,
 242	33	orderdetailid	serial	1	3
 243	33	orderid	int4	10248	3
 244	33	productid	int4	11	3
+63040	940	categoryid	Long	9	5
+63041	940	categoryname	String	Fixes1	5
+63042	940	description	String	Fixes2	5
+63043	941	categoryid	Long	10	5
+63044	941	categoryname	String	Fixes3	5
+63045	941	description	String	Fises4	5
 254	36	orderdetailid	serial	4	3
 255	36	orderid	int4	10249	3
 256	36	productid	int4	14	3
@@ -4830,8 +4790,6 @@ COPY public.field_info (field_id, column_id, column_name, data_type, data_value,
 
 
 --
--- TOC entry 3446 (class 0 OID 16790)
--- Dependencies: 222
 -- Data for Name: ownership_details; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73178,8 +73136,6 @@ COPY public.ownership_details (ownership_details_id, access_level) FROM stdin;
 
 
 --
--- TOC entry 3447 (class 0 OID 16796)
--- Dependencies: 223
 -- Data for Name: ownership_join_table; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73217,8 +73173,6 @@ COPY public.ownership_join_table (table_info_table_info_id, ownership_details_id
 
 
 --
--- TOC entry 3454 (class 0 OID 25357)
--- Dependencies: 230
 -- Data for Name: table_connection; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73234,8 +73188,6 @@ COPY public.table_connection (id, many_column_name, one_column_name, many, one) 
 
 
 --
--- TOC entry 3456 (class 0 OID 25366)
--- Dependencies: 232
 -- Data for Name: table_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73271,8 +73223,6 @@ COPY public.table_info (table_info_id, created_at, primary_key, table_name, data
 
 
 --
--- TOC entry 3458 (class 0 OID 25375)
--- Dependencies: 234
 -- Data for Name: table_structure; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73336,8 +73286,6 @@ COPY public.table_structure (id, column_name, column_type, table_info_id) FROM s
 
 
 --
--- TOC entry 3444 (class 0 OID 16688)
--- Dependencies: 220
 -- Data for Name: table_visit_history; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73346,8 +73294,6 @@ COPY public.table_visit_history (table_visit_history_id, visited_at, table_info_
 
 
 --
--- TOC entry 3448 (class 0 OID 16824)
--- Dependencies: 224
 -- Data for Name: user_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73360,8 +73306,6 @@ COPY public.user_info (user_info_id, email, is_admin, password_hash, username, a
 
 
 --
--- TOC entry 3459 (class 0 OID 25383)
--- Dependencies: 235
 -- Data for Name: user_table_access; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -73456,8 +73400,6 @@ COPY public.user_table_access (user_id, ownership_details_id) FROM stdin;
 
 
 --
--- TOC entry 3472 (class 0 OID 0)
--- Dependencies: 225
 -- Name: database_info_database_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73465,17 +73407,13 @@ SELECT pg_catalog.setval('public.database_info_database_id_seq', 16662, true);
 
 
 --
--- TOC entry 3473 (class 0 OID 0)
--- Dependencies: 227
 -- Name: field_info_field_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
-SELECT pg_catalog.setval('public.field_info_field_id_seq', 63039, true);
+SELECT pg_catalog.setval('public.field_info_field_id_seq', 63045, true);
 
 
 --
--- TOC entry 3474 (class 0 OID 0)
--- Dependencies: 221
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73483,8 +73421,6 @@ SELECT pg_catalog.setval('public.ownership_details_ownership_details_id_seq', 68
 
 
 --
--- TOC entry 3475 (class 0 OID 0)
--- Dependencies: 229
 -- Name: table_connection_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73492,8 +73428,6 @@ SELECT pg_catalog.setval('public.table_connection_id_seq', 22, true);
 
 
 --
--- TOC entry 3476 (class 0 OID 0)
--- Dependencies: 231
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73501,8 +73435,6 @@ SELECT pg_catalog.setval('public.table_info_table_info_id_seq', 68348, true);
 
 
 --
--- TOC entry 3477 (class 0 OID 0)
--- Dependencies: 233
 -- Name: table_structure_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73510,8 +73442,6 @@ SELECT pg_catalog.setval('public.table_structure_id_seq', 112474, true);
 
 
 --
--- TOC entry 3478 (class 0 OID 0)
--- Dependencies: 219
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73519,8 +73449,6 @@ SELECT pg_catalog.setval('public.table_visit_history_table_visit_history_id_seq'
 
 
 --
--- TOC entry 3479 (class 0 OID 0)
--- Dependencies: 218
 -- Name: userinfo_sequence; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -73528,7 +73456,6 @@ SELECT pg_catalog.setval('public.userinfo_sequence', 4043, true);
 
 
 --
--- TOC entry 3274 (class 2606 OID 25346)
 -- Name: database_info database_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73537,7 +73464,6 @@ ALTER TABLE ONLY public.database_info
 
 
 --
--- TOC entry 3276 (class 2606 OID 25355)
 -- Name: field_info field_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73546,7 +73472,6 @@ ALTER TABLE ONLY public.field_info
 
 
 --
--- TOC entry 3264 (class 2606 OID 16795)
 -- Name: ownership_details ownership_details_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73555,7 +73480,6 @@ ALTER TABLE ONLY public.ownership_details
 
 
 --
--- TOC entry 3266 (class 2606 OID 16800)
 -- Name: ownership_join_table ownership_join_table_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73564,7 +73488,6 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3278 (class 2606 OID 25364)
 -- Name: table_connection table_connection_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73573,7 +73496,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3280 (class 2606 OID 25373)
 -- Name: table_info table_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73582,7 +73504,6 @@ ALTER TABLE ONLY public.table_info
 
 
 --
--- TOC entry 3282 (class 2606 OID 25382)
 -- Name: table_structure table_structure_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73591,7 +73512,6 @@ ALTER TABLE ONLY public.table_structure
 
 
 --
--- TOC entry 3262 (class 2606 OID 16693)
 -- Name: table_visit_history table_visit_history_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73600,7 +73520,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3268 (class 2606 OID 238853)
 -- Name: user_info uk_f2ksd6h8hsjtd57ipfq9myr64; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73609,7 +73528,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3270 (class 2606 OID 238851)
 -- Name: user_info uk_gnu0k8vv6ptioedbxbfsnan9g; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73618,7 +73536,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3272 (class 2606 OID 16830)
 -- Name: user_info user_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73627,7 +73544,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3284 (class 2606 OID 25387)
 -- Name: user_table_access user_table_access_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73636,7 +73552,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3285 (class 2606 OID 16875)
 -- Name: table_visit_history fk43yqt0uvnl0n0alob97uq273g; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73645,7 +73560,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3287 (class 2606 OID 16845)
 -- Name: ownership_join_table fk8bnxuxg84u7egcnktvakayk5u; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73654,7 +73568,6 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3291 (class 2606 OID 25403)
 -- Name: table_connection fk9l56joqb0p1qksejya64cb9pa; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73663,7 +73576,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3293 (class 2606 OID 25408)
 -- Name: table_info fkga69ehyond541tv1rfe9guho8; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73672,7 +73584,6 @@ ALTER TABLE ONLY public.table_info
 
 
 --
--- TOC entry 3295 (class 2606 OID 25428)
 -- Name: user_table_access fkjfdn9fcl3rrkajitsh4rb0y9g; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73681,7 +73592,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3286 (class 2606 OID 25418)
 -- Name: table_visit_history fkjjtwsxknegx6awkfildu5wltj; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73690,7 +73600,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3296 (class 2606 OID 25423)
 -- Name: user_table_access fkp655xoygsl5kmnumvlmf7o4bf; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73699,7 +73608,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3290 (class 2606 OID 25388)
 -- Name: field_info fkpqyijesgjl10ww0x65mhrm67p; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73708,7 +73616,6 @@ ALTER TABLE ONLY public.field_info
 
 
 --
--- TOC entry 3289 (class 2606 OID 16890)
 -- Name: user_info fkqc1bl3kamlf8vxyybk9m9jjcc; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73717,7 +73624,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3292 (class 2606 OID 25398)
 -- Name: table_connection fkqorlqgid42qmm1qthy4fvu9eq; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73726,7 +73632,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3288 (class 2606 OID 83033)
 -- Name: ownership_join_table fks9doh1h371qn1m1phwmxkqafe; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -73735,15 +73640,12 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3294 (class 2606 OID 25413)
 -- Name: table_structure fktmcfohnawr2k6iiv3yo8j07y0; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
 ALTER TABLE ONLY public.table_structure
     ADD CONSTRAINT fktmcfohnawr2k6iiv3yo8j07y0 FOREIGN KEY (table_info_id) REFERENCES public.table_info(table_info_id);
 
-
--- Completed on 2025-02-17 15:08:45 UTC
 
 --
 -- PostgreSQL database dump complete
@@ -73754,9 +73656,7 @@ ALTER TABLE ONLY public.table_structure
 --
 
 -- Dumped from database version 17.1 (Debian 17.1-1.pgdg120+1)
--- Dumped by pg_dump version 17.0
-
--- Started on 2025-02-17 15:08:45 UTC
+-- Dumped by pg_dump version 17.1 (Debian 17.1-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -73771,7 +73671,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 6 (class 2615 OID 83038)
 -- Name: Schema; Type: SCHEMA; Schema: -; Owner: username
 --
 
@@ -73785,7 +73684,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 226 (class 1259 OID 25339)
 -- Name: database_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73800,7 +73698,6 @@ CREATE TABLE public.database_info (
 ALTER TABLE public.database_info OWNER TO username;
 
 --
--- TOC entry 225 (class 1259 OID 25338)
 -- Name: database_info_database_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -73815,8 +73712,6 @@ CREATE SEQUENCE public.database_info_database_id_seq
 ALTER SEQUENCE public.database_info_database_id_seq OWNER TO username;
 
 --
--- TOC entry 3465 (class 0 OID 0)
--- Dependencies: 225
 -- Name: database_info_database_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73824,7 +73719,6 @@ ALTER SEQUENCE public.database_info_database_id_seq OWNED BY public.database_inf
 
 
 --
--- TOC entry 228 (class 1259 OID 25348)
 -- Name: field_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73841,7 +73735,6 @@ CREATE TABLE public.field_info (
 ALTER TABLE public.field_info OWNER TO username;
 
 --
--- TOC entry 227 (class 1259 OID 25347)
 -- Name: field_info_field_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -73856,8 +73749,6 @@ CREATE SEQUENCE public.field_info_field_id_seq
 ALTER SEQUENCE public.field_info_field_id_seq OWNER TO username;
 
 --
--- TOC entry 3466 (class 0 OID 0)
--- Dependencies: 227
 -- Name: field_info_field_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73865,7 +73756,6 @@ ALTER SEQUENCE public.field_info_field_id_seq OWNED BY public.field_info.field_i
 
 
 --
--- TOC entry 222 (class 1259 OID 16790)
 -- Name: ownership_details; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73878,7 +73768,6 @@ CREATE TABLE public.ownership_details (
 ALTER TABLE public.ownership_details OWNER TO username;
 
 --
--- TOC entry 221 (class 1259 OID 16789)
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -73893,8 +73782,6 @@ CREATE SEQUENCE public.ownership_details_ownership_details_id_seq
 ALTER SEQUENCE public.ownership_details_ownership_details_id_seq OWNER TO username;
 
 --
--- TOC entry 3467 (class 0 OID 0)
--- Dependencies: 221
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73902,7 +73789,6 @@ ALTER SEQUENCE public.ownership_details_ownership_details_id_seq OWNED BY public
 
 
 --
--- TOC entry 223 (class 1259 OID 16796)
 -- Name: ownership_join_table; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73915,7 +73801,6 @@ CREATE TABLE public.ownership_join_table (
 ALTER TABLE public.ownership_join_table OWNER TO username;
 
 --
--- TOC entry 230 (class 1259 OID 25357)
 -- Name: table_connection; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73931,7 +73816,6 @@ CREATE TABLE public.table_connection (
 ALTER TABLE public.table_connection OWNER TO username;
 
 --
--- TOC entry 229 (class 1259 OID 25356)
 -- Name: table_connection_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -73946,8 +73830,6 @@ CREATE SEQUENCE public.table_connection_id_seq
 ALTER SEQUENCE public.table_connection_id_seq OWNER TO username;
 
 --
--- TOC entry 3468 (class 0 OID 0)
--- Dependencies: 229
 -- Name: table_connection_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73955,7 +73837,6 @@ ALTER SEQUENCE public.table_connection_id_seq OWNED BY public.table_connection.i
 
 
 --
--- TOC entry 232 (class 1259 OID 25366)
 -- Name: table_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -73971,7 +73852,6 @@ CREATE TABLE public.table_info (
 ALTER TABLE public.table_info OWNER TO username;
 
 --
--- TOC entry 231 (class 1259 OID 25365)
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -73986,8 +73866,6 @@ CREATE SEQUENCE public.table_info_table_info_id_seq
 ALTER SEQUENCE public.table_info_table_info_id_seq OWNER TO username;
 
 --
--- TOC entry 3469 (class 0 OID 0)
--- Dependencies: 231
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -73995,7 +73873,6 @@ ALTER SEQUENCE public.table_info_table_info_id_seq OWNED BY public.table_info.ta
 
 
 --
--- TOC entry 234 (class 1259 OID 25375)
 -- Name: table_structure; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -74010,7 +73887,6 @@ CREATE TABLE public.table_structure (
 ALTER TABLE public.table_structure OWNER TO username;
 
 --
--- TOC entry 233 (class 1259 OID 25374)
 -- Name: table_structure_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -74025,8 +73901,6 @@ CREATE SEQUENCE public.table_structure_id_seq
 ALTER SEQUENCE public.table_structure_id_seq OWNER TO username;
 
 --
--- TOC entry 3470 (class 0 OID 0)
--- Dependencies: 233
 -- Name: table_structure_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -74034,7 +73908,6 @@ ALTER SEQUENCE public.table_structure_id_seq OWNED BY public.table_structure.id;
 
 
 --
--- TOC entry 220 (class 1259 OID 16688)
 -- Name: table_visit_history; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -74049,7 +73922,6 @@ CREATE TABLE public.table_visit_history (
 ALTER TABLE public.table_visit_history OWNER TO username;
 
 --
--- TOC entry 219 (class 1259 OID 16687)
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -74064,8 +73936,6 @@ CREATE SEQUENCE public.table_visit_history_table_visit_history_id_seq
 ALTER SEQUENCE public.table_visit_history_table_visit_history_id_seq OWNER TO username;
 
 --
--- TOC entry 3471 (class 0 OID 0)
--- Dependencies: 219
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: username
 --
 
@@ -74073,7 +73943,6 @@ ALTER SEQUENCE public.table_visit_history_table_visit_history_id_seq OWNED BY pu
 
 
 --
--- TOC entry 224 (class 1259 OID 16824)
 -- Name: user_info; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -74090,7 +73959,6 @@ CREATE TABLE public.user_info (
 ALTER TABLE public.user_info OWNER TO username;
 
 --
--- TOC entry 235 (class 1259 OID 25383)
 -- Name: user_table_access; Type: TABLE; Schema: public; Owner: username
 --
 
@@ -74103,7 +73971,6 @@ CREATE TABLE public.user_table_access (
 ALTER TABLE public.user_table_access OWNER TO username;
 
 --
--- TOC entry 218 (class 1259 OID 16558)
 -- Name: userinfo_sequence; Type: SEQUENCE; Schema: public; Owner: username
 --
 
@@ -74118,7 +73985,6 @@ CREATE SEQUENCE public.userinfo_sequence
 ALTER SEQUENCE public.userinfo_sequence OWNER TO username;
 
 --
--- TOC entry 3256 (class 2604 OID 25342)
 -- Name: database_info database_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74126,7 +73992,6 @@ ALTER TABLE ONLY public.database_info ALTER COLUMN database_id SET DEFAULT nextv
 
 
 --
--- TOC entry 3257 (class 2604 OID 25351)
 -- Name: field_info field_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74134,7 +73999,6 @@ ALTER TABLE ONLY public.field_info ALTER COLUMN field_id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3255 (class 2604 OID 16793)
 -- Name: ownership_details ownership_details_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74142,7 +74006,6 @@ ALTER TABLE ONLY public.ownership_details ALTER COLUMN ownership_details_id SET 
 
 
 --
--- TOC entry 3258 (class 2604 OID 25360)
 -- Name: table_connection id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74150,7 +74013,6 @@ ALTER TABLE ONLY public.table_connection ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- TOC entry 3259 (class 2604 OID 25369)
 -- Name: table_info table_info_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74158,7 +74020,6 @@ ALTER TABLE ONLY public.table_info ALTER COLUMN table_info_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3260 (class 2604 OID 25378)
 -- Name: table_structure id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74166,7 +74027,6 @@ ALTER TABLE ONLY public.table_structure ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
--- TOC entry 3254 (class 2604 OID 16691)
 -- Name: table_visit_history table_visit_history_id; Type: DEFAULT; Schema: public; Owner: username
 --
 
@@ -74174,8 +74034,6 @@ ALTER TABLE ONLY public.table_visit_history ALTER COLUMN table_visit_history_id 
 
 
 --
--- TOC entry 3450 (class 0 OID 25339)
--- Dependencies: 226
 -- Data for Name: database_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -74213,8 +74071,6 @@ COPY public.database_info (database_id, created_at, database_name, description) 
 
 
 --
--- TOC entry 3452 (class 0 OID 25348)
--- Dependencies: 228
 -- Data for Name: field_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -74463,6 +74319,12 @@ COPY public.field_info (field_id, column_id, column_name, data_type, data_value,
 242	33	orderdetailid	serial	1	3
 243	33	orderid	int4	10248	3
 244	33	productid	int4	11	3
+63040	940	categoryid	Long	9	5
+63041	940	categoryname	String	Fixes1	5
+63042	940	description	String	Fixes2	5
+63043	941	categoryid	Long	10	5
+63044	941	categoryname	String	Fixes3	5
+63045	941	description	String	Fises4	5
 254	36	orderdetailid	serial	4	3
 255	36	orderid	int4	10249	3
 256	36	productid	int4	14	3
@@ -78581,8 +78443,6 @@ COPY public.field_info (field_id, column_id, column_name, data_type, data_value,
 
 
 --
--- TOC entry 3446 (class 0 OID 16790)
--- Dependencies: 222
 -- Data for Name: ownership_details; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -146929,8 +146789,6 @@ COPY public.ownership_details (ownership_details_id, access_level) FROM stdin;
 
 
 --
--- TOC entry 3447 (class 0 OID 16796)
--- Dependencies: 223
 -- Data for Name: ownership_join_table; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -146968,8 +146826,6 @@ COPY public.ownership_join_table (table_info_table_info_id, ownership_details_id
 
 
 --
--- TOC entry 3454 (class 0 OID 25357)
--- Dependencies: 230
 -- Data for Name: table_connection; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -146985,8 +146841,6 @@ COPY public.table_connection (id, many_column_name, one_column_name, many, one) 
 
 
 --
--- TOC entry 3456 (class 0 OID 25366)
--- Dependencies: 232
 -- Data for Name: table_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -147022,8 +146876,6 @@ COPY public.table_info (table_info_id, created_at, primary_key, table_name, data
 
 
 --
--- TOC entry 3458 (class 0 OID 25375)
--- Dependencies: 234
 -- Data for Name: table_structure; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -147087,8 +146939,6 @@ COPY public.table_structure (id, column_name, column_type, table_info_id) FROM s
 
 
 --
--- TOC entry 3444 (class 0 OID 16688)
--- Dependencies: 220
 -- Data for Name: table_visit_history; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -147097,8 +146947,6 @@ COPY public.table_visit_history (table_visit_history_id, visited_at, table_info_
 
 
 --
--- TOC entry 3448 (class 0 OID 16824)
--- Dependencies: 224
 -- Data for Name: user_info; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -147111,8 +146959,6 @@ COPY public.user_info (user_info_id, email, is_admin, password_hash, username, a
 
 
 --
--- TOC entry 3459 (class 0 OID 25383)
--- Dependencies: 235
 -- Data for Name: user_table_access; Type: TABLE DATA; Schema: public; Owner: username
 --
 
@@ -147207,8 +147053,6 @@ COPY public.user_table_access (user_id, ownership_details_id) FROM stdin;
 
 
 --
--- TOC entry 3472 (class 0 OID 0)
--- Dependencies: 225
 -- Name: database_info_database_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147216,17 +147060,13 @@ SELECT pg_catalog.setval('public.database_info_database_id_seq', 16662, true);
 
 
 --
--- TOC entry 3473 (class 0 OID 0)
--- Dependencies: 227
 -- Name: field_info_field_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
-SELECT pg_catalog.setval('public.field_info_field_id_seq', 63039, true);
+SELECT pg_catalog.setval('public.field_info_field_id_seq', 63045, true);
 
 
 --
--- TOC entry 3474 (class 0 OID 0)
--- Dependencies: 221
 -- Name: ownership_details_ownership_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147234,8 +147074,6 @@ SELECT pg_catalog.setval('public.ownership_details_ownership_details_id_seq', 68
 
 
 --
--- TOC entry 3475 (class 0 OID 0)
--- Dependencies: 229
 -- Name: table_connection_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147243,8 +147081,6 @@ SELECT pg_catalog.setval('public.table_connection_id_seq', 22, true);
 
 
 --
--- TOC entry 3476 (class 0 OID 0)
--- Dependencies: 231
 -- Name: table_info_table_info_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147252,8 +147088,6 @@ SELECT pg_catalog.setval('public.table_info_table_info_id_seq', 68348, true);
 
 
 --
--- TOC entry 3477 (class 0 OID 0)
--- Dependencies: 233
 -- Name: table_structure_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147261,8 +147095,6 @@ SELECT pg_catalog.setval('public.table_structure_id_seq', 112474, true);
 
 
 --
--- TOC entry 3478 (class 0 OID 0)
--- Dependencies: 219
 -- Name: table_visit_history_table_visit_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147270,8 +147102,6 @@ SELECT pg_catalog.setval('public.table_visit_history_table_visit_history_id_seq'
 
 
 --
--- TOC entry 3479 (class 0 OID 0)
--- Dependencies: 218
 -- Name: userinfo_sequence; Type: SEQUENCE SET; Schema: public; Owner: username
 --
 
@@ -147279,7 +147109,6 @@ SELECT pg_catalog.setval('public.userinfo_sequence', 4043, true);
 
 
 --
--- TOC entry 3274 (class 2606 OID 25346)
 -- Name: database_info database_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147288,7 +147117,6 @@ ALTER TABLE ONLY public.database_info
 
 
 --
--- TOC entry 3276 (class 2606 OID 25355)
 -- Name: field_info field_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147297,7 +147125,6 @@ ALTER TABLE ONLY public.field_info
 
 
 --
--- TOC entry 3264 (class 2606 OID 16795)
 -- Name: ownership_details ownership_details_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147306,7 +147133,6 @@ ALTER TABLE ONLY public.ownership_details
 
 
 --
--- TOC entry 3266 (class 2606 OID 16800)
 -- Name: ownership_join_table ownership_join_table_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147315,7 +147141,6 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3278 (class 2606 OID 25364)
 -- Name: table_connection table_connection_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147324,7 +147149,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3280 (class 2606 OID 25373)
 -- Name: table_info table_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147333,7 +147157,6 @@ ALTER TABLE ONLY public.table_info
 
 
 --
--- TOC entry 3282 (class 2606 OID 25382)
 -- Name: table_structure table_structure_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147342,7 +147165,6 @@ ALTER TABLE ONLY public.table_structure
 
 
 --
--- TOC entry 3262 (class 2606 OID 16693)
 -- Name: table_visit_history table_visit_history_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147351,7 +147173,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3268 (class 2606 OID 238853)
 -- Name: user_info uk_f2ksd6h8hsjtd57ipfq9myr64; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147360,7 +147181,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3270 (class 2606 OID 238851)
 -- Name: user_info uk_gnu0k8vv6ptioedbxbfsnan9g; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147369,7 +147189,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3272 (class 2606 OID 16830)
 -- Name: user_info user_info_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147378,7 +147197,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3284 (class 2606 OID 25387)
 -- Name: user_table_access user_table_access_pkey; Type: CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147387,7 +147205,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3285 (class 2606 OID 16875)
 -- Name: table_visit_history fk43yqt0uvnl0n0alob97uq273g; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147396,7 +147213,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3287 (class 2606 OID 16845)
 -- Name: ownership_join_table fk8bnxuxg84u7egcnktvakayk5u; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147405,7 +147221,6 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3291 (class 2606 OID 25403)
 -- Name: table_connection fk9l56joqb0p1qksejya64cb9pa; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147414,7 +147229,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3293 (class 2606 OID 25408)
 -- Name: table_info fkga69ehyond541tv1rfe9guho8; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147423,7 +147237,6 @@ ALTER TABLE ONLY public.table_info
 
 
 --
--- TOC entry 3295 (class 2606 OID 25428)
 -- Name: user_table_access fkjfdn9fcl3rrkajitsh4rb0y9g; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147432,7 +147245,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3286 (class 2606 OID 25418)
 -- Name: table_visit_history fkjjtwsxknegx6awkfildu5wltj; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147441,7 +147253,6 @@ ALTER TABLE ONLY public.table_visit_history
 
 
 --
--- TOC entry 3296 (class 2606 OID 25423)
 -- Name: user_table_access fkp655xoygsl5kmnumvlmf7o4bf; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147450,7 +147261,6 @@ ALTER TABLE ONLY public.user_table_access
 
 
 --
--- TOC entry 3290 (class 2606 OID 25388)
 -- Name: field_info fkpqyijesgjl10ww0x65mhrm67p; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147459,7 +147269,6 @@ ALTER TABLE ONLY public.field_info
 
 
 --
--- TOC entry 3289 (class 2606 OID 16890)
 -- Name: user_info fkqc1bl3kamlf8vxyybk9m9jjcc; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147468,7 +147277,6 @@ ALTER TABLE ONLY public.user_info
 
 
 --
--- TOC entry 3292 (class 2606 OID 25398)
 -- Name: table_connection fkqorlqgid42qmm1qthy4fvu9eq; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147477,7 +147285,6 @@ ALTER TABLE ONLY public.table_connection
 
 
 --
--- TOC entry 3288 (class 2606 OID 83033)
 -- Name: ownership_join_table fks9doh1h371qn1m1phwmxkqafe; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
@@ -147486,15 +147293,12 @@ ALTER TABLE ONLY public.ownership_join_table
 
 
 --
--- TOC entry 3294 (class 2606 OID 25413)
 -- Name: table_structure fktmcfohnawr2k6iiv3yo8j07y0; Type: FK CONSTRAINT; Schema: public; Owner: username
 --
 
 ALTER TABLE ONLY public.table_structure
     ADD CONSTRAINT fktmcfohnawr2k6iiv3yo8j07y0 FOREIGN KEY (table_info_id) REFERENCES public.table_info(table_info_id);
 
-
--- Completed on 2025-02-17 15:08:45 UTC
 
 --
 -- PostgreSQL database dump complete

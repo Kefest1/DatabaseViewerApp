@@ -7,6 +7,7 @@ services:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
       PGDATA: /data/postgres
+      POSTGRES_DB: database
     volumes:
       - postgres:/data/postgres
     ports:
@@ -15,7 +16,7 @@ services:
       - my-network
     restart: unless-stopped
  
-    
+
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -34,7 +35,7 @@ services:
   app:
     container_name: spring_app
     build:
-      context: ../BackEnd
+      context: ./BackEnd
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/database
       SPRING_DATASOURCE_USERNAME: username
@@ -50,7 +51,7 @@ services:
   frontend:
     container_name: react_frontend
     build:
-      context: ../front-end
+      context: ./front-end
     ports:
       - "3000:3000"
     networks:
@@ -60,7 +61,7 @@ services:
     depends_on:
       - app
     restart: unless-stopped
-    
+
 networks:
   my-network:
 

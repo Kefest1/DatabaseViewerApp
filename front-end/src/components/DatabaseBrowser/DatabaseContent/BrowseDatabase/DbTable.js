@@ -260,7 +260,6 @@ const DbTable = ({ data, tableName, databaseName, selectedColumns }) => {
 
         const columnId = column.columnId;
         const dataTypes = data.flatMap(sublist => sublist.filter(node => node.columnId === columnId).map(node => node.dataType));
-        // setDataTypesBuf(dataTypes);
 
         return {
             Header: (

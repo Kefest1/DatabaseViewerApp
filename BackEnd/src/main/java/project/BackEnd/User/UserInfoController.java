@@ -77,6 +77,10 @@ public class UserInfoController {
 
     @GetMapping("/checkifadmin/{userName}")
     public boolean checkIfAdmin(@PathVariable("userName") String userName) {
+        System.out.println("\nCheckIfadmin");
+        System.out.println(userName);
+        System.out.println();
+        System.out.println();
         return userInfoRepository.findByUsernameAndIsAdmin(userName, true) != null;
     }
 

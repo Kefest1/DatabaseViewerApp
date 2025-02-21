@@ -45,7 +45,6 @@ function UserAdminPanel() {
 
     const handleEmailClick = () => {
         setShowInfo(true);
-        // setTimeout(() => setShowInfo(false), 3000);
     };
 
     return (

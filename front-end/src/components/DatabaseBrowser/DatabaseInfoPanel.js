@@ -37,7 +37,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
     const [expandedItems, setExpandedItems] = React.useState([]);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
 
     async function fetchAvailableDatabases(userName) {
         const token = localStorage.getItem("jwtToken");
@@ -87,7 +87,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
     };
 
     const fetchAndSetTablesData = () => {
-        setLoading(true); // Set loading to true when fetching starts
+        setLoading(true);
         fetchAvailableDatabases(userName)
             .then((data) => {
                 const organizedData = organizeData(data);
@@ -99,7 +99,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 setOpenSnackbar(true);
             })
             .finally(() => {
-                setLoading(false); // Set loading to false when fetching is done
+                setLoading(false);
             });
     };
 
@@ -135,7 +135,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 </Button>
             </div>
 
-            {loading ? ( // Show loading spinner if loading is true
+            {loading ? (
                 <Box
                     sx={{
                         display: 'flex',
@@ -146,7 +146,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 >
                     <CircularProgress />
                 </Box>
-            ) : tablesData.length === 0 ? ( // Show "No tables" message if no data
+            ) : tablesData.length === 0 ? (
                 <h4 style={{
                     fontSize: '1.5rem',
                     color: '#333',
@@ -162,7 +162,7 @@ const DatabaseInfoPanel = ({ handleChange }) => {
                 }}>
                     No tables assigned to you
                 </h4>
-            ) : ( // Show the actual content if data is available
+            ) : (
                 <Box
                     sx={{
                         height: 770,
